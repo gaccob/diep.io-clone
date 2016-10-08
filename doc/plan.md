@@ -1,20 +1,3 @@
-Main Contents:    
-=============
-- game design
-- engine & framework
-- art design
-- data configuration
-- communication protocol
-- input control
-- game logic
-- audio
-- load balance
-- reverse-proxy
-- data storage
-- data collection & monitor
-- commercialization or advertising
-- WeAPP version
-
 Version 0.1: simple control & view
 =================================
 - game design
@@ -28,13 +11,19 @@ Version 0.2: multiple-online PVP
 - game logic
 
 Ver 0.3: touch input & Audio
+================================
 
 Ver 0.4: data storage & commercialization
+================================
 
 Ver 0.5: data collection & monitor
+================================
 
 Ver 0.6: load balance & reverse-proxy
+================================
 
 Ver 0.7: WeAPP adaptor
+================================
 
 Ver 1.0: new game mode & terrain
+================================
