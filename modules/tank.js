@@ -103,7 +103,7 @@ function tankFire() {
     var pos = this.sprite.weapons[0].offset.clone();
     pos.rotate(this.sprite.rotation);
     pos.add(new Victor(this.sprite.position.x, this.sprite.position.y));
-    var bullet = new Bullet(this.stage, pos, this);
+    var bullet = new Bullet(this.stage, pos, this.sprite.rotation - Math.PI / 2, this);
     self.world.bullets.push(bullet);
 }
 
