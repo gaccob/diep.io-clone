@@ -1,9 +1,23 @@
-var config = {
+var Config = {
+
     "world": {
         "w": 768,
         "h": 1024,
         "color": 0xcdcdcd
     },
+
+    // 239 73 84
+    "bullet": {
+        "edge": {
+            "w": 2.5,
+            "color": 0x555555
+        },
+        "body": {
+            "radius": 6,
+            "color": 0x00b2e1
+        },
+    },
+
     "tank": {
         "edge": {
             "w": 2.5,
@@ -26,4 +40,5 @@ var config = {
         "speed": 3,
     }
 };
-module.exports = config;
+
+module.exports = Config;

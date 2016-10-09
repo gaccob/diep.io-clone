@@ -20,11 +20,13 @@ function generate(input_file)
                 return
             end
             local prefix = space or ""
+            output_fd:write(prefix .. "<script>\n")
             output_fd:write(prefix .. "require.register(\"" .. mod .. "\", function(module, exports, require) {\n")
             for line in mod_fd:lines() do
                 output_fd:write(prefix .. "    " .. line .. "\n")
             end
             output_fd:write(prefix .. "});\n")
+            output_fd:write(prefix .. "</script>\n")
             mod_fd:close()
         else
             output_fd:write(line .. "\n")
