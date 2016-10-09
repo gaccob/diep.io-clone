@@ -17,6 +17,16 @@ View.spawnTank = function() {
     var tank = new PIXI.Sprite(graphics.generateTexture());
     tank.anchor.x = (Config.tank.body.radius + Config.tank.edge.w) / tank.width;
     tank.anchor.y = (weapon.h + Config.tank.edge.w) / tank.height;
+
+    // custom property
+    tank.weapons = [];
+    for (var i in Config.tank.weapons) {
+        var weapon = Config.tank.weapons[i];
+        tank.weapons[i] = {};
+        var offsetX = -weapon.w / 2 - weapon.x + weapon.shootOffsetX;
+        var offsetY = -weapon.h + weapon.shootOffsetY;
+        tank.weapons[i].offset = new Victor(offsetX, offsetY);
+    }
     graphics.destroy();
     return tank;
 }

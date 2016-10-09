@@ -13,9 +13,10 @@ var Config = {
             "color": 0x555555
         },
         "body": {
-            "radius": 6,
+            "radius": 10,
             "color": 0x00b2e1
         },
+        "speed": 10,
     },
 
     "tank": {
@@ -34,7 +35,9 @@ var Config = {
                 "x": -10,
                 "y": -55,
                 "angle": 0,
-                "color": 0x999999
+                "color": 0x999999,
+                "shootOffsetX": 0,
+                "shootOffsetY": -20,
             }
         ],
         "speed": 3,

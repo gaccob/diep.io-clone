@@ -33,9 +33,10 @@
                         "color": 0x555555
                     },
                     "body": {
-                        "radius": 6,
+                        "radius": 10,
                         "color": 0x00b2e1
                     },
+                    "speed": 10,
                 },
             
                 "tank": {
@@ -54,7 +55,9 @@
                             "x": -10,
                             "y": -55,
                             "angle": 0,
-                            "color": 0x999999
+                            "color": 0x999999,
+                            "shootOffsetX": 0,
+                            "shootOffsetY": -20,
                         }
                     ],
                     "speed": 3,
@@ -85,6 +88,16 @@
                 var tank = new PIXI.Sprite(graphics.generateTexture());
                 tank.anchor.x = (Config.tank.body.radius + Config.tank.edge.w) / tank.width;
                 tank.anchor.y = (weapon.h + Config.tank.edge.w) / tank.height;
+            
+                // custom property
+                tank.weapons = [];
+                for (var i in Config.tank.weapons) {
+                    var weapon = Config.tank.weapons[i];
+                    tank.weapons[i] = {};
+                    var offsetX = -weapon.w / 2 - weapon.x + weapon.shootOffsetX;
+                    var offsetY = -weapon.h + weapon.shootOffsetY;
+                    tank.weapons[i].offset = new Victor(offsetX, offsetY);
+                }
                 graphics.destroy();
                 return tank;
             }
@@ -106,7 +119,36 @@
         });
         </script>
         <script>
+        require.register("./modules/bullet", function(module, exports, require) {
+            var Config = require("../modules/config");
+            var View = require('../modules/view');
+            
+            function bulletUpdate() {
+                // update bullet position
+                if (this.moveDir.lengthSq() > 1e-6) {
+                    var angle = this.moveDir.angle();
+                    this.sprite.position.x += Config.bullet.speed * Math.cos(angle);
+                    this.sprite.position.y += Config.bullet.speed * Math.sin(angle);
+                }
+            }
+            
+            function Bullet(stage, position, tank) {
+                this.owner = tank;
+                this.sprite = View.spawnBullet();
+                this.sprite.position.x = position.x;
+                this.sprite.position.y = position.y;
+                this.moveDir = new Victor(0, 0);
+                this.update = bulletUpdate;
+                stage.addChild(this.sprite);
+            }
+            
+            module.exports = Bullet;
+            
+        });
+        </script>
+        <script>
         require.register("./modules/tank", function(module, exports, require) {
+            var Bullet = require("../modules/bullet");
             var Config = require("../modules/config");
             var View = require('../modules/view');
             
@@ -187,6 +229,12 @@
                 }, false);
             }
             
+            function tankHandleMouseDown(tank) {
+                document.body.addEventListener('mousedown', function(e) {
+                    tank.fire();
+                }, false);
+            }
+            
             function tankUpdate() {
                 // update tank position
                 if (this.moveDir.lengthSq() > 1e-6) {
@@ -201,19 +249,30 @@
                 }
             }
             
-            // factory
-            function Tank(stage, isPlayer) {
+            function tankFire() {
+                var pos = this.sprite.weapons[0].offset.clone();
+                pos.rotate(this.sprite.rotation);
+                pos.add(new Victor(this.sprite.position.x, this.sprite.position.y));
+                var bullet = new Bullet(this.stage, pos, this);
+                self.world.bullets.push(bullet);
+            }
+            
+            function Tank(world, stage, isPlayer) {
+                this.world = world;
                 this.isPlayer = isPlayer;
+                this.stage = stage;
                 this.sprite = View.spawnTank();
                 this.sprite.position.x = Config.world.w / 2;
                 this.sprite.position.y = Config.world.h / 2;
                 this.moveDir = new Victor(0, 0);
                 this.targetPos = new Victor(0, 0);
                 this.update = tankUpdate;
+                this.fire = tankFire;
                 if (isPlayer == true) {
                     tankHandleKeyDown(this);
                     tankHandleKeyUp(this);
                     tankHandleMouseMove(this);
+                    tankHandleMouseDown(this);
                 }
                 stage.addChild(this.sprite);
             }
