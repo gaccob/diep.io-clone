@@ -26,53 +26,58 @@
                     "updateMS": 1000 / 30
                 },
             
-                // 239 73 84
-                "bullet": {
-                    "edge": {
-                        "w": 2,
-                        "color": 0x555555
-                    },
-                    "body": {
-                        "radius": 10,
-                        "color": 0x00b2e1
-                    },
-                    "speed": 10,
+                "bullets": {
+                    "normal": {
+                        "edge": {
+                            "w": 2,
+                            "color": 0x555555
+                        },
+                        "body": {
+                            "radius": 10,
+                            "color": 0x00b2e1
+                        },
+                        "speed": 10,
+                    }
                 },
             
-                "tank": {
-                    "edge": {
-                        "w": 2.5,
-                        "color": 0x555555
-                    },
-                    "body": {
-                        "radius": 30,
-                        "color": 0x00b2e1
-                    },
-                    "weapons": [
-                        {
-                            "w": 15,
-                            "h": 50,
-                            "x": -10,
-                            "y": 0,
-                            "angle": 0,
-                            "color": 0x999999,
-                            "shootOffset": 10,
-                            "reloadFrame": 10,
-                            "shootDelayFrame": 3
+                "tanks": {
+                    "normal": {
+                        "edge": {
+                            "w": 2.5,
+                            "color": 0x555555
                         },
-                        {
-                            "w": 15,
-                            "h": 50,
-                            "x": 10,
-                            "y": 0,
-                            "angle": 0,
-                            "color": 0x999999,
-                            "shootOffset": 10,
-                            "reloadFrame": 10,
-                            "shootDelayFrame": 6
-                        }
-                    ],
-                    "speed": 5,
+                        "body": {
+                            "radius": 30,
+                            "color": 0x00b2e1
+                        },
+                        "weapons": [
+                            {
+                                "w": 15,
+                                "h": 50,
+                                "x": -10,
+                                "y": 0,
+                                "bullet": "normal",
+                                "angle": 0,
+                                "color": 0x999999,
+                                "shootOffset": 10,
+                                "reloadFrame": 10,
+                                "shootDelayFrame": 3
+                            },
+                            {
+                                "w": 15,
+                                "h": 50,
+                                "x": 10,
+                                "y": 0,
+                                "bullet": "normal",
+                                "angle": 0,
+                                "color": 0x999999,
+                                "shootOffset": 10,
+                                "reloadFrame": 10,
+                                "shootDelayFrame": 6
+                            }
+                        ],
+                        "speed": 5,
+                    }
                 }
             };
             
@@ -88,8 +93,8 @@
             function bulletUpdate()
             {
                 // update bullet position
-                this.sprite.position.x += Config.bullet.speed * Math.cos(this.angle);
-                this.sprite.position.y += Config.bullet.speed * Math.sin(this.angle);
+                this.sprite.position.x += this.speed * Math.cos(this.angle);
+                this.sprite.position.y += this.speed * Math.sin(this.angle);
                 if (this.sprite.position.x < 0
                     || this.sprite.position.x > Config.world.w
                     || this.sprite.position.y < 0
@@ -102,9 +107,9 @@
             function bulletCreateView(bullet, position)
             {
                 var graphics = new PIXI.Graphics();
-                graphics.lineStyle(Config.bullet.edge.w, Config.bullet.edge.color);
-                graphics.beginFill(Config.bullet.body.color);
-                graphics.drawCircle(0, 0, Config.bullet.body.radius);
+                graphics.lineStyle(bullet.cfg.edge.w, bullet.cfg.edge.color);
+                graphics.beginFill(bullet.cfg.body.color);
+                graphics.drawCircle(0, 0, bullet.cfg.body.radius);
                 graphics.endFill();
             
                 bullet.sprite = new PIXI.Sprite(graphics.generateTexture());
@@ -116,13 +121,15 @@
                 graphics.destroy();
             }
             
-            function Bullet(world, position, angle, tank)
+            function Bullet(world, position, angle, weapon)
             {
                 this.id = _id ++;
                 this.world = world;
-                this.owner = tank;
+                this.owner = weapon.owner;
                 this.angle = angle;
             
+                this.cfg = Config.bullets[weapon.cfg.bullet];
+                this.speed = this.cfg.speed;
                 bulletCreateView(this, position);
             
                 this.update = bulletUpdate;
@@ -229,8 +236,8 @@
                 // update tank position
                 if (this.moveDir.lengthSq() > 1e-6) {
                     var angle = this.moveDir.angle();
-                    this.sprite.position.x += Config.tank.speed * Math.cos(angle);
-                    this.sprite.position.y += Config.tank.speed * Math.sin(angle);
+                    this.sprite.position.x += this.cfg.speed * Math.cos(angle);
+                    this.sprite.position.y += this.cfg.speed * Math.sin(angle);
                 }
                 // update tank weapon direction
                 if (this.targetPos.lengthSq() > 1e-6) {
@@ -253,9 +260,9 @@
             function tankCreateView(tank)
             {
                 var graphics = new PIXI.Graphics();
-                graphics.lineStyle(Config.tank.edge.w, Config.tank.edge.color);
-                graphics.beginFill(Config.tank.body.color);
-                graphics.drawCircle(0, 0, Config.tank.body.radius);
+                graphics.lineStyle(tank.cfg.edge.w, tank.cfg.edge.color);
+                graphics.beginFill(tank.cfg.body.color);
+                graphics.drawCircle(0, 0, tank.cfg.body.radius);
                 graphics.endFill();
             
                 var bodySprite = new PIXI.Sprite(graphics.generateTexture());
@@ -266,7 +273,7 @@
                 graphics.destroy();
             }
             
-            function Tank(world, isPlayer)
+            function Tank(world, name, isPlayer)
             {
             // properties:
                 this.world = world;
@@ -274,10 +281,11 @@
                 this.autoFire = true;
                 this.moveDir = new Victor(0, 0);
                 this.targetPos = new Victor(0, 0);
+                this.cfg = Config.tanks[name];
             
                 this.sprite = new PIXI.Container();
                 this.weapons = [];
-                for (var idx in Config.tank.weapons) {
+                for (var idx in this.cfg.weapons) {
                     this.weapons.push(new Weapon(world, this, idx));
                 }
                 tankCreateView(this);
@@ -306,38 +314,36 @@
         <script>
         require.register("./modules/weapon", function(module, exports, require) {
             var Bullet = require("../modules/bullet");
-            var Config = require("../modules/config");
             
             function weaponFire()
             {
-                if (this.world.frame - this.fireFrame >= this.reload) {
+                if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
                     this.fireFrame = this.world.frame;
                     var pos = this.offset.clone();
                     pos.rotate(this.owner.sprite.rotation);
                     pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
-            
-                    var dir = this.owner.sprite.rotation + this.angle * Math.PI / 180 - Math.PI / 2;
-                    var bullet = new Bullet(this.world, pos, dir, this.owner);
+                    var angle = this.owner.sprite.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
+                    var bullet = new Bullet(this.world, pos, angle, this);
                     this.world.bullets.push(bullet);
                 }
             }
             
-            function weaponCreateView(weapon, cfg)
+            function weaponCreateView(weapon)
             {
                 var sprite = weapon.owner.sprite;
             
                 var graphics = new PIXI.Graphics();
-                graphics.lineStyle(Config.tank.edge.w, Config.tank.edge.color);
-                graphics.beginFill(cfg.color);
-                graphics.drawRect(0, 0, cfg.w, cfg.h);
+                graphics.lineStyle(weapon.owner.cfg.edge.w, weapon.owner.cfg.edge.color);
+                graphics.beginFill(weapon.cfg.color);
+                graphics.drawRect(0, 0, weapon.cfg.w, weapon.cfg.h);
                 graphics.endFill();
             
                 var weaponSprite = new PIXI.Sprite(graphics.generateTexture());
                 weaponSprite.anchor.x = 0.5;
                 weaponSprite.anchor.y = 1.0;
-                weaponSprite.rotation = cfg.angle * Math.PI / 180;
-                weaponSprite.x += cfg.x;
-                weaponSprite.y += cfg.y;
+                weaponSprite.rotation = weapon.cfg.angle * Math.PI / 180;
+                weaponSprite.x += weapon.cfg.x;
+                weaponSprite.y += weapon.cfg.y;
                 sprite.addChild(weaponSprite);
             
                 graphics.destroy();
@@ -348,23 +354,20 @@
             // properties:
                 this.world = world;
                 this.owner = tank;
-            
-                var cfg = Config.tank.weapons[idx];
-                this.angle = cfg.angle;
-                this.offset = new Victor(0, - cfg.shootOffset - cfg.h);
-                this.offset.rotateDeg(cfg.angle).add(new Victor(cfg.x, cfg.y));
-            
-                this.reload = cfg.reloadFrame;
-                this.delay = cfg.shootDelayFrame;
-                this.fireFrame = world.frame + this.delay;
-            
-                weaponCreateView(this, cfg);
+                this.cfg = tank.cfg.weapons[idx];
+                this.angle = this.cfg.angle;
+                this.offset = new Victor(0, - this.cfg.shootOffset - this.cfg.h);
+                this.offset.rotateDeg(this.cfg.angle)
+                           .add(new Victor(this.cfg.x, this.cfg.y));
+                this.fireFrame = world.frame + this.cfg.shootDelayFrame;
+                weaponCreateView(this);
             
             // functions:
                 this.fire = weaponFire;
             }
             
             module.exports = Weapon;
+            
         });
         </script>
 

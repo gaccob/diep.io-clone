@@ -19,7 +19,7 @@ function initWorld()
     document.body.appendChild(world.renderer.view);
 
     world.bullets = [];
-    world.tank = new Tank(world, true);
+    world.tank = new Tank(world, "normal", true);
 }
 
 function updateWorld()

@@ -5,8 +5,8 @@ var _id = 1;
 function bulletUpdate()
 {
     // update bullet position
-    this.sprite.position.x += Config.bullet.speed * Math.cos(this.angle);
-    this.sprite.position.y += Config.bullet.speed * Math.sin(this.angle);
+    this.sprite.position.x += this.speed * Math.cos(this.angle);
+    this.sprite.position.y += this.speed * Math.sin(this.angle);
     if (this.sprite.position.x < 0
         || this.sprite.position.x > Config.world.w
         || this.sprite.position.y < 0
@@ -19,9 +19,9 @@ function bulletUpdate()
 function bulletCreateView(bullet, position)
 {
     var graphics = new PIXI.Graphics();
-    graphics.lineStyle(Config.bullet.edge.w, Config.bullet.edge.color);
-    graphics.beginFill(Config.bullet.body.color);
-    graphics.drawCircle(0, 0, Config.bullet.body.radius);
+    graphics.lineStyle(bullet.cfg.edge.w, bullet.cfg.edge.color);
+    graphics.beginFill(bullet.cfg.body.color);
+    graphics.drawCircle(0, 0, bullet.cfg.body.radius);
     graphics.endFill();
 
     bullet.sprite = new PIXI.Sprite(graphics.generateTexture());
@@ -33,13 +33,15 @@ function bulletCreateView(bullet, position)
     graphics.destroy();
 }
 
-function Bullet(world, position, angle, tank)
+function Bullet(world, position, angle, weapon)
 {
     this.id = _id ++;
     this.world = world;
-    this.owner = tank;
+    this.owner = weapon.owner;
     this.angle = angle;
 
+    this.cfg = Config.bullets[weapon.cfg.bullet];
+    this.speed = this.cfg.speed;
     bulletCreateView(this, position);
 
     this.update = bulletUpdate;

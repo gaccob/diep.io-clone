@@ -92,8 +92,8 @@ function tankUpdate()
     // update tank position
     if (this.moveDir.lengthSq() > 1e-6) {
         var angle = this.moveDir.angle();
-        this.sprite.position.x += Config.tank.speed * Math.cos(angle);
-        this.sprite.position.y += Config.tank.speed * Math.sin(angle);
+        this.sprite.position.x += this.cfg.speed * Math.cos(angle);
+        this.sprite.position.y += this.cfg.speed * Math.sin(angle);
     }
     // update tank weapon direction
     if (this.targetPos.lengthSq() > 1e-6) {
@@ -116,9 +116,9 @@ function tankFire()
 function tankCreateView(tank)
 {
     var graphics = new PIXI.Graphics();
-    graphics.lineStyle(Config.tank.edge.w, Config.tank.edge.color);
-    graphics.beginFill(Config.tank.body.color);
-    graphics.drawCircle(0, 0, Config.tank.body.radius);
+    graphics.lineStyle(tank.cfg.edge.w, tank.cfg.edge.color);
+    graphics.beginFill(tank.cfg.body.color);
+    graphics.drawCircle(0, 0, tank.cfg.body.radius);
     graphics.endFill();
 
     var bodySprite = new PIXI.Sprite(graphics.generateTexture());
@@ -129,7 +129,7 @@ function tankCreateView(tank)
     graphics.destroy();
 }
 
-function Tank(world, isPlayer)
+function Tank(world, name, isPlayer)
 {
 // properties:
     this.world = world;
@@ -137,10 +137,11 @@ function Tank(world, isPlayer)
     this.autoFire = true;
     this.moveDir = new Victor(0, 0);
     this.targetPos = new Victor(0, 0);
+    this.cfg = Config.tanks[name];
 
     this.sprite = new PIXI.Container();
     this.weapons = [];
-    for (var idx in Config.tank.weapons) {
+    for (var idx in this.cfg.weapons) {
         this.weapons.push(new Weapon(world, this, idx));
     }
     tankCreateView(this);
