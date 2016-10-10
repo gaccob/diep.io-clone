@@ -10,7 +10,6 @@
         <meta name="format-detection" content="telephone=no">
     </head>
     <body>
-        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
         <script src="./lib/pixi.min.js"></script>
         <script src="./lib/victor.min.js"></script>
         <script src="./lib/require.js"></script>
@@ -18,18 +17,19 @@
         <!-- require modules -->
         <script>
         require.register("./modules/config", function(module, exports, require) {
-            var Config = {
-            
+            var Config =
+            {
                 "world": {
                     "w": 768,
                     "h": 1024,
-                    "color": 0xcdcdcd
+                    "color": 0xcdcdcd,
+                    "updateMS": 1000 / 30
                 },
             
                 // 239 73 84
                 "bullet": {
                     "edge": {
-                        "w": 2.5,
+                        "w": 2,
                         "color": 0x555555
                     },
                     "body": {
@@ -50,17 +50,29 @@
                     },
                     "weapons": [
                         {
-                            "w": 20,
-                            "h": 55,
+                            "w": 15,
+                            "h": 50,
                             "x": -10,
-                            "y": -55,
+                            "y": 0,
                             "angle": 0,
                             "color": 0x999999,
-                            "shootOffsetX": 0,
-                            "shootOffsetY": -20,
+                            "shootOffset": 10,
+                            "reloadFrame": 10,
+                            "shootDelayFrame": 3
+                        },
+                        {
+                            "w": 15,
+                            "h": 50,
+                            "x": 10,
+                            "y": 0,
+                            "angle": 0,
+                            "color": 0x999999,
+                            "shootOffset": 10,
+                            "reloadFrame": 10,
+                            "shootDelayFrame": 6
                         }
                     ],
-                    "speed": 3,
+                    "speed": 5,
                 }
             };
             
@@ -68,64 +80,13 @@
         });
         </script>
         <script>
-        require.register("./modules/view", function(module, exports, require) {
-            var Config = require("../modules/config");
-            
-            var View = {};
-            
-            View.spawnTank = function() {
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(Config.tank.edge.w, Config.tank.edge.color);
-                for (var i in Config.tank.weapons) {
-                    var weapon = Config.tank.weapons[i];
-                    graphics.beginFill(weapon.color);
-                    // TODO: angle
-                    graphics.drawRect(weapon.x, weapon.y, weapon.w, weapon.h);
-                }
-                graphics.beginFill(Config.tank.body.color);
-                graphics.drawCircle(0, 0, Config.tank.body.radius);
-                graphics.endFill();
-                var tank = new PIXI.Sprite(graphics.generateTexture());
-                tank.anchor.x = (Config.tank.body.radius + Config.tank.edge.w) / tank.width;
-                tank.anchor.y = (weapon.h + Config.tank.edge.w) / tank.height;
-            
-                // custom property
-                tank.weapons = [];
-                for (var i in Config.tank.weapons) {
-                    var weapon = Config.tank.weapons[i];
-                    tank.weapons[i] = {};
-                    var offsetX = -weapon.w / 2 - weapon.x + weapon.shootOffsetX;
-                    var offsetY = -weapon.h + weapon.shootOffsetY;
-                    tank.weapons[i].offset = new Victor(offsetX, offsetY);
-                }
-                graphics.destroy();
-                return tank;
-            }
-            
-            View.spawnBullet = function() {
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(Config.bullet.edge.w, Config.bullet.edge.color);
-                graphics.beginFill(Config.bullet.body.color);
-                graphics.drawCircle(0, 0, Config.bullet.body.radius);
-                graphics.endFill();
-                var bullet = new PIXI.Sprite(graphics.generateTexture());
-                bullet.anchor.x = 0.5;
-                bullet.anchor.y = 0.5;
-                graphics.destroy();
-                return bullet;
-            }
-            
-            module.exports = View;
-        });
-        </script>
-        <script>
         require.register("./modules/bullet", function(module, exports, require) {
             var Config = require("../modules/config");
-            var View = require('../modules/view');
             
             var _id = 1;
             
-            function bulletUpdate() {
+            function bulletUpdate()
+            {
                 // update bullet position
                 this.sprite.position.x += Config.bullet.speed * Math.cos(this.angle);
                 this.sprite.position.y += Config.bullet.speed * Math.sin(this.angle);
@@ -138,15 +99,34 @@
                 return 0;
             }
             
-            function Bullet(stage, position, angle, tank) {
+            function bulletCreateView(bullet, position)
+            {
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(Config.bullet.edge.w, Config.bullet.edge.color);
+                graphics.beginFill(Config.bullet.body.color);
+                graphics.drawCircle(0, 0, Config.bullet.body.radius);
+                graphics.endFill();
+            
+                bullet.sprite = new PIXI.Sprite(graphics.generateTexture());
+                bullet.sprite.anchor.x = 0.5;
+                bullet.sprite.anchor.y = 0.5;
+                bullet.sprite.position.x = position.x;
+                bullet.sprite.position.y = position.y;
+            
+                graphics.destroy();
+            }
+            
+            function Bullet(world, position, angle, tank)
+            {
                 this.id = _id ++;
+                this.world = world;
                 this.owner = tank;
                 this.angle = angle;
-                this.sprite = View.spawnBullet();
-                this.sprite.position.x = position.x;
-                this.sprite.position.y = position.y;
+            
+                bulletCreateView(this, position);
+            
                 this.update = bulletUpdate;
-                stage.addChild(this.sprite);
+                world.stage.addChild(this.sprite);
             }
             
             module.exports = Bullet;
@@ -155,11 +135,11 @@
         </script>
         <script>
         require.register("./modules/tank", function(module, exports, require) {
-            var Bullet = require("../modules/bullet");
             var Config = require("../modules/config");
-            var View = require('../modules/view');
+            var Weapon = require("../modules/weapon");
             
-            function tankHandleKeyDown(tank) {
+            function tankHandleKeyDown(tank)
+            {
                 document.body.addEventListener('keydown', function(e) {
                     switch (e.key) {
                         case 'w':
@@ -194,7 +174,8 @@
                 }, false);
             }
             
-            function tankHandleKeyUp(tank) {
+            function tankHandleKeyUp(tank)
+            {
                 document.body.addEventListener('keyup', function(e) {
                     switch (e.key) {
                         case 'w':
@@ -229,7 +210,8 @@
                 }, false);
             }
             
-            function tankHandleMouseMove(tank) {
+            function tankHandleMouseMove(tank)
+            {
                 document.body.addEventListener('mousemove', function(e) {
                     tank.targetPos.x = e.x;
                     tank.targetPos.y = e.y;
@@ -242,7 +224,8 @@
                 }, false);
             }
             
-            function tankUpdate() {
+            function tankUpdate()
+            {
                 // update tank position
                 if (this.moveDir.lengthSq() > 1e-6) {
                     var angle = this.moveDir.angle();
@@ -254,38 +237,134 @@
                     var dir = this.targetPos.clone().subtract(this.sprite.position);
                     this.sprite.rotation = dir.angle() + Math.PI / 2;
                 }
+                // fire
+                if (this.autoFire == true) {
+                    this.fire();
+                }
             }
             
-            function tankFire() {
-                var pos = this.sprite.weapons[0].offset.clone();
-                pos.rotate(this.sprite.rotation);
-                pos.add(new Victor(this.sprite.position.x, this.sprite.position.y));
-                var bullet = new Bullet(this.stage, pos, this.sprite.rotation - Math.PI / 2, this);
-                self.world.bullets.push(bullet);
+            function tankFire()
+            {
+                for (var idx in this.weapons) {
+                    this.weapons[idx].fire();
+                }
             }
             
-            function Tank(world, stage, isPlayer) {
+            function tankCreateView(tank)
+            {
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(Config.tank.edge.w, Config.tank.edge.color);
+                graphics.beginFill(Config.tank.body.color);
+                graphics.drawCircle(0, 0, Config.tank.body.radius);
+                graphics.endFill();
+            
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                bodySprite.anchor.x = 0.5;
+                bodySprite.anchor.y = 0.5;
+                tank.sprite.addChild(bodySprite);
+            
+                graphics.destroy();
+            }
+            
+            function Tank(world, isPlayer)
+            {
+            // properties:
                 this.world = world;
                 this.isPlayer = isPlayer;
-                this.stage = stage;
-                this.sprite = View.spawnTank();
-                this.sprite.position.x = Config.world.w / 2;
-                this.sprite.position.y = Config.world.h / 2;
+                this.autoFire = true;
                 this.moveDir = new Victor(0, 0);
                 this.targetPos = new Victor(0, 0);
+            
+                this.sprite = new PIXI.Container();
+                this.weapons = [];
+                for (var idx in Config.tank.weapons) {
+                    this.weapons.push(new Weapon(world, this, idx));
+                }
+                tankCreateView(this);
+                this.sprite.position.x = Config.world.w / 2;
+                this.sprite.position.y = Config.world.h / 2;
+            
+            // functions:
                 this.update = tankUpdate;
                 this.fire = tankFire;
+            
+            // event handlers:
                 if (isPlayer == true) {
                     tankHandleKeyDown(this);
                     tankHandleKeyUp(this);
                     tankHandleMouseMove(this);
                     tankHandleMouseDown(this);
                 }
-                stage.addChild(this.sprite);
+            
+                world.stage.addChild(this.sprite);
             }
             
             module.exports = Tank;
             
+        });
+        </script>
+        <script>
+        require.register("./modules/weapon", function(module, exports, require) {
+            var Bullet = require("../modules/bullet");
+            var Config = require("../modules/config");
+            
+            function weaponFire()
+            {
+                if (this.world.frame - this.fireFrame >= this.reload) {
+                    this.fireFrame = this.world.frame;
+                    var pos = this.offset.clone();
+                    pos.rotate(this.owner.sprite.rotation);
+                    pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
+            
+                    var dir = this.owner.sprite.rotation + this.angle * Math.PI / 180 - Math.PI / 2;
+                    var bullet = new Bullet(this.world, pos, dir, this.owner);
+                    this.world.bullets.push(bullet);
+                }
+            }
+            
+            function weaponCreateView(weapon, cfg)
+            {
+                var sprite = weapon.owner.sprite;
+            
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(Config.tank.edge.w, Config.tank.edge.color);
+                graphics.beginFill(cfg.color);
+                graphics.drawRect(0, 0, cfg.w, cfg.h);
+                graphics.endFill();
+            
+                var weaponSprite = new PIXI.Sprite(graphics.generateTexture());
+                weaponSprite.anchor.x = 0.5;
+                weaponSprite.anchor.y = 1.0;
+                weaponSprite.rotation = cfg.angle * Math.PI / 180;
+                weaponSprite.x += cfg.x;
+                weaponSprite.y += cfg.y;
+                sprite.addChild(weaponSprite);
+            
+                graphics.destroy();
+            }
+            
+            function Weapon(world, tank, idx)
+            {
+            // properties:
+                this.world = world;
+                this.owner = tank;
+            
+                var cfg = Config.tank.weapons[idx];
+                this.angle = cfg.angle;
+                this.offset = new Victor(0, - cfg.shootOffset - cfg.h);
+                this.offset.rotateDeg(cfg.angle).add(new Victor(cfg.x, cfg.y));
+            
+                this.reload = cfg.reloadFrame;
+                this.delay = cfg.shootDelayFrame;
+                this.fireFrame = world.frame + this.delay;
+            
+                weaponCreateView(this, cfg);
+            
+            // functions:
+                this.fire = weaponFire;
+            }
+            
+            module.exports = Weapon;
         });
         </script>
 

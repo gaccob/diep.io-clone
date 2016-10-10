@@ -1,8 +1,8 @@
-var Bullet = require("../modules/bullet");
 var Config = require("../modules/config");
-var View = require('../modules/view');
+var Weapon = require("../modules/weapon");
 
-function tankHandleKeyDown(tank) {
+function tankHandleKeyDown(tank)
+{
     document.body.addEventListener('keydown', function(e) {
         switch (e.key) {
             case 'w':
@@ -37,7 +37,8 @@ function tankHandleKeyDown(tank) {
     }, false);
 }
 
-function tankHandleKeyUp(tank) {
+function tankHandleKeyUp(tank)
+{
     document.body.addEventListener('keyup', function(e) {
         switch (e.key) {
             case 'w':
@@ -72,7 +73,8 @@ function tankHandleKeyUp(tank) {
     }, false);
 }
 
-function tankHandleMouseMove(tank) {
+function tankHandleMouseMove(tank)
+{
     document.body.addEventListener('mousemove', function(e) {
         tank.targetPos.x = e.x;
         tank.targetPos.y = e.y;
@@ -85,7 +87,8 @@ function tankHandleMouseDown(tank) {
     }, false);
 }
 
-function tankUpdate() {
+function tankUpdate()
+{
     // update tank position
     if (this.moveDir.lengthSq() > 1e-6) {
         var angle = this.moveDir.angle();
@@ -97,34 +100,66 @@ function tankUpdate() {
         var dir = this.targetPos.clone().subtract(this.sprite.position);
         this.sprite.rotation = dir.angle() + Math.PI / 2;
     }
+    // fire
+    if (this.autoFire == true) {
+        this.fire();
+    }
 }
 
-function tankFire() {
-    var pos = this.sprite.weapons[0].offset.clone();
-    pos.rotate(this.sprite.rotation);
-    pos.add(new Victor(this.sprite.position.x, this.sprite.position.y));
-    var bullet = new Bullet(this.stage, pos, this.sprite.rotation - Math.PI / 2, this);
-    self.world.bullets.push(bullet);
+function tankFire()
+{
+    for (var idx in this.weapons) {
+        this.weapons[idx].fire();
+    }
 }
 
-function Tank(world, stage, isPlayer) {
+function tankCreateView(tank)
+{
+    var graphics = new PIXI.Graphics();
+    graphics.lineStyle(Config.tank.edge.w, Config.tank.edge.color);
+    graphics.beginFill(Config.tank.body.color);
+    graphics.drawCircle(0, 0, Config.tank.body.radius);
+    graphics.endFill();
+
+    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+    bodySprite.anchor.x = 0.5;
+    bodySprite.anchor.y = 0.5;
+    tank.sprite.addChild(bodySprite);
+
+    graphics.destroy();
+}
+
+function Tank(world, isPlayer)
+{
+// properties:
     this.world = world;
     this.isPlayer = isPlayer;
-    this.stage = stage;
-    this.sprite = View.spawnTank();
-    this.sprite.position.x = Config.world.w / 2;
-    this.sprite.position.y = Config.world.h / 2;
+    this.autoFire = true;
     this.moveDir = new Victor(0, 0);
     this.targetPos = new Victor(0, 0);
+
+    this.sprite = new PIXI.Container();
+    this.weapons = [];
+    for (var idx in Config.tank.weapons) {
+        this.weapons.push(new Weapon(world, this, idx));
+    }
+    tankCreateView(this);
+    this.sprite.position.x = Config.world.w / 2;
+    this.sprite.position.y = Config.world.h / 2;
+
+// functions:
     this.update = tankUpdate;
     this.fire = tankFire;
+
+// event handlers:
     if (isPlayer == true) {
         tankHandleKeyDown(this);
         tankHandleKeyUp(this);
         tankHandleMouseMove(this);
         tankHandleMouseDown(this);
     }
-    stage.addChild(this.sprite);
+
+    world.stage.addChild(this.sprite);
 }
 
 module.exports = Tank;

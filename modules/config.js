@@ -1,15 +1,16 @@
-var Config = {
-
+var Config =
+{
     "world": {
         "w": 768,
         "h": 1024,
-        "color": 0xcdcdcd
+        "color": 0xcdcdcd,
+        "updateMS": 1000 / 30
     },
 
     // 239 73 84
     "bullet": {
         "edge": {
-            "w": 2.5,
+            "w": 2,
             "color": 0x555555
         },
         "body": {
@@ -30,17 +31,29 @@ var Config = {
         },
         "weapons": [
             {
-                "w": 20,
-                "h": 55,
+                "w": 15,
+                "h": 50,
                 "x": -10,
-                "y": -55,
+                "y": 0,
                 "angle": 0,
                 "color": 0x999999,
-                "shootOffsetX": 0,
-                "shootOffsetY": -20,
+                "shootOffset": 10,
+                "reloadFrame": 10,
+                "shootDelayFrame": 3
+            },
+            {
+                "w": 15,
+                "h": 50,
+                "x": 10,
+                "y": 0,
+                "angle": 0,
+                "color": 0x999999,
+                "shootOffset": 10,
+                "reloadFrame": 10,
+                "shootDelayFrame": 6
             }
         ],
-        "speed": 3,
+        "speed": 5,
     }
 };
 

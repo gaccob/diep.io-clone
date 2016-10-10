@@ -1,9 +1,9 @@
 var Config = require("../modules/config");
-var View = require('../modules/view');
 
 var _id = 1;
 
-function bulletUpdate() {
+function bulletUpdate()
+{
     // update bullet position
     this.sprite.position.x += Config.bullet.speed * Math.cos(this.angle);
     this.sprite.position.y += Config.bullet.speed * Math.sin(this.angle);
@@ -16,15 +16,34 @@ function bulletUpdate() {
     return 0;
 }
 
-function Bullet(stage, position, angle, tank) {
+function bulletCreateView(bullet, position)
+{
+    var graphics = new PIXI.Graphics();
+    graphics.lineStyle(Config.bullet.edge.w, Config.bullet.edge.color);
+    graphics.beginFill(Config.bullet.body.color);
+    graphics.drawCircle(0, 0, Config.bullet.body.radius);
+    graphics.endFill();
+
+    bullet.sprite = new PIXI.Sprite(graphics.generateTexture());
+    bullet.sprite.anchor.x = 0.5;
+    bullet.sprite.anchor.y = 0.5;
+    bullet.sprite.position.x = position.x;
+    bullet.sprite.position.y = position.y;
+
+    graphics.destroy();
+}
+
+function Bullet(world, position, angle, tank)
+{
     this.id = _id ++;
+    this.world = world;
     this.owner = tank;
     this.angle = angle;
-    this.sprite = View.spawnBullet();
-    this.sprite.position.x = position.x;
-    this.sprite.position.y = position.y;
+
+    bulletCreateView(this, position);
+
     this.update = bulletUpdate;
-    stage.addChild(this.sprite);
+    world.stage.addChild(this.sprite);
 }
 
 module.exports = Bullet;
