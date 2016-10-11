@@ -76,8 +76,10 @@ function tankHandleKeyUp(tank)
 function tankHandleMouseMove(tank)
 {
     document.body.addEventListener('mousemove', function(e) {
-        tank.targetPos.x = e.x;
-        tank.targetPos.y = e.y;
+        var targetPos = new Victor(e.x - tank.world.view.x, e.y - tank.world.view.y);
+        var dir = targetPos.subtract(tank.sprite.position);
+        // TODO: rotate speed
+        tank.sprite.rotation = dir.angle() + Math.PI / 2;
     }, false);
 }
 
@@ -94,11 +96,20 @@ function tankUpdate()
         var angle = this.moveDir.angle();
         this.sprite.position.x += this.cfg.speed * Math.cos(angle);
         this.sprite.position.y += this.cfg.speed * Math.sin(angle);
-    }
-    // update tank weapon direction
-    if (this.targetPos.lengthSq() > 1e-6) {
-        var dir = this.targetPos.clone().subtract(this.sprite.position);
-        this.sprite.rotation = dir.angle() + Math.PI / 2;
+        // clamp
+        var cfg = Config.world.walkable;
+        if (this.sprite.position.x > cfg.x + cfg.w) {
+            this.sprite.position.x = cfg.x + cfg.w;
+        }
+        if (this.sprite.position.x < cfg.x) {
+            this.sprite.position.x = cfg.x;
+        }
+        if (this.sprite.position.y > cfg.y + cfg.h) {
+            this.sprite.position.y = cfg.y + cfg.h;
+        }
+        if (this.sprite.position.y < cfg.y) {
+            this.sprite.position.y = cfg.y;
+        }
     }
     // fire
     if (this.autoFire == true) {
@@ -136,7 +147,6 @@ function Tank(world, name, isPlayer)
     this.isPlayer = isPlayer;
     this.autoFire = true;
     this.moveDir = new Victor(0, 0);
-    this.targetPos = new Victor(0, 0);
     this.cfg = Config.tanks[name];
 
     this.sprite = new PIXI.Container();
@@ -145,8 +155,10 @@ function Tank(world, name, isPlayer)
         this.weapons.push(new Weapon(world, this, idx));
     }
     tankCreateView(this);
-    this.sprite.position.x = Config.world.w / 2;
-    this.sprite.position.y = Config.world.h / 2;
+
+    // born position
+    this.sprite.position.x = Config.world.map.w / 2;
+    this.sprite.position.y = Config.world.map.h / 2;
 
 // functions:
     this.update = tankUpdate;
@@ -160,7 +172,7 @@ function Tank(world, name, isPlayer)
         tankHandleMouseDown(this);
     }
 
-    world.stage.addChild(this.sprite);
+    world.view.addChild(this.sprite);
 }
 
 module.exports = Tank;

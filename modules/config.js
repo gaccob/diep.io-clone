@@ -1,9 +1,27 @@
 var Config =
 {
     "world": {
-        "w": 768,
-        "h": 1024,
-        "color": 0xcdcdcd,
+        "map": {
+            "w": 2048,
+            "h": 2048,
+            "color": 0x808080
+        },
+        "view": {
+            "w": 600,
+            "h": 800
+        },
+        "grid": {
+            "size": 32,
+            "edge": 1,
+            "color": 0xa0a0a0
+        },
+        "walkable": {
+            "x": 128,
+            "y": 128,
+            "w": 1792,
+            "h": 1792,
+            "color": 0xcdcdcd
+        },
         "updateMS": 1000 / 30
     },
 

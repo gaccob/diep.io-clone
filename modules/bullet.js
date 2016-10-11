@@ -5,14 +5,14 @@ var _id = 1;
 function bulletUpdate()
 {
     // update bullet position
-    this.sprite.position.x += this.speed * Math.cos(this.angle);
-    this.sprite.position.y += this.speed * Math.sin(this.angle);
     if (this.sprite.position.x < 0
-        || this.sprite.position.x > Config.world.w
+        || this.sprite.position.x > Config.world.map.w
         || this.sprite.position.y < 0
-        || this.sprite.position.y > Config.world.h) {
+        || this.sprite.position.y > Config.world.map.h) {
         return -1;
     }
+    this.sprite.position.x += this.speed * Math.cos(this.angle);
+    this.sprite.position.y += this.speed * Math.sin(this.angle);
     return 0;
 }
 
@@ -45,7 +45,7 @@ function Bullet(world, position, angle, weapon)
     bulletCreateView(this, position);
 
     this.update = bulletUpdate;
-    world.stage.addChild(this.sprite);
+    world.view.addChild(this.sprite);
 }
 
 module.exports = Bullet;
