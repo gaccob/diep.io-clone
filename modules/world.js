@@ -53,7 +53,7 @@ function World()
 
     // world objects
     this._bullets = [];
-    this._tank = new Tank(this, "normal", true);
+    this._tank = new Tank(this, "normal");
 }
 
 World.prototype = {};

@@ -108,51 +108,87 @@
             
             var _id = 1;
             
-            function bulletUpdate()
+            function Bullet(world, position, angle, weapon)
+            {
+                this._id = _id ++;
+                this._world = world;
+                this._owner = weapon.owner;
+                this._angle = angle;
+            
+                this._cfg = Config.bullets[weapon.cfg.bullet];
+                this._speed = this._cfg.speed;
+            
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(this._cfg.edge.w, this._cfg.edge.color);
+                graphics.beginFill(this._cfg.body.color);
+                graphics.drawCircle(0, 0, this._cfg.body.radius);
+                graphics.endFill();
+                this._sprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+            
+                this._sprite.anchor.x = 0.5;
+                this._sprite.anchor.y = 0.5;
+                this._sprite.position.x = position.x;
+                this._sprite.position.y = position.y;
+                world.view.addChild(this._sprite);
+            }
+            
+            Bullet.prototype = {}
+            
+            Bullet.prototype.update = function()
             {
                 // update bullet position
-                if (this.sprite.position.x < 0
-                    || this.sprite.position.x > Config.world.map.w
-                    || this.sprite.position.y < 0
-                    || this.sprite.position.y > Config.world.map.h) {
+                if (this._sprite.position.x < 0
+                    || this._sprite.position.x > Config.world.map.w
+                    || this._sprite.position.y < 0
+                    || this._sprite.position.y > Config.world.map.h) {
                     return -1;
                 }
-                this.sprite.position.x += this.speed * Math.cos(this.angle);
-                this.sprite.position.y += this.speed * Math.sin(this.angle);
+                this._sprite.position.x += this._speed * Math.cos(this._angle);
+                this._sprite.position.y += this._speed * Math.sin(this._angle);
                 return 0;
             }
             
-            function bulletCreateView(bullet, position)
-            {
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(bullet.cfg.edge.w, bullet.cfg.edge.color);
-                graphics.beginFill(bullet.cfg.body.color);
-                graphics.drawCircle(0, 0, bullet.cfg.body.radius);
-                graphics.endFill();
+            Object.defineProperties(Bullet.prototype, {
             
-                bullet.sprite = new PIXI.Sprite(graphics.generateTexture());
-                bullet.sprite.anchor.x = 0.5;
-                bullet.sprite.anchor.y = 0.5;
-                bullet.sprite.position.x = position.x;
-                bullet.sprite.position.y = position.y;
+                id : {
+                    get: function() { return this._id; }
+                },
             
-                graphics.destroy();
-            }
+                world: {
+                    get: function() { return this._world; }
+                },
             
-            function Bullet(world, position, angle, weapon)
-            {
-                this.id = _id ++;
-                this.world = world;
-                this.owner = weapon.owner;
-                this.angle = angle;
+                owner: {
+                    get: function() { return this._owner; }
+                },
             
-                this.cfg = Config.bullets[weapon.cfg.bullet];
-                this.speed = this.cfg.speed;
-                bulletCreateView(this, position);
+                cfg: {
+                    get: function() { return this._cfg; }
+                },
             
-                this.update = bulletUpdate;
-                world.view.addChild(this.sprite);
-            }
+                sprite: {
+                    get: function() { return this._sprite; }
+                },
+            
+                speed: {
+                    get: function() { return this._speed; }
+                },
+            
+                angle: {
+                    get: function() { return this._angle; }
+                },
+            
+                x: {
+                    get: function() { return this._sprite.x; },
+                    set: function(v) { this._sprite.x = v; }
+                },
+            
+                y: {
+                    get: function() { return this._sprite.y; },
+                    set: function(v) { this._sprite.y = v; }
+                },
+            });
             
             module.exports = Bullet;
             
@@ -240,6 +276,7 @@
                 document.body.addEventListener('mousemove', function(e) {
                     var targetPos = new Victor(e.x - tank.world.view.x, e.y - tank.world.view.y);
                     var dir = targetPos.subtract(tank.sprite.position);
+                    // TODO: rotate speed
                     tank.sprite.rotation = dir.angle() + Math.PI / 2;
                 }, false);
             }
@@ -250,91 +287,117 @@
                 }, false);
             }
             
-            function tankUpdate()
+            function Tank(world, name)
+            {
+                this._world = world;
+                this._cfg = Config.tanks[name];
+                this._autoFire = true;
+                this._moveDir = new Victor(0, 0);
+            
+                this._sprite = new PIXI.Container();
+                this._weapons = [];
+                for (var idx in this._cfg.weapons) {
+                    this._weapons.push(new Weapon(world, this, this._cfg.weapons[idx]));
+                }
+            
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(this._cfg.edge.w, this._cfg.edge.color);
+                graphics.beginFill(this._cfg.body.color);
+                graphics.drawCircle(0, 0, this._cfg.body.radius);
+                graphics.endFill();
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                bodySprite.anchor.x = 0.5;
+                bodySprite.anchor.y = 0.5;
+                this._sprite.addChild(bodySprite);
+                graphics.destroy();
+            
+                // born position
+                this._sprite.x = Config.world.map.w / 2;
+                this._sprite.y = Config.world.map.h / 2;
+            
+                // event handlers:
+                tankHandleKeyDown(this);
+                tankHandleKeyUp(this);
+                tankHandleMouseMove(this);
+                tankHandleMouseDown(this);
+            
+                world.view.addChild(this._sprite);
+            }
+            
+            Tank.prototype = {}
+            
+            Tank.prototype.update = function()
             {
                 // update tank position
-                if (this.moveDir.lengthSq() > 1e-6) {
-                    var angle = this.moveDir.angle();
-                    this.sprite.position.x += this.cfg.speed * Math.cos(angle);
-                    this.sprite.position.y += this.cfg.speed * Math.sin(angle);
+                if (this._moveDir.lengthSq() > 1e-6) {
+                    var angle = this._moveDir.angle();
+                    this.y += this.cfg.speed * Math.sin(angle);
+                    this.x += this.cfg.speed * Math.cos(angle);
                     // clamp
                     var cfg = Config.world.walkable;
-                    if (this.sprite.position.x > cfg.x + cfg.w) {
-                        this.sprite.position.x = cfg.x + cfg.w;
+                    if (this.x > cfg.x + cfg.w) {
+                        this.x = cfg.x + cfg.w;
                     }
-                    if (this.sprite.position.x < cfg.x) {
-                        this.sprite.position.x = cfg.x;
+                    if (this.x < cfg.x) {
+                        this.x = cfg.x;
                     }
-                    if (this.sprite.position.y > cfg.y + cfg.h) {
-                        this.sprite.position.y = cfg.y + cfg.h;
+                    if (this.y > cfg.y + cfg.h) {
+                        this.y = cfg.y + cfg.h;
                     }
-                    if (this.sprite.position.y < cfg.y) {
-                        this.sprite.position.y = cfg.y;
+                    if (this.y < cfg.y) {
+                        this.y = cfg.y;
                     }
                 }
+            
                 // fire
                 if (this.autoFire == true) {
                     this.fire();
                 }
             }
             
-            function tankFire()
+            Tank.prototype.fire = function()
             {
                 for (var idx in this.weapons) {
                     this.weapons[idx].fire();
                 }
             }
             
-            function tankCreateView(tank)
-            {
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(tank.cfg.edge.w, tank.cfg.edge.color);
-                graphics.beginFill(tank.cfg.body.color);
-                graphics.drawCircle(0, 0, tank.cfg.body.radius);
-                graphics.endFill();
+            Object.defineProperties(Tank.prototype, {
             
-                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-                bodySprite.anchor.x = 0.5;
-                bodySprite.anchor.y = 0.5;
-                tank.sprite.addChild(bodySprite);
+                world: {
+                    get: function() { return this._world; }
+                },
             
-                graphics.destroy();
-            }
+                cfg: {
+                    get: function() { return this._cfg; }
+                },
             
-            function Tank(world, name, isPlayer)
-            {
-            // properties:
-                this.world = world;
-                this.isPlayer = isPlayer;
-                this.autoFire = true;
-                this.moveDir = new Victor(0, 0);
-                this.cfg = Config.tanks[name];
+                sprite: {
+                    get: function() { return this._sprite; }
+                },
             
-                this.sprite = new PIXI.Container();
-                this.weapons = [];
-                for (var idx in this.cfg.weapons) {
-                    this.weapons.push(new Weapon(world, this, idx));
-                }
-                tankCreateView(this);
+                x: {
+                    get: function() { return this._sprite.x; },
+                    set: function(v) { this._sprite.x = v; }
+                },
+                y: {
+                    get: function() { return this._sprite.y; },
+                    set: function(v) { this._sprite.y = v; }
+                },
             
-                // born position
-                this.sprite.position.x = Config.world.map.w / 2;
-                this.sprite.position.y = Config.world.map.h / 2;
+                autoFire: {
+                    get: function() { return this._autoFire; },
+                    set: function(v) { this._autoFire = v; }
+                },
             
-            // functions:
-                this.update = tankUpdate;
-                this.fire = tankFire;
+                moveDir: {
+                    get: function() { return this._moveDir; }
+                },
             
-            // event handlers:
-                if (isPlayer == true) {
-                    tankHandleKeyDown(this);
-                    tankHandleKeyUp(this);
-                    tankHandleMouseMove(this);
-                    tankHandleMouseDown(this);
-                }
-            
-                world.view.addChild(this.sprite);
-            }
+                weapons: {
+                    get: function() { return this._weapons; }
+                },
+            });
             
             module.exports = Tank;
             
@@ -344,56 +407,75 @@
         require.register("./modules/weapon", function(module, exports, require) {
             var Bullet = require("../modules/bullet");
             
-            function weaponFire()
-            {
-                if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
-                    this.fireFrame = this.world.frame;
-                    var pos = this.offset.clone();
-                    pos.rotate(this.owner.sprite.rotation);
-                    pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
-                    var angle = this.owner.sprite.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
-                    var bullet = new Bullet(this.world, pos, angle, this);
-                    this.world.bullets.push(bullet);
-                }
-            }
-            
             function weaponCreateView(weapon)
             {
-                var sprite = weapon.owner.sprite;
+            }
+            
+            function Weapon(world, tank, cfg)
+            {
+                this._world = world;
+                this._owner = tank;
+                this._cfg = cfg;
+                this._angle = this._cfg.angle;
+                this._offset = new Victor(0, - this._cfg.shootOffset - this._cfg.h);
+                this._offset.rotateDeg(this._cfg.angle)
+                           .add(new Victor(this._cfg.x, this._cfg.y));
+                this._fireFrame = world.frame + this._cfg.shootDelayFrame;
             
                 var graphics = new PIXI.Graphics();
-                graphics.lineStyle(weapon.owner.cfg.edge.w, weapon.owner.cfg.edge.color);
-                graphics.beginFill(weapon.cfg.color);
-                graphics.drawRect(0, 0, weapon.cfg.w, weapon.cfg.h);
+                graphics.lineStyle(this._owner.cfg.edge.w, this._owner.cfg.edge.color);
+                graphics.beginFill(this._cfg.color);
+                graphics.drawRect(0, 0, this._cfg.w, this._cfg.h);
                 graphics.endFill();
-            
                 var weaponSprite = new PIXI.Sprite(graphics.generateTexture());
                 weaponSprite.anchor.x = 0.5;
                 weaponSprite.anchor.y = 1.0;
-                weaponSprite.rotation = weapon.cfg.angle * Math.PI / 180;
-                weaponSprite.x += weapon.cfg.x;
-                weaponSprite.y += weapon.cfg.y;
-                sprite.addChild(weaponSprite);
-            
+                weaponSprite.rotation = this._cfg.angle * Math.PI / 180;
+                weaponSprite.x += this._cfg.x;
+                weaponSprite.y += this._cfg.y;
+                tank.sprite.addChild(weaponSprite);
                 graphics.destroy();
             }
             
-            function Weapon(world, tank, idx)
-            {
-            // properties:
-                this.world = world;
-                this.owner = tank;
-                this.cfg = tank.cfg.weapons[idx];
-                this.angle = this.cfg.angle;
-                this.offset = new Victor(0, - this.cfg.shootOffset - this.cfg.h);
-                this.offset.rotateDeg(this.cfg.angle)
-                           .add(new Victor(this.cfg.x, this.cfg.y));
-                this.fireFrame = world.frame + this.cfg.shootDelayFrame;
-                weaponCreateView(this);
+            Weapon.prototype = {}
             
-            // functions:
-                this.fire = weaponFire;
+            Weapon.prototype.fire = function()
+            {
+                if (this._world.frame - this._fireFrame >= this._cfg.reloadFrame) {
+            
+                    this._fireFrame = this._world.frame;
+            
+                    var pos = this._offset.clone();
+                    pos.rotate(this._owner.sprite.rotation);
+                    pos.add(new Victor(this._owner.sprite.position.x, this._owner.sprite.position.y));
+                    var angle = this._owner.sprite.rotation + this._cfg.angle * Math.PI / 180 - Math.PI / 2;
+                    var bullet = new Bullet(this._world, pos, angle, this);
+                    this._world.bullets.push(bullet);
+                }
             }
+            
+            Object.defineProperties(Weapon.prototype, {
+            
+                world: {
+                    get: function() { return this._world; }
+                },
+            
+                owner: {
+                    get: function() { return this._owner; }
+                },
+            
+                cfg: {
+                    get: function() { return this._cfg; }
+                },
+            
+                angle: {
+                    get: function() { return this._angle; }
+                },
+            
+                offset: {
+                    get: function() { return this._offset; }
+                },
+            });
             
             module.exports = Weapon;
             
@@ -456,7 +538,7 @@
             
                 // world objects
                 this._bullets = [];
-                this._tank = new Tank(this, "normal", true);
+                this._tank = new Tank(this, "normal");
             }
             
             World.prototype = {};
