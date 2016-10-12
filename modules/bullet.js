@@ -4,83 +4,58 @@ var _id = 1;
 
 function Bullet(world, position, angle, weapon)
 {
-    this._id = _id ++;
-    this._world = world;
-    this._owner = weapon.owner;
-    this._angle = angle;
+    this.id = _id ++;
+    this.world = world;
+    this.owner = weapon.owner;
+    this.angle = angle;
+    this.bornTime = world.time;
 
-    this._cfg = Config.bullets[weapon.cfg.bullet];
-    this._speed = this._cfg.speed;
+    this.cfg = Config.bullets[weapon.cfg.bullet];
+    this.speed = this.cfg.speed;
 
     var graphics = new PIXI.Graphics();
-    graphics.lineStyle(this._cfg.edge.w, this._cfg.edge.color);
-    graphics.beginFill(this._cfg.body.color);
-    graphics.drawCircle(0, 0, this._cfg.body.radius);
+    graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
+    graphics.beginFill(this.cfg.body.color);
+    graphics.drawCircle(0, 0, this.cfg.body.radius);
     graphics.endFill();
-    this._sprite = new PIXI.Sprite(graphics.generateTexture());
+    this.sprite = new PIXI.Sprite(graphics.generateTexture());
     graphics.destroy();
 
-    this._sprite.anchor.x = 0.5;
-    this._sprite.anchor.y = 0.5;
-    this._sprite.position.x = position.x;
-    this._sprite.position.y = position.y;
-    world.view.addChild(this._sprite);
+    this.sprite.anchor.x = 0.5;
+    this.sprite.anchor.y = 0.5;
+    this.sprite.position.x = position.x;
+    this.sprite.position.y = position.y;
+    world.view.addChild(this.sprite);
 }
 
 Bullet.prototype = {}
 
 Bullet.prototype.update = function()
 {
-    // update bullet position
-    if (this._sprite.position.x < 0
-        || this._sprite.position.x > Config.world.map.w
-        || this._sprite.position.y < 0
-        || this._sprite.position.y > Config.world.map.h) {
+    // due to die
+    if (this.world.time > this.bornTime + this.cfg.duration) {
         return -1;
     }
-    this._sprite.position.x += this._speed * Math.cos(this._angle);
-    this._sprite.position.y += this._speed * Math.sin(this._angle);
+    // update bullet position
+    if (this.sprite.position.x < 0
+        || this.sprite.position.x > Config.world.map.w
+        || this.sprite.position.y < 0
+        || this.sprite.position.y > Config.world.map.h) {
+        return -1;
+    }
+    this.sprite.position.x += this.speed * Math.cos(this.angle);
+    this.sprite.position.y += this.speed * Math.sin(this.angle);
     return 0;
 }
 
 Object.defineProperties(Bullet.prototype, {
-
-    id : {
-        get: function() { return this._id; }
-    },
-
-    world: {
-        get: function() { return this._world; }
-    },
-
-    owner: {
-        get: function() { return this._owner; }
-    },
-
-    cfg: {
-        get: function() { return this._cfg; }
-    },
-
-    sprite: {
-        get: function() { return this._sprite; }
-    },
-
-    speed: {
-        get: function() { return this._speed; }
-    },
-
-    angle: {
-        get: function() { return this._angle; }
-    },
-
     x: {
-        get: function() { return this._sprite.x; },
-        set: function(v) { this._sprite.x = v; }
+        get: function() { return this.sprite.x; },
+        set: function(v) { this.sprite.x = v; }
     },
-
     y: {
-        get: function() { return this._sprite.y; },
-        set: function(v) { this._sprite.y = v; }
+        get: function() { return this.sprite.y; },
+        set: function(v) { this.sprite.y = v; }
     },
 });
 

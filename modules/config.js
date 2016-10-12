@@ -25,6 +25,13 @@ var Config =
         "updateMS": 1000 / 30
     },
 
+    "dieAnimation": {
+        "alphaStart": 0.4,
+        "alphaDecrease": 0.1,
+        "alphaEnd": 0.1,
+        "scaleIncrease": 0.1
+    },
+
     "bullets": {
         "normal": {
             "edge": {
@@ -36,6 +43,7 @@ var Config =
                 "color": 0x00b2e1
             },
             "speed": 10,
+            "duration": 1000
         }
     },
 
@@ -60,7 +68,8 @@ var Config =
                     "color": 0x999999,
                     "shootOffset": 10,
                     "reloadFrame": 10,
-                    "shootDelayFrame": 3
+                    "shootDelayFrame": 3,
+                    "disturbDeg": 15,
                 },
                 {
                     "w": 15,
@@ -72,7 +81,8 @@ var Config =
                     "color": 0x999999,
                     "shootOffset": 10,
                     "reloadFrame": 10,
-                    "shootDelayFrame": 6
+                    "shootDelayFrame": 6,
+                    "disturbDeg": 15,
                 }
             ],
             "speed": 5,

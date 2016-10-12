@@ -44,6 +44,13 @@
                     "updateMS": 1000 / 30
                 },
             
+                "dieAnimation": {
+                    "alphaStart": 0.4,
+                    "alphaDecrease": 0.1,
+                    "alphaEnd": 0.1,
+                    "scaleIncrease": 0.1
+                },
+            
                 "bullets": {
                     "normal": {
                         "edge": {
@@ -55,6 +62,7 @@
                             "color": 0x00b2e1
                         },
                         "speed": 10,
+                        "duration": 1000
                     }
                 },
             
@@ -79,7 +87,8 @@
                                 "color": 0x999999,
                                 "shootOffset": 10,
                                 "reloadFrame": 10,
-                                "shootDelayFrame": 3
+                                "shootDelayFrame": 3,
+                                "disturbDeg": 15,
                             },
                             {
                                 "w": 15,
@@ -91,7 +100,8 @@
                                 "color": 0x999999,
                                 "shootOffset": 10,
                                 "reloadFrame": 10,
-                                "shootDelayFrame": 6
+                                "shootDelayFrame": 6,
+                                "disturbDeg": 15,
                             }
                         ],
                         "speed": 5,
@@ -110,83 +120,58 @@
             
             function Bullet(world, position, angle, weapon)
             {
-                this._id = _id ++;
-                this._world = world;
-                this._owner = weapon.owner;
-                this._angle = angle;
+                this.id = _id ++;
+                this.world = world;
+                this.owner = weapon.owner;
+                this.angle = angle;
+                this.bornTime = world.time;
             
-                this._cfg = Config.bullets[weapon.cfg.bullet];
-                this._speed = this._cfg.speed;
+                this.cfg = Config.bullets[weapon.cfg.bullet];
+                this.speed = this.cfg.speed;
             
                 var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this._cfg.edge.w, this._cfg.edge.color);
-                graphics.beginFill(this._cfg.body.color);
-                graphics.drawCircle(0, 0, this._cfg.body.radius);
+                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
+                graphics.beginFill(this.cfg.body.color);
+                graphics.drawCircle(0, 0, this.cfg.body.radius);
                 graphics.endFill();
-                this._sprite = new PIXI.Sprite(graphics.generateTexture());
+                this.sprite = new PIXI.Sprite(graphics.generateTexture());
                 graphics.destroy();
             
-                this._sprite.anchor.x = 0.5;
-                this._sprite.anchor.y = 0.5;
-                this._sprite.position.x = position.x;
-                this._sprite.position.y = position.y;
-                world.view.addChild(this._sprite);
+                this.sprite.anchor.x = 0.5;
+                this.sprite.anchor.y = 0.5;
+                this.sprite.position.x = position.x;
+                this.sprite.position.y = position.y;
+                world.view.addChild(this.sprite);
             }
             
             Bullet.prototype = {}
             
             Bullet.prototype.update = function()
             {
-                // update bullet position
-                if (this._sprite.position.x < 0
-                    || this._sprite.position.x > Config.world.map.w
-                    || this._sprite.position.y < 0
-                    || this._sprite.position.y > Config.world.map.h) {
+                // due to die
+                if (this.world.time > this.bornTime + this.cfg.duration) {
                     return -1;
                 }
-                this._sprite.position.x += this._speed * Math.cos(this._angle);
-                this._sprite.position.y += this._speed * Math.sin(this._angle);
+                // update bullet position
+                if (this.sprite.position.x < 0
+                    || this.sprite.position.x > Config.world.map.w
+                    || this.sprite.position.y < 0
+                    || this.sprite.position.y > Config.world.map.h) {
+                    return -1;
+                }
+                this.sprite.position.x += this.speed * Math.cos(this.angle);
+                this.sprite.position.y += this.speed * Math.sin(this.angle);
                 return 0;
             }
             
             Object.defineProperties(Bullet.prototype, {
-            
-                id : {
-                    get: function() { return this._id; }
-                },
-            
-                world: {
-                    get: function() { return this._world; }
-                },
-            
-                owner: {
-                    get: function() { return this._owner; }
-                },
-            
-                cfg: {
-                    get: function() { return this._cfg; }
-                },
-            
-                sprite: {
-                    get: function() { return this._sprite; }
-                },
-            
-                speed: {
-                    get: function() { return this._speed; }
-                },
-            
-                angle: {
-                    get: function() { return this._angle; }
-                },
-            
                 x: {
-                    get: function() { return this._sprite.x; },
-                    set: function(v) { this._sprite.x = v; }
+                    get: function() { return this.sprite.x; },
+                    set: function(v) { this.sprite.x = v; }
                 },
-            
                 y: {
-                    get: function() { return this._sprite.y; },
-                    set: function(v) { this._sprite.y = v; }
+                    get: function() { return this.sprite.y; },
+                    set: function(v) { this.sprite.y = v; }
                 },
             });
             
@@ -198,6 +183,7 @@
         require.register("./modules/tank", function(module, exports, require) {
             var Config = require("../modules/config");
             var Weapon = require("../modules/weapon");
+            var Util = require("../modules/util");
             
             function tankHandleKeyDown(tank)
             {
@@ -289,31 +275,31 @@
             
             function Tank(world, name)
             {
-                this._world = world;
-                this._cfg = Config.tanks[name];
-                this._autoFire = true;
-                this._moveDir = new Victor(0, 0);
+                this.world = world;
+                this.cfg = Config.tanks[name];
+                this.autoFire = true;
+                this.moveDir = new Victor(0, 0);
             
-                this._sprite = new PIXI.Container();
-                this._weapons = [];
-                for (var idx in this._cfg.weapons) {
-                    this._weapons.push(new Weapon(world, this, this._cfg.weapons[idx]));
+                this.sprite = new PIXI.Container();
+                this.weapons = [];
+                for (var idx in this.cfg.weapons) {
+                    this.weapons.push(new Weapon(world, this, this.cfg.weapons[idx]));
                 }
             
                 var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this._cfg.edge.w, this._cfg.edge.color);
-                graphics.beginFill(this._cfg.body.color);
-                graphics.drawCircle(0, 0, this._cfg.body.radius);
+                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
+                graphics.beginFill(this.cfg.body.color);
+                graphics.drawCircle(0, 0, this.cfg.body.radius);
                 graphics.endFill();
                 var bodySprite = new PIXI.Sprite(graphics.generateTexture());
                 bodySprite.anchor.x = 0.5;
                 bodySprite.anchor.y = 0.5;
-                this._sprite.addChild(bodySprite);
+                this.sprite.addChild(bodySprite);
                 graphics.destroy();
             
                 // born position
-                this._sprite.x = Config.world.map.w / 2;
-                this._sprite.y = Config.world.map.h / 2;
+                this.sprite.x = Config.world.map.w / 2;
+                this.sprite.y = Config.world.map.h / 2;
             
                 // event handlers:
                 tankHandleKeyDown(this);
@@ -321,7 +307,7 @@
                 tankHandleMouseMove(this);
                 tankHandleMouseDown(this);
             
-                world.view.addChild(this._sprite);
+                world.view.addChild(this.sprite);
             }
             
             Tank.prototype = {}
@@ -329,24 +315,12 @@
             Tank.prototype.update = function()
             {
                 // update tank position
-                if (this._moveDir.lengthSq() > 1e-6) {
-                    var angle = this._moveDir.angle();
+                if (this.moveDir.lengthSq() > 1e-6) {
+                    var angle = this.moveDir.angle();
                     this.y += this.cfg.speed * Math.sin(angle);
                     this.x += this.cfg.speed * Math.cos(angle);
-                    // clamp
                     var cfg = Config.world.walkable;
-                    if (this.x > cfg.x + cfg.w) {
-                        this.x = cfg.x + cfg.w;
-                    }
-                    if (this.x < cfg.x) {
-                        this.x = cfg.x;
-                    }
-                    if (this.y > cfg.y + cfg.h) {
-                        this.y = cfg.y + cfg.h;
-                    }
-                    if (this.y < cfg.y) {
-                        this.y = cfg.y;
-                    }
+                    Util.clampPosition(this, cfg.x, cfg.x + cfg.w, cfg.y, cfg.y + cfg.h);
                 }
             
                 // fire
@@ -363,39 +337,13 @@
             }
             
             Object.defineProperties(Tank.prototype, {
-            
-                world: {
-                    get: function() { return this._world; }
-                },
-            
-                cfg: {
-                    get: function() { return this._cfg; }
-                },
-            
-                sprite: {
-                    get: function() { return this._sprite; }
-                },
-            
                 x: {
-                    get: function() { return this._sprite.x; },
-                    set: function(v) { this._sprite.x = v; }
+                    get: function() { return this.sprite.x; },
+                    set: function(v) { this.sprite.x = v; }
                 },
                 y: {
-                    get: function() { return this._sprite.y; },
-                    set: function(v) { this._sprite.y = v; }
-                },
-            
-                autoFire: {
-                    get: function() { return this._autoFire; },
-                    set: function(v) { this._autoFire = v; }
-                },
-            
-                moveDir: {
-                    get: function() { return this._moveDir; }
-                },
-            
-                weapons: {
-                    get: function() { return this._weapons; }
+                    get: function() { return this.sprite.y; },
+                    set: function(v) { this.sprite.y = v; }
                 },
             });
             
@@ -413,26 +361,26 @@
             
             function Weapon(world, tank, cfg)
             {
-                this._world = world;
-                this._owner = tank;
-                this._cfg = cfg;
-                this._angle = this._cfg.angle;
-                this._offset = new Victor(0, - this._cfg.shootOffset - this._cfg.h);
-                this._offset.rotateDeg(this._cfg.angle)
-                           .add(new Victor(this._cfg.x, this._cfg.y));
-                this._fireFrame = world.frame + this._cfg.shootDelayFrame;
+                this.world = world;
+                this.owner = tank;
+                this.cfg = cfg;
+                this.angle = this.cfg.angle;
+                this.offset = new Victor(0, - this.cfg.shootOffset - this.cfg.h);
+                this.offset.rotateDeg(this.cfg.angle)
+                           .add(new Victor(this.cfg.x, this.cfg.y));
+                this.fireFrame = world.frame + this.cfg.shootDelayFrame;
             
                 var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this._owner.cfg.edge.w, this._owner.cfg.edge.color);
-                graphics.beginFill(this._cfg.color);
-                graphics.drawRect(0, 0, this._cfg.w, this._cfg.h);
+                graphics.lineStyle(this.owner.cfg.edge.w, this.owner.cfg.edge.color);
+                graphics.beginFill(this.cfg.color);
+                graphics.drawRect(0, 0, this.cfg.w, this.cfg.h);
                 graphics.endFill();
                 var weaponSprite = new PIXI.Sprite(graphics.generateTexture());
                 weaponSprite.anchor.x = 0.5;
                 weaponSprite.anchor.y = 1.0;
-                weaponSprite.rotation = this._cfg.angle * Math.PI / 180;
-                weaponSprite.x += this._cfg.x;
-                weaponSprite.y += this._cfg.y;
+                weaponSprite.rotation = this.cfg.angle * Math.PI / 180;
+                weaponSprite.x += this.cfg.x;
+                weaponSprite.y += this.cfg.y;
                 tank.sprite.addChild(weaponSprite);
                 graphics.destroy();
             }
@@ -441,41 +389,20 @@
             
             Weapon.prototype.fire = function()
             {
-                if (this._world.frame - this._fireFrame >= this._cfg.reloadFrame) {
+                if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
             
-                    this._fireFrame = this._world.frame;
+                    this.fireFrame = this.world.frame;
             
-                    var pos = this._offset.clone();
-                    pos.rotate(this._owner.sprite.rotation);
-                    pos.add(new Victor(this._owner.sprite.position.x, this._owner.sprite.position.y));
-                    var angle = this._owner.sprite.rotation + this._cfg.angle * Math.PI / 180 - Math.PI / 2;
-                    var bullet = new Bullet(this._world, pos, angle, this);
-                    this._world.bullets.push(bullet);
+                    var pos = this.offset.clone();
+                    pos.rotate(this.owner.sprite.rotation);
+                    pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
+                    var angle = this.owner.sprite.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
+                    var disturb = this.cfg.disturbDeg * Math.PI / 180;
+                    angle += (Math.random() * disturb - disturb / 2);
+                    var bullet = new Bullet(this.world, pos, angle, this);
+                    this.world.bullets.push(bullet);
                 }
             }
-            
-            Object.defineProperties(Weapon.prototype, {
-            
-                world: {
-                    get: function() { return this._world; }
-                },
-            
-                owner: {
-                    get: function() { return this._owner; }
-                },
-            
-                cfg: {
-                    get: function() { return this._cfg; }
-                },
-            
-                angle: {
-                    get: function() { return this._angle; }
-                },
-            
-                offset: {
-                    get: function() { return this._offset; }
-                },
-            });
             
             module.exports = Weapon;
             
@@ -485,6 +412,7 @@
         require.register("./modules/world", function(module, exports, require) {
             var Config = require("../modules/config");
             var Tank = require("../modules/tank");
+            var Util = require("../modules/util");
             
             function getWorldBackground()
             {
@@ -513,80 +441,90 @@
             
             function World()
             {
-                this._frame = 0;
+                this.frame = 0;
             
                 var dateTime = new Date();
-                this._ms = dateTime.getTime();
+                this.time = dateTime.getTime();
             
-                this._stage = new PIXI.Container();
+                this.stage = new PIXI.Container();
             
                 // main view (camera bind)
-                this._view = new PIXI.Container();
-                this._view.addChild(getWorldBackground());
-                this._stage.addChild(this._view);
+                this.view = new PIXI.Container();
+                this.view.addChild(getWorldBackground());
+                this.stage.addChild(this.view);
             
                 // UI & HUD
-                this._ui = new PIXI.Container();
-                this._stage.addChild(this._ui);
+                this.ui = new PIXI.Container();
+                this.stage.addChild(this.ui);
             
-                this._renderer = new PIXI.CanvasRenderer(Config.world.view.w, Config.world.view.h, {
+                this.renderer = new PIXI.CanvasRenderer(Config.world.view.w, Config.world.view.h, {
                         backgroundColor: Config.world.map.color,
                         antialias: true,
                         autoResize: true,
                     });
-                document.body.appendChild(this._renderer.view);
+                document.body.appendChild(this.renderer.view);
             
                 // world objects
-                this._bullets = [];
-                this._tank = new Tank(this, "normal");
+                this.bullets = [];
+                this.tank = new Tank(this, "normal");
+            
+                // die sprites
+                this.dieSprites = [];
             }
             
             World.prototype = {};
             World.prototype.constructor = World;
             
-            World.prototype._updateCamera = function()
+            World.prototype.updateCamera = function()
             {
-                var x = this._tank.sprite.position.x;
-                var y = this._tank.sprite.position.y;
+                var x = this.tank.sprite.position.x;
+                var y = this.tank.sprite.position.y;
                 var viewCenterX = Config.world.view.w / 2;
                 var viewCenterY = Config.world.view.h / 2;
-                if (x < viewCenterX) {
-                    x = viewCenterX;
-                }
-                if (x > Config.world.map.w - viewCenterX) {
-                    x = Config.world.map.w - viewCenterX;
-                }
-                if (y < viewCenterY) {
-                    y = viewCenterY;
-                }
-                if (y > Config.world.map.h - viewCenterY) {
-                    y = Config.world.map.h - viewCenterY;
-                }
-                this._view.x = viewCenterX - x;
-                this._view.y = viewCenterY - y;
+                x = Util.clamp(x, viewCenterX, Config.world.map.w - viewCenterX);
+                y = Util.clamp(y, viewCenterY, Config.world.map.h - viewCenterY);
+                this.view.x = viewCenterX - x;
+                this.view.y = viewCenterY - y;
             }
             
-            World.prototype._updateLogic = function()
+            World.prototype.updateLogic = function()
             {
                 var dateTime = new Date();
                 var ms = dateTime.getTime();
             
-                while (ms > this._ms + Config.world.updateMS) {
+                while (ms > this.time + Config.world.updateMS) {
             
-                    this._ms += Config.world.updateMS;
-                    this._frame ++;
+                    this.time += Config.world.updateMS;
+                    this.frame ++;
             
-                    if (this._tank) {
-                        this._tank.update();
+                    if (this.tank) {
+                        this.tank.update();
                     }
             
-                    for (var i in this._bullets) {
-                        var bullet = this._bullets[i];
+                    for (var i in this.bullets) {
+                        var bullet = this.bullets[i];
                         if (bullet.update() < 0) {
-                            var idx = this._view.getChildIndex(bullet.sprite);
-                            this._bullets.splice(i, 1);
-                            this._view.removeChildAt(idx);
+                            this.bullets.splice(i, 1);
+                            this.dieSprites.push(bullet.sprite);
                             delete bullet;
+                        }
+                    }
+            
+                    var cfg = Config.dieAnimation;
+                    for (var i in this.dieSprites) {
+                        var sprite = this.dieSprites[i];
+                        if (sprite.alpha > cfg.alphaStart) {
+                            sprite.alpha = cfg.alphaStart;
+                        } else {
+                            sprite.alpha -= cfg.alphaDecrease;;
+                        }
+                        sprite.scale.x += cfg.scaleIncrease;
+                        sprite.scale.y += cfg.scaleIncrease;
+                        if (sprite.alpha < cfg.alphaEnd) {
+                            var idx = this.view.getChildIndex(sprite);
+                            this.view.removeChildAt(idx);
+                            this.dieSprites.splice(i, 1);
+                            delete sprite;
                         }
                     }
                 }
@@ -594,36 +532,53 @@
             
             World.prototype.update = function()
             {
-                this._updateLogic();
-                this._updateCamera();
-                this._renderer.render(this._stage);
+                this.updateLogic();
+                this.updateCamera();
+                this.renderer.render(this.stage);
             }
-            
-            Object.defineProperties(World.prototype, {
-            
-                frame: {
-                    get: function () { return this._frame; }
-                },
-            
-                view: {
-                    get: function() { return this._view; }
-                },
-            
-                ui: {
-                    get: function() { return this._ui; }
-                },
-            
-                bullets: {
-                    get: function() { return this._bullets; }
-                },
-            
-                tank: {
-                    get: function() { return this._tank; }
-                }
-            });
             
             module.exports = World;
             
+        });
+        </script>
+        <script>
+        require.register("./modules/util", function(module, exports, require) {
+            var Util = {
+            
+                "unitType": {
+                    "tank": 1,
+                    "weapon": 2,
+                    "bullet": 3,
+                    "obstacle": 4
+                },
+            
+                "clamp": function(value, min, max) {
+                    if (value > max) {
+                        value = max;
+                    }
+                    if (value < min) {
+                        value = min;
+                    }
+                    return value;
+                },
+            
+                "clampPosition": function(pos, minx, maxx, miny, maxy) {
+                    if (pos.x > maxx) {
+                        pos.x = maxx;
+                    }
+                    if (pos.x < minx) {
+                        pos.x = minx;
+                    }
+                    if (pos.y > maxy) {
+                        pos.y = maxy;
+                    }
+                    if (pos.y < miny) {
+                        pos.y = miny;
+                    }
+                }
+            };
+            
+            module.exports = Util;
         });
         </script>
 

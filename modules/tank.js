@@ -1,5 +1,6 @@
 var Config = require("../modules/config");
 var Weapon = require("../modules/weapon");
+var Util = require("../modules/util");
 
 function tankHandleKeyDown(tank)
 {
@@ -91,31 +92,31 @@ function tankHandleMouseDown(tank) {
 
 function Tank(world, name)
 {
-    this._world = world;
-    this._cfg = Config.tanks[name];
-    this._autoFire = true;
-    this._moveDir = new Victor(0, 0);
+    this.world = world;
+    this.cfg = Config.tanks[name];
+    this.autoFire = true;
+    this.moveDir = new Victor(0, 0);
 
-    this._sprite = new PIXI.Container();
-    this._weapons = [];
-    for (var idx in this._cfg.weapons) {
-        this._weapons.push(new Weapon(world, this, this._cfg.weapons[idx]));
+    this.sprite = new PIXI.Container();
+    this.weapons = [];
+    for (var idx in this.cfg.weapons) {
+        this.weapons.push(new Weapon(world, this, this.cfg.weapons[idx]));
     }
 
     var graphics = new PIXI.Graphics();
-    graphics.lineStyle(this._cfg.edge.w, this._cfg.edge.color);
-    graphics.beginFill(this._cfg.body.color);
-    graphics.drawCircle(0, 0, this._cfg.body.radius);
+    graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
+    graphics.beginFill(this.cfg.body.color);
+    graphics.drawCircle(0, 0, this.cfg.body.radius);
     graphics.endFill();
     var bodySprite = new PIXI.Sprite(graphics.generateTexture());
     bodySprite.anchor.x = 0.5;
     bodySprite.anchor.y = 0.5;
-    this._sprite.addChild(bodySprite);
+    this.sprite.addChild(bodySprite);
     graphics.destroy();
 
     // born position
-    this._sprite.x = Config.world.map.w / 2;
-    this._sprite.y = Config.world.map.h / 2;
+    this.sprite.x = Config.world.map.w / 2;
+    this.sprite.y = Config.world.map.h / 2;
 
     // event handlers:
     tankHandleKeyDown(this);
@@ -123,7 +124,7 @@ function Tank(world, name)
     tankHandleMouseMove(this);
     tankHandleMouseDown(this);
 
-    world.view.addChild(this._sprite);
+    world.view.addChild(this.sprite);
 }
 
 Tank.prototype = {}
@@ -131,24 +132,12 @@ Tank.prototype = {}
 Tank.prototype.update = function()
 {
     // update tank position
-    if (this._moveDir.lengthSq() > 1e-6) {
-        var angle = this._moveDir.angle();
+    if (this.moveDir.lengthSq() > 1e-6) {
+        var angle = this.moveDir.angle();
         this.y += this.cfg.speed * Math.sin(angle);
         this.x += this.cfg.speed * Math.cos(angle);
-        // clamp
         var cfg = Config.world.walkable;
-        if (this.x > cfg.x + cfg.w) {
-            this.x = cfg.x + cfg.w;
-        }
-        if (this.x < cfg.x) {
-            this.x = cfg.x;
-        }
-        if (this.y > cfg.y + cfg.h) {
-            this.y = cfg.y + cfg.h;
-        }
-        if (this.y < cfg.y) {
-            this.y = cfg.y;
-        }
+        Util.clampPosition(this, cfg.x, cfg.x + cfg.w, cfg.y, cfg.y + cfg.h);
     }
 
     // fire
@@ -165,39 +154,13 @@ Tank.prototype.fire = function()
 }
 
 Object.defineProperties(Tank.prototype, {
-
-    world: {
-        get: function() { return this._world; }
-    },
-
-    cfg: {
-        get: function() { return this._cfg; }
-    },
-
-    sprite: {
-        get: function() { return this._sprite; }
-    },
-
     x: {
-        get: function() { return this._sprite.x; },
-        set: function(v) { this._sprite.x = v; }
+        get: function() { return this.sprite.x; },
+        set: function(v) { this.sprite.x = v; }
     },
     y: {
-        get: function() { return this._sprite.y; },
-        set: function(v) { this._sprite.y = v; }
-    },
-
-    autoFire: {
-        get: function() { return this._autoFire; },
-        set: function(v) { this._autoFire = v; }
-    },
-
-    moveDir: {
-        get: function() { return this._moveDir; }
-    },
-
-    weapons: {
-        get: function() { return this._weapons; }
+        get: function() { return this.sprite.y; },
+        set: function(v) { this.sprite.y = v; }
     },
 });
 
