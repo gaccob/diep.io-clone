@@ -85,7 +85,7 @@
                 },
             
                 obstacles: {
-                    count: 100,
+                    count: 10,
                     small: {
                         side: 3,
                         radius: 25,
@@ -514,7 +514,7 @@
             
                 this.id = Util.getId();
                 this.cfg = Config.tanks[name];
-                // this.autoFire = true;
+                this.autoFire = true;
                 this.moveDir = new Victor(0, 0);
             
                 this.sprite = new PIXI.Container();
@@ -816,6 +816,103 @@
                 }
             }
             
+            World.prototype.getUnitsIn9Grids = function(x, y)
+            {
+                var targets = [];
+                var idxs = [
+                    (y - 1) * this.gridW + x - 1,
+                    (y - 1) * this.gridW + x,
+                    (y - 1) * this.gridW + x + 1,
+                    y * this.gridW + x - 1,
+                    y * this.gridW + x,
+                    y * this.gridW + x + 1,
+                    (y + 1) * this.gridW + x - 1,
+                    (y + 1) * this.gridW + x,
+                    (y + 1) * this.gridW + x + 1,
+                ];
+            
+                var x1 = (x >= 1);
+                var x2 = (x < this.gridW - 1);
+            
+                var y1 = (y >= 1);
+                var y2 = (y < this.gridH - 1);
+            
+                if (y1 && x1) {
+                    var g = this.grids[idxs[0]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                if (y1) {
+                    var g = this.grids[idxs[1]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                if (y1 && x2) {
+                    var g = this.grids[idxs[2]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                if (x1) {
+                    var g = this.grids[idxs[3]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                {
+                    var g = this.grids[idxs[4]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                if (x2) {
+                    var g = this.grids[idxs[5]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                if (y2 && x1) {
+                    var g = this.grids[idxs[6]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                if (y2) {
+                    var g = this.grids[idxs[7]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                if (y2 && x2) {
+                    var g = this.grids[idxs[8]];
+                    for (var i in g) { targets.push(g[i]); }
+                }
+                return targets;
+            }
+            
+            World.prototype.needCheckCollision = function(unit, target)
+            {
+                var u1 = (unit.owner == null ? unit : unit.owner);
+                var u2 = (target.owner == null ? target : target.owner);
+                return u1 != u2;
+            }
+            
+            World.prototype.updateCollision = function()
+            {
+                for (var x = 0; x < this.gridW; ++ x) {
+                    for (var y = 0; y < this.gridH; ++ y) {
+                        var idx = y * this.gridW + x;
+                        for (var i in this.grids[idx]) {
+                            var unit = this.grids[idx][i];
+                            var targets = this.getUnitsIn9Grids(x, y);
+                            for (var j in targets) {
+                                var target = targets[j];
+                                if (this.needCheckCollision(unit, target) == false) {
+                                    continue;
+                                }
+                                if (target.collideCheckFrame == this.frame) {
+                                    continue;
+                                }
+                                var distX = unit.x - target.x;
+                                var distY = unit.y - target.y;
+                                var distR = unit.radius + target.radius;
+                                if (distX * distX + distY * distY < distR * distR) {
+                                    // TODO: collision
+                                    console.log("frame[" + this.frame + "] collistion: unit[" + unit.id + "] vs unit[" + target.id + "]");
+                                }
+                            }
+                            unit.collideCheckFrame = this.frame;
+                        }
+                    }
+                }
+            }
+            
             World.prototype.updateDieAnimations = function()
             {
                 var cfg = Config.dieAnimation;
@@ -848,6 +945,7 @@
                     this.updatePlayers();
                     this.updateObstacles();
                     this.updateBullets();
+                    this.updateCollision();
                     this.updateDieAnimations();
                 }
             }
@@ -868,7 +966,7 @@
             
                 if (idx != oidx) {
                     delete this.grids[oidx][unit.id];
-                    console.log("unit[" + unit.id + "] grid[" + oidx + "->" + idx + "]");
+                    // console.log("unit[" + unit.id + "] grid[" + oidx + "->" + idx + "]");
                 }
                 this.grids[idx][unit.id] = unit;
             }

@@ -66,7 +66,7 @@ var Config =
     },
 
     obstacles: {
-        count: 100,
+        count: 10,
         small: {
             side: 3,
             radius: 25,
