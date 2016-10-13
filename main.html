@@ -19,92 +19,147 @@
         require.register("./modules/config", function(module, exports, require) {
             var Config =
             {
-                "world": {
-                    "map": {
-                        "w": 2048,
-                        "h": 2048,
-                        "color": 0x808080
+                world: {
+                    map: {
+                        w: 4096,
+                        h: 4096,
+                        color: 0x808080,
+                        grid: {
+                            size: 128,
+                        },
                     },
-                    "view": {
-                        "w": 600,
-                        "h": 800
+                    view: {
+                        w: 600,
+                        h: 800,
+                        grid: {
+                            size: 32,
+                            edge: 1,
+                            color: 0xa0a0a0
+                        },
                     },
-                    "grid": {
-                        "size": 32,
-                        "edge": 1,
-                        "color": 0xa0a0a0
+                    walkable: {
+                        x: 128,
+                        y: 128,
+                        w: 3840,
+                        h: 3840,
+                        color: 0xcdcdcd
                     },
-                    "walkable": {
-                        "x": 128,
-                        "y": 128,
-                        "w": 1792,
-                        "h": 1792,
-                        "color": 0xcdcdcd
-                    },
-                    "updateMS": 1000 / 30
+                    updateMS: 1000 / 30
                 },
             
-                "dieAnimation": {
-                    "alphaStart": 0.4,
-                    "alphaDecrease": 0.1,
-                    "alphaEnd": 0.1,
-                    "scaleIncrease": 0.1
+                hpbar: {
+                    edge: {
+                        w: 4,
+                        color: 0x555555,
+                    },
+                    w: 100,
+                    h: 20,
+                    radius: 10,
+                    color: 0x86c680,
+                    xOffset: 0,
+                    yOffset: 35,
+                    xDisplayRatio: 1,
+                    yDisplayRatio: 0.8,
                 },
             
-                "bullets": {
-                    "normal": {
-                        "edge": {
-                            "w": 2,
-                            "color": 0x555555
+                dieAnimation: {
+                    alphaStart: 0.4,
+                    alphaDecrease: 0.1,
+                    alphaEnd: 0.1,
+                    scaleIncrease: 0.1
+                },
+            
+                bullets: {
+                    normal: {
+                        edge: {
+                            w: 2,
+                            color: 0x555555
                         },
-                        "body": {
-                            "radius": 10,
-                            "color": 0x00b2e1
+                        body: {
+                            radius: 10,
+                            color: 0x00b2e1
                         },
-                        "speed": 10,
-                        "duration": 1000
+                        speed: 400,
+                        duration: 1000
                     }
                 },
             
-                "tanks": {
-                    "normal": {
-                        "edge": {
-                            "w": 2.5,
-                            "color": 0x555555
+                obstacles: {
+                    count: 100,
+                    small: {
+                        side: 3,
+                        radius: 25,
+                        color: 0xfc7676,
+                        edge: {
+                            w: 2.5,
+                            color: 0x555555
                         },
-                        "body": {
-                            "radius": 30,
-                            "color": 0x00b2e1
+                        rotationSpeed: 0.5,
+                        moveSpeed: 3,
+                    },
+                    middle: {
+                        side: 4,
+                        radius: 30,
+                        color: 0xffe869,
+                        edge: {
+                            w: 2.5,
+                            color: 0x555555
                         },
-                        "weapons": [
+                        rotationSpeed: 0.5,
+                        moveSpeed: 3,
+                    },
+                    large: {
+                        side: 5,
+                        radius: 35,
+                        color: 0x768dfc,
+                        edge: {
+                            w: 2.5,
+                            color: 0x555555
+                        },
+                        rotationSpeed: 0.5,
+                        moveSpeed: 3,
+                    },
+                },
+            
+                tanks: {
+                    normal: {
+                        edge: {
+                            w: 2.5,
+                            color: 0x555555
+                        },
+                        body: {
+                            radius: 30,
+                            color: 0x00b2e1
+                        },
+                        weapons: [
                             {
-                                "w": 15,
-                                "h": 50,
-                                "x": -10,
-                                "y": 0,
-                                "bullet": "normal",
-                                "angle": 0,
-                                "color": 0x999999,
-                                "shootOffset": 10,
-                                "reloadFrame": 10,
-                                "shootDelayFrame": 3,
-                                "disturbDeg": 15,
+                                w: 15,
+                                h: 50,
+                                x: -10,
+                                y: 0,
+                                bullet: "normal",
+                                angle: 0,
+                                color: 0x999999,
+                                shootOffset: 10,
+                                reloadFrame: 10,
+                                shootDelayFrame: 3,
+                                disturbDeg: 15,
                             },
                             {
-                                "w": 15,
-                                "h": 50,
-                                "x": 10,
-                                "y": 0,
-                                "bullet": "normal",
-                                "angle": 0,
-                                "color": 0x999999,
-                                "shootOffset": 10,
-                                "reloadFrame": 10,
-                                "shootDelayFrame": 6,
-                                "disturbDeg": 15,
+                                w: 15,
+                                h: 50,
+                                x: 10,
+                                y: 0,
+                                bullet: "normal",
+                                angle: 0,
+                                color: 0x999999,
+                                shootOffset: 10,
+                                reloadFrame: 10,
+                                shootDelayFrame: 6,
+                                disturbDeg: 15,
                             }
                         ],
-                        "speed": 5,
+                        speed: 160,
                     }
                 }
             };
@@ -115,12 +170,11 @@
         <script>
         require.register("./modules/bullet", function(module, exports, require) {
             var Config = require("../modules/config");
-            
-            var _id = 1;
+            var Util = require("../modules/util");
             
             function Bullet(world, position, angle, weapon)
             {
-                this.id = _id ++;
+                this.id = Util.getId();
                 this.world = world;
                 this.owner = weapon.owner;
                 this.angle = angle;
@@ -135,32 +189,42 @@
                 graphics.drawCircle(0, 0, this.cfg.body.radius);
                 graphics.endFill();
                 this.sprite = new PIXI.Sprite(graphics.generateTexture());
-                graphics.destroy();
+                delete graphics;
             
                 this.sprite.anchor.x = 0.5;
                 this.sprite.anchor.y = 0.5;
-                this.sprite.position.x = position.x;
-                this.sprite.position.y = position.y;
                 world.view.addChild(this.sprite);
+            
+                this.x = position.x;
+                this.y = position.y;
+                this.radius = this.cfg.body.radius + this.cfg.edge.w;
             }
             
             Bullet.prototype = {}
             
+            Bullet.prototype.outOfBounds = function()
+            {
+                if (this.x < 0 || this.x > Config.world.map.w
+                    || this.y < 0 || this.y > Config.world.map.h) {
+                    return true;
+                }
+                return false;
+            }
+            
+            Bullet.prototype.outOfDate = function()
+            {
+                if (this.world.time > this.bornTime + this.cfg.duration) {
+                    return true;
+                }
+                return false;
+            }
+            
             Bullet.prototype.update = function()
             {
-                // due to die
-                if (this.world.time > this.bornTime + this.cfg.duration) {
-                    return -1;
-                }
-                // update bullet position
-                if (this.sprite.position.x < 0
-                    || this.sprite.position.x > Config.world.map.w
-                    || this.sprite.position.y < 0
-                    || this.sprite.position.y > Config.world.map.h) {
-                    return -1;
-                }
-                this.sprite.position.x += this.speed * Math.cos(this.angle);
-                this.sprite.position.y += this.speed * Math.sin(this.angle);
+                var oldx = this.x;
+                var oldy = this.y;
+                this.x += this.speed * Math.cos(this.angle) * Config.world.updateMS / 1000;
+                this.y += this.speed * Math.sin(this.angle) * Config.world.updateMS / 1000;
                 return 0;
             }
             
@@ -180,8 +244,179 @@
         });
         </script>
         <script>
+        require.register("./modules/hpbar", function(module, exports, require) {
+            var Config = require("../modules/config");
+            
+            function HpBar(world, cfg, owner, display)
+            {
+                this.world = world;
+                this.cfg = cfg;
+                this.owner = owner;
+                this.display = display;
+                this.percent = 1;
+            
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
+                graphics.beginFill(this.cfg.edge.color);
+                graphics.drawRoundedRect(0, 0, this.cfg.w, this.cfg.h, this.cfg.radius);
+                graphics.endFill();
+                this.backSprite = new PIXI.Sprite(graphics.generateTexture());
+                this.backSprite.anchor.x = 0.5;
+                this.backSprite.anchor.y = 0.5;
+            
+                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
+                graphics.beginFill(this.cfg.color);
+                graphics.drawRoundedRect(0, 0, this.cfg.w, this.cfg.h, this.cfg.radius);
+                graphics.endFill();
+                this.frontSprite = new PIXI.Sprite(graphics.generateTexture());
+                this.frontSprite.anchor.x = 0.5;
+                this.frontSprite.anchor.y = 0.5;
+            
+                this.sprite = new PIXI.Container();
+                this.sprite.addChild(this.backSprite);
+                this.sprite.addChild(this.frontSprite);
+            
+                this.x = this.owner.x + this.cfg.xOffset;
+                var bounds = this.owner.sprite.getLocalBounds();
+                this.y = this.owner.y + (bounds.height + bounds.y) + this.cfg.yOffset;
+            
+                var scale = this.owner.w / this.w;
+                this.scale.x = this.cfg.xDisplayRatio * scale;
+                this.scale.y = this.cfg.yDisplayRatio * scale;
+            
+                world.view.addChild(this.sprite);
+            }
+            
+            HpBar.prototype = {}
+            
+            HpBar.prototype.update = function(percent)
+            {
+                this.percent = percent;
+                this.frontSprite.width = this.cfg.w * percent;
+                this.frontSprite.x -= this.frontSprite.width * (1 - percent);
+            
+                // full hp & default not display
+                if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
+                    this.visible = false;
+                }
+            }
+            
+            Object.defineProperties(HpBar.prototype, {
+                x: {
+                    get: function() { return this.sprite.x; },
+                    set: function(v) { this.sprite.x = v; }
+                },
+                y: {
+                    get: function() { return this.sprite.y; },
+                    set: function(v) { this.sprite.y = v; }
+                },
+                scale: {
+                    get: function() { return this.sprite.scale; },
+                    set: function(s) { this.sprite.scale = s; }
+                },
+                w: {
+                    get: function() { return this.sprite.width; }
+                },
+                h: {
+                    get: function() { return this.sprite.height; }
+                },
+            });
+            
+            module.exports = HpBar;
+            
+        });
+        </script>
+        <script>
+        require.register("./modules/obstacle", function(module, exports, require) {
+            var Config = require("../modules/config");
+            var Util = require("../modules/util");
+            
+            function Obstacle(world, cfg, position)
+            {
+                this.world = world;
+                this.cfg = cfg;
+                this.id = Util.getId();
+            
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
+                graphics.beginFill(this.cfg.color);
+            
+                var from = new PIXI.Point(0, this.cfg.radius);
+                graphics.moveTo(from.x, from.y);
+                for (var i = 1; i < this.cfg.side; ++ i) {
+                    var p = new Victor(from.x, from.y);
+                    p.rotate(Math.PI * 2 / this.cfg.side);
+                    graphics.lineTo(p.x, p.y);
+                    from.set(p.x, p.y);
+                    delete p;
+                }
+                graphics.endFill();
+                this.sprite = new PIXI.Sprite(graphics.generateTexture());
+                delete from;
+                delete graphics;
+            
+                this.sprite.anchor.x = 0.5;
+                this.sprite.anchor.y = (this.cfg.radius + this.cfg.edge.w) / this.sprite.height;
+                world.view.addChild(this.sprite);
+            
+                this.x = position.x;
+                this.y = position.y;
+                this.radius = this.cfg.radius + this.cfg.edge.w;
+            
+                var angle = Math.random() * Math.PI * 2;
+                this.speed = new Victor(this.cfg.moveSpeed * Math.cos(angle),
+                    this.cfg.moveSpeed * Math.sin(angle));
+            }
+            
+            Obstacle.prototype = {}
+            
+            Obstacle.prototype.update = function()
+            {
+                if (this.x < Config.world.walkable.x) {
+                    this.speed.x = - this.speed.x;
+                }
+                if (this.x > Config.world.walkable.x + Config.world.walkable.w) {
+                    this.speed.x = - this.speed.x;
+                }
+                if (this.y < Config.world.walkable.y) {
+                    this.speed.y = - this.speed.y;
+                }
+                if (this.y > Config.world.walkable.y + Config.world.walkable.h) {
+                    this.speed.y = - this.speed.y;
+                }
+            
+                // slow move
+                this.x += this.speed.x * Config.world.updateMS / 1000;
+                this.y += this.speed.y * Config.world.updateMS / 1000;
+            
+                // slow rotation
+                this.sprite.rotation += this.cfg.rotationSpeed * Config.world.updateMS / 1000;
+            }
+            
+            Object.defineProperties(Obstacle.prototype, {
+                x: {
+                    get: function() { return this.sprite.x; },
+                    set: function(v) { this.sprite.x = v; }
+                },
+                y: {
+                    get: function() { return this.sprite.y; },
+                    set: function(v) { this.sprite.y = v; }
+                },
+                h: {
+                    get: function() { return this.sprite.height; }
+                },
+                w: {
+                    get: function() { return this.sprite.width; }
+                },
+            });
+            
+            module.exports = Obstacle;
+        });
+        </script>
+        <script>
         require.register("./modules/tank", function(module, exports, require) {
             var Config = require("../modules/config");
+            var HpBar = require("../modules/hpbar");
             var Weapon = require("../modules/weapon");
             var Util = require("../modules/util");
             
@@ -273,17 +508,21 @@
                 }, false);
             }
             
-            function Tank(world, name)
+            function Tank(world, name, position)
             {
                 this.world = world;
+            
+                this.id = Util.getId();
                 this.cfg = Config.tanks[name];
-                this.autoFire = true;
+                // this.autoFire = true;
                 this.moveDir = new Victor(0, 0);
             
                 this.sprite = new PIXI.Container();
                 this.weapons = [];
                 for (var idx in this.cfg.weapons) {
-                    this.weapons.push(new Weapon(world, this, this.cfg.weapons[idx]));
+                    var weapon = new Weapon(world, this, this.cfg.weapons[idx]);
+                    this.weapons.push(weapon);
+                    this.sprite.addChild(weapon.sprite);
                 }
             
                 var graphics = new PIXI.Graphics();
@@ -292,14 +531,17 @@
                 graphics.drawCircle(0, 0, this.cfg.body.radius);
                 graphics.endFill();
                 var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+            
                 bodySprite.anchor.x = 0.5;
                 bodySprite.anchor.y = 0.5;
                 this.sprite.addChild(bodySprite);
-                graphics.destroy();
             
-                // born position
-                this.sprite.x = Config.world.map.w / 2;
-                this.sprite.y = Config.world.map.h / 2;
+                world.view.addChild(this.sprite);
+            
+                this.x = position.x;
+                this.y = position.y;
+                this.radius = this.cfg.body.radius + this.cfg.edge.w;
             
                 // event handlers:
                 tankHandleKeyDown(this);
@@ -307,7 +549,9 @@
                 tankHandleMouseMove(this);
                 tankHandleMouseDown(this);
             
-                world.view.addChild(this.sprite);
+                // hp bar
+                this.hpbar = new HpBar(world, Config.hpbar, this, true);
+                this.hpbar.update(0.5);
             }
             
             Tank.prototype = {}
@@ -317,8 +561,12 @@
                 // update tank position
                 if (this.moveDir.lengthSq() > 1e-6) {
                     var angle = this.moveDir.angle();
-                    this.y += this.cfg.speed * Math.sin(angle);
-                    this.x += this.cfg.speed * Math.cos(angle);
+                    var deltaY = this.cfg.speed * Math.sin(angle) * Config.world.updateMS / 1000;
+                    var deltaX = this.cfg.speed * Math.cos(angle) * Config.world.updateMS / 1000;
+                    this.x += deltaX;
+                    this.y += deltaY;
+                    this.hpbar.x += deltaX;
+                    this.hpbar.y += deltaY;
                     var cfg = Config.world.walkable;
                     Util.clampPosition(this, cfg.x, cfg.x + cfg.w, cfg.y, cfg.y + cfg.h);
                 }
@@ -344,6 +592,12 @@
                 y: {
                     get: function() { return this.sprite.y; },
                     set: function(v) { this.sprite.y = v; }
+                },
+                h: {
+                    get: function() { return this.sprite.height; }
+                },
+                w: {
+                    get: function() { return this.sprite.width; }
                 },
             });
             
@@ -375,14 +629,14 @@
                 graphics.beginFill(this.cfg.color);
                 graphics.drawRect(0, 0, this.cfg.w, this.cfg.h);
                 graphics.endFill();
-                var weaponSprite = new PIXI.Sprite(graphics.generateTexture());
-                weaponSprite.anchor.x = 0.5;
-                weaponSprite.anchor.y = 1.0;
-                weaponSprite.rotation = this.cfg.angle * Math.PI / 180;
-                weaponSprite.x += this.cfg.x;
-                weaponSprite.y += this.cfg.y;
-                tank.sprite.addChild(weaponSprite);
+                this.sprite = new PIXI.Sprite(graphics.generateTexture());
                 graphics.destroy();
+            
+                this.sprite.anchor.x = 0.5;
+                this.sprite.anchor.y = 1.0;
+                this.sprite.rotation = this.cfg.angle * Math.PI / 180;
+                this.sprite.x += this.cfg.x;
+                this.sprite.y += this.cfg.y;
             }
             
             Weapon.prototype = {}
@@ -411,6 +665,7 @@
         <script>
         require.register("./modules/world", function(module, exports, require) {
             var Config = require("../modules/config");
+            var Obstacle = require("../modules/obstacle");
             var Tank = require("../modules/tank");
             var Util = require("../modules/util");
             
@@ -426,12 +681,12 @@
                 graphics.endFill();
             
                 // background grids
-                graphics.lineStyle(cfg.grid.edge, cfg.grid.color);
-                for (var x = cfg.grid.size; x < cfg.map.w; x += cfg.grid.size) {
+                graphics.lineStyle(cfg.view.grid.edge, cfg.view.grid.color);
+                for (var x = cfg.view.grid.size; x < cfg.map.w; x += cfg.view.grid.size) {
                     graphics.moveTo(x, 0);
                     graphics.lineTo(x, cfg.map.h);
                 }
-                for (var y = cfg.grid.size; y < cfg.map.h; y += cfg.grid.size) {
+                for (var y = cfg.view.grid.size; y < cfg.map.h; y += cfg.view.grid.size) {
                     graphics.moveTo(0, y);
                     graphics.lineTo(cfg.map.w, y);
                 }
@@ -442,6 +697,19 @@
             function World()
             {
                 this.frame = 0;
+            
+                this.w = Config.world.map.w;
+                this.h = Config.world.map.h;
+            
+                this.gridSize = Config.world.map.grid.size;
+                this.gridW = this.w / this.gridSize;
+                this.gridH = this.h / this.gridSize;
+                this.grids = [];
+                for (var i = 0; i < this.gridH; ++ i) {
+                    for (var j = 0; j < this.gridW; ++ j) {
+                        this.grids.push({});
+                    }
+                }
             
                 var dateTime = new Date();
                 this.time = dateTime.getTime();
@@ -466,7 +734,11 @@
             
                 // world objects
                 this.bullets = [];
-                this.tank = new Tank(this, "normal");
+                this.obstacles = [];
+                this.tank = new Tank(this, "normal", {
+                    x: Config.world.map.w / 2,
+                    y: Config.world.map.h / 2,
+                });
             
                 // die sprites
                 this.dieSprites = [];
@@ -477,8 +749,8 @@
             
             World.prototype.updateCamera = function()
             {
-                var x = this.tank.sprite.position.x;
-                var y = this.tank.sprite.position.y;
+                var x = this.tank.x;
+                var y = this.tank.y;
                 var viewCenterX = Config.world.view.w / 2;
                 var viewCenterY = Config.world.view.h / 2;
                 x = Util.clamp(x, viewCenterX, Config.world.map.w - viewCenterX);
@@ -487,47 +759,126 @@
                 this.view.y = viewCenterY - y;
             }
             
+            World.prototype.updateTanks = function()
+            {
+                var oldx = this.tank.x;
+                var oldy = this.tank.y;
+                this.tank.update();
+                this.updateUnitGrid(this.tank, { x: oldx, y: oldy });
+            }
+            
+            World.prototype.updatePlayers = function()
+            {
+                // TODO:
+            }
+            
+            World.prototype.updateObstacles = function()
+            {
+                if (this.obstacles.length < Config.obstacles.count) {
+                    var cfgs = [
+                        Config.obstacles.small,
+                        Config.obstacles.middle,
+                        Config.obstacles.large
+                    ];
+                    var cfg = cfgs[Math.floor((Math.random() * cfgs.length))];
+                    var wcfg = Config.world.walkable;
+                    var obstacle = new Obstacle(this, cfg, {
+                        x: Util.randomBetween(wcfg.x, wcfg.x + wcfg.w),
+                        y: Util.randomBetween(wcfg.y, wcfg.y + wcfg.h),
+                    });
+                    this.obstacles.push(obstacle);
+                }
+            
+                for (var i in this.obstacles) {
+                    var obstacle = this.obstacles[i];
+                    var oldx = obstacle.x;
+                    var oldy = obstacle.y;
+                    obstacle.update();
+                    this.updateUnitGrid(obstacle, { x: oldx, y: oldy });
+                }
+            }
+            
+            World.prototype.updateBullets = function()
+            {
+                for (var i in this.bullets) {
+                    var bullet = this.bullets[i];
+                    if (bullet.outOfDate() || bullet.outOfBounds()) {
+                        this.bullets.splice(i, 1);
+                        this.dieSprites.push(bullet.sprite);
+                        this.removeUnitFromGrid(bullet);
+                        delete bullet;
+                    } else {
+                        var oldx = bullet.x;
+                        var oldy = bullet.y;
+                        bullet.update();
+                        this.updateUnitGrid(bullet, { x: oldx, y: oldy });
+                    }
+                }
+            }
+            
+            World.prototype.updateDieAnimations = function()
+            {
+                var cfg = Config.dieAnimation;
+                for (var i in this.dieSprites) {
+                    var sprite = this.dieSprites[i];
+                    if (sprite.alpha > cfg.alphaStart) {
+                        sprite.alpha = cfg.alphaStart;
+                    } else {
+                        sprite.alpha -= cfg.alphaDecrease;;
+                    }
+                    sprite.scale.x += cfg.scaleIncrease;
+                    sprite.scale.y += cfg.scaleIncrease;
+                    if (sprite.alpha < cfg.alphaEnd) {
+                        var idx = this.view.getChildIndex(sprite);
+                        this.view.removeChildAt(idx);
+                        this.dieSprites.splice(i, 1);
+                        delete sprite;
+                    }
+                }
+            }
+            
             World.prototype.updateLogic = function()
             {
                 var dateTime = new Date();
                 var ms = dateTime.getTime();
-            
                 while (ms > this.time + Config.world.updateMS) {
-            
                     this.time += Config.world.updateMS;
                     this.frame ++;
-            
-                    if (this.tank) {
-                        this.tank.update();
-                    }
-            
-                    for (var i in this.bullets) {
-                        var bullet = this.bullets[i];
-                        if (bullet.update() < 0) {
-                            this.bullets.splice(i, 1);
-                            this.dieSprites.push(bullet.sprite);
-                            delete bullet;
-                        }
-                    }
-            
-                    var cfg = Config.dieAnimation;
-                    for (var i in this.dieSprites) {
-                        var sprite = this.dieSprites[i];
-                        if (sprite.alpha > cfg.alphaStart) {
-                            sprite.alpha = cfg.alphaStart;
-                        } else {
-                            sprite.alpha -= cfg.alphaDecrease;;
-                        }
-                        sprite.scale.x += cfg.scaleIncrease;
-                        sprite.scale.y += cfg.scaleIncrease;
-                        if (sprite.alpha < cfg.alphaEnd) {
-                            var idx = this.view.getChildIndex(sprite);
-                            this.view.removeChildAt(idx);
-                            this.dieSprites.splice(i, 1);
-                            delete sprite;
-                        }
-                    }
+                    this.updateTanks();
+                    this.updatePlayers();
+                    this.updateObstacles();
+                    this.updateBullets();
+                    this.updateDieAnimations();
                 }
+            }
+            
+            World.prototype.updateUnitGrid = function(unit, oldPos)
+            {
+                if (oldPos.x == unit.x && oldPos.y == unit.y) {
+                    return;
+                }
+            
+                var ogx = Math.floor(oldPos.x / this.gridSize);
+                var ogy = Math.floor(oldPos.y / this.gridSize);
+                var oidx = ogy * this.gridW + ogx;
+            
+                var gx = Math.floor(unit.x / this.gridSize);
+                var gy = Math.floor(unit.y / this.gridSize);
+                var idx = gy * this.gridW + gx;
+            
+                if (idx != oidx) {
+                    delete this.grids[oidx][unit.id];
+                    console.log("unit[" + unit.id + "] grid[" + oidx + "->" + idx + "]");
+                }
+                this.grids[idx][unit.id] = unit;
+            }
+            
+            World.prototype.removeUnitFromGrid = function(unit)
+            {
+                var gx = Math.floor(unit.x / this.gridSize);
+                var gy = Math.floor(unit.y / this.gridSize);
+                var idx = gy * this.gridW + gx;
+                delete this.grids[idx][unit.id];
             }
             
             World.prototype.update = function()
@@ -545,14 +896,16 @@
         require.register("./modules/util", function(module, exports, require) {
             var Util = {
             
-                "unitType": {
+                id: 0,
+            
+                unitType: {
                     "tank": 1,
                     "weapon": 2,
                     "bullet": 3,
                     "obstacle": 4
                 },
             
-                "clamp": function(value, min, max) {
+                clamp: function(value, min, max) {
                     if (value > max) {
                         value = max;
                     }
@@ -562,7 +915,7 @@
                     return value;
                 },
             
-                "clampPosition": function(pos, minx, maxx, miny, maxy) {
+                clampPosition: function(pos, minx, maxx, miny, maxy) {
                     if (pos.x > maxx) {
                         pos.x = maxx;
                     }
@@ -575,7 +928,15 @@
                     if (pos.y < miny) {
                         pos.y = miny;
                     }
-                }
+                },
+            
+                randomBetween: function(min, max) {
+                    return Math.random() * (max - min) + min;
+                },
+            
+                getId: function() {
+                    return ++ this.id;
+                },
             };
             
             module.exports = Util;

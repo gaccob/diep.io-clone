@@ -1,10 +1,9 @@
 var Config = require("../modules/config");
-
-var _id = 1;
+var Util = require("../modules/util");
 
 function Bullet(world, position, angle, weapon)
 {
-    this.id = _id ++;
+    this.id = Util.getId();
     this.world = world;
     this.owner = weapon.owner;
     this.angle = angle;
@@ -19,32 +18,42 @@ function Bullet(world, position, angle, weapon)
     graphics.drawCircle(0, 0, this.cfg.body.radius);
     graphics.endFill();
     this.sprite = new PIXI.Sprite(graphics.generateTexture());
-    graphics.destroy();
+    delete graphics;
 
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = 0.5;
-    this.sprite.position.x = position.x;
-    this.sprite.position.y = position.y;
     world.view.addChild(this.sprite);
+
+    this.x = position.x;
+    this.y = position.y;
+    this.radius = this.cfg.body.radius + this.cfg.edge.w;
 }
 
 Bullet.prototype = {}
 
+Bullet.prototype.outOfBounds = function()
+{
+    if (this.x < 0 || this.x > Config.world.map.w
+        || this.y < 0 || this.y > Config.world.map.h) {
+        return true;
+    }
+    return false;
+}
+
+Bullet.prototype.outOfDate = function()
+{
+    if (this.world.time > this.bornTime + this.cfg.duration) {
+        return true;
+    }
+    return false;
+}
+
 Bullet.prototype.update = function()
 {
-    // due to die
-    if (this.world.time > this.bornTime + this.cfg.duration) {
-        return -1;
-    }
-    // update bullet position
-    if (this.sprite.position.x < 0
-        || this.sprite.position.x > Config.world.map.w
-        || this.sprite.position.y < 0
-        || this.sprite.position.y > Config.world.map.h) {
-        return -1;
-    }
-    this.sprite.position.x += this.speed * Math.cos(this.angle);
-    this.sprite.position.y += this.speed * Math.sin(this.angle);
+    var oldx = this.x;
+    var oldy = this.y;
+    this.x += this.speed * Math.cos(this.angle) * Config.world.updateMS / 1000;
+    this.y += this.speed * Math.sin(this.angle) * Config.world.updateMS / 1000;
     return 0;
 }
 

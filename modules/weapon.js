@@ -20,14 +20,14 @@ function Weapon(world, tank, cfg)
     graphics.beginFill(this.cfg.color);
     graphics.drawRect(0, 0, this.cfg.w, this.cfg.h);
     graphics.endFill();
-    var weaponSprite = new PIXI.Sprite(graphics.generateTexture());
-    weaponSprite.anchor.x = 0.5;
-    weaponSprite.anchor.y = 1.0;
-    weaponSprite.rotation = this.cfg.angle * Math.PI / 180;
-    weaponSprite.x += this.cfg.x;
-    weaponSprite.y += this.cfg.y;
-    tank.sprite.addChild(weaponSprite);
+    this.sprite = new PIXI.Sprite(graphics.generateTexture());
     graphics.destroy();
+
+    this.sprite.anchor.x = 0.5;
+    this.sprite.anchor.y = 1.0;
+    this.sprite.rotation = this.cfg.angle * Math.PI / 180;
+    this.sprite.x += this.cfg.x;
+    this.sprite.y += this.cfg.y;
 }
 
 Weapon.prototype = {}

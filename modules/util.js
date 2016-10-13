@@ -1,13 +1,15 @@
 var Util = {
 
-    "unitType": {
+    id: 0,
+
+    unitType: {
         "tank": 1,
         "weapon": 2,
         "bullet": 3,
         "obstacle": 4
     },
 
-    "clamp": function(value, min, max) {
+    clamp: function(value, min, max) {
         if (value > max) {
             value = max;
         }
@@ -17,7 +19,7 @@ var Util = {
         return value;
     },
 
-    "clampPosition": function(pos, minx, maxx, miny, maxy) {
+    clampPosition: function(pos, minx, maxx, miny, maxy) {
         if (pos.x > maxx) {
             pos.x = maxx;
         }
@@ -30,7 +32,15 @@ var Util = {
         if (pos.y < miny) {
             pos.y = miny;
         }
-    }
+    },
+
+    randomBetween: function(min, max) {
+        return Math.random() * (max - min) + min;
+    },
+
+    getId: function() {
+        return ++ this.id;
+    },
 };
 
 module.exports = Util;

@@ -1,4 +1,5 @@
 var Config = require("../modules/config");
+var HpBar = require("../modules/hpbar");
 var Weapon = require("../modules/weapon");
 var Util = require("../modules/util");
 
@@ -90,9 +91,11 @@ function tankHandleMouseDown(tank) {
     }, false);
 }
 
-function Tank(world, name)
+function Tank(world, name, position)
 {
     this.world = world;
+
+    this.id = Util.getId();
     this.cfg = Config.tanks[name];
     this.autoFire = true;
     this.moveDir = new Victor(0, 0);
@@ -100,7 +103,9 @@ function Tank(world, name)
     this.sprite = new PIXI.Container();
     this.weapons = [];
     for (var idx in this.cfg.weapons) {
-        this.weapons.push(new Weapon(world, this, this.cfg.weapons[idx]));
+        var weapon = new Weapon(world, this, this.cfg.weapons[idx]);
+        this.weapons.push(weapon);
+        this.sprite.addChild(weapon.sprite);
     }
 
     var graphics = new PIXI.Graphics();
@@ -109,14 +114,17 @@ function Tank(world, name)
     graphics.drawCircle(0, 0, this.cfg.body.radius);
     graphics.endFill();
     var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+    graphics.destroy();
+
     bodySprite.anchor.x = 0.5;
     bodySprite.anchor.y = 0.5;
     this.sprite.addChild(bodySprite);
-    graphics.destroy();
 
-    // born position
-    this.sprite.x = Config.world.map.w / 2;
-    this.sprite.y = Config.world.map.h / 2;
+    world.view.addChild(this.sprite);
+
+    this.x = position.x;
+    this.y = position.y;
+    this.radius = this.cfg.body.radius + this.cfg.edge.w;
 
     // event handlers:
     tankHandleKeyDown(this);
@@ -124,7 +132,9 @@ function Tank(world, name)
     tankHandleMouseMove(this);
     tankHandleMouseDown(this);
 
-    world.view.addChild(this.sprite);
+    // hp bar
+    this.hpbar = new HpBar(world, Config.hpbar, this, true);
+    this.hpbar.update(0.5);
 }
 
 Tank.prototype = {}
@@ -134,8 +144,12 @@ Tank.prototype.update = function()
     // update tank position
     if (this.moveDir.lengthSq() > 1e-6) {
         var angle = this.moveDir.angle();
-        this.y += this.cfg.speed * Math.sin(angle);
-        this.x += this.cfg.speed * Math.cos(angle);
+        var deltaY = this.cfg.speed * Math.sin(angle) * Config.world.updateMS / 1000;
+        var deltaX = this.cfg.speed * Math.cos(angle) * Config.world.updateMS / 1000;
+        this.x += deltaX;
+        this.y += deltaY;
+        this.hpbar.x += deltaX;
+        this.hpbar.y += deltaY;
         var cfg = Config.world.walkable;
         Util.clampPosition(this, cfg.x, cfg.x + cfg.w, cfg.y, cfg.y + cfg.h);
     }
@@ -161,6 +175,12 @@ Object.defineProperties(Tank.prototype, {
     y: {
         get: function() { return this.sprite.y; },
         set: function(v) { this.sprite.y = v; }
+    },
+    h: {
+        get: function() { return this.sprite.height; }
+    },
+    w: {
+        get: function() { return this.sprite.width; }
     },
 });
 
