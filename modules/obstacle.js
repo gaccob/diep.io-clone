@@ -58,6 +58,8 @@ Obstacle.prototype.update = function()
     // slow move
     this.x += this.speed.x * Config.world.updateMS / 1000;
     this.y += this.speed.y * Config.world.updateMS / 1000;
+    var cfg = Config.world.map;
+    Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
 
     // slow rotation
     this.sprite.rotation += this.cfg.rotationSpeed * Config.world.updateMS / 1000;

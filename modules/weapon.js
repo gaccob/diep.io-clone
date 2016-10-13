@@ -41,11 +41,16 @@ Weapon.prototype.fire = function()
         var pos = this.offset.clone();
         pos.rotate(this.owner.sprite.rotation);
         pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
+        if (pos.x <= 0 || pos.y <= 0 || pos.x >= this.world.w || pos.y >= this.world.h) {
+            return;
+        }
+
         var angle = this.owner.sprite.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
         angle += (Math.random() * disturb - disturb / 2);
+
         var bullet = new Bullet(this.world, pos, angle, this);
-        this.world.bullets.push(bullet);
+        this.world.bullets[bullet.id] = bullet;
     }
 }
 

@@ -143,15 +143,19 @@ Tank.prototype.update = function()
 {
     // update tank position
     if (this.moveDir.lengthSq() > 1e-6) {
+        var oldX = this.x;
+        var oldY = this.y;
+
         var angle = this.moveDir.angle();
         var deltaY = this.cfg.speed * Math.sin(angle) * Config.world.updateMS / 1000;
         var deltaX = this.cfg.speed * Math.cos(angle) * Config.world.updateMS / 1000;
         this.x += deltaX;
         this.y += deltaY;
-        this.hpbar.x += deltaX;
-        this.hpbar.y += deltaY;
-        var cfg = Config.world.walkable;
-        Util.clampPosition(this, cfg.x, cfg.x + cfg.w, cfg.y, cfg.y + cfg.h);
+        var cfg = Config.world.map;
+        Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
+
+        this.hpbar.x += (this.x - oldX);
+        this.hpbar.y += (this.y - oldY);
     }
 
     // fire

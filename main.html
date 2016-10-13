@@ -60,6 +60,7 @@
                     yOffset: 35,
                     xDisplayRatio: 1,
                     yDisplayRatio: 0.8,
+                    alpha: 0.75,
                 },
             
                 dieAnimation: {
@@ -85,7 +86,7 @@
                 },
             
                 obstacles: {
-                    count: 10,
+                    count: 100,
                     small: {
                         side: 3,
                         radius: 25,
@@ -204,8 +205,8 @@
             
             Bullet.prototype.outOfBounds = function()
             {
-                if (this.x < 0 || this.x > Config.world.map.w
-                    || this.y < 0 || this.y > Config.world.map.h) {
+                if (this.x <= 0 || this.x >= this.world.w
+                    || this.y <= 0 || this.y >= this.world.h) {
                     return true;
                 }
                 return false;
@@ -219,12 +220,21 @@
                 return false;
             }
             
+            Bullet.prototype.die = function()
+            {
+                delete this.world.bullets[this.id];
+                this.world.dieSprites.push(this.sprite);
+                this.world.removeUnitFromGrid(this);
+            }
+            
             Bullet.prototype.update = function()
             {
                 var oldx = this.x;
                 var oldy = this.y;
                 this.x += this.speed * Math.cos(this.angle) * Config.world.updateMS / 1000;
                 this.y += this.speed * Math.sin(this.angle) * Config.world.updateMS / 1000;
+                var cfg = Config.world.map;
+                Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
                 return 0;
             }
             
@@ -275,6 +285,7 @@
                 this.sprite = new PIXI.Container();
                 this.sprite.addChild(this.backSprite);
                 this.sprite.addChild(this.frontSprite);
+                this.sprite.alpha = this.cfg.alpha;
             
                 this.x = this.owner.x + this.cfg.xOffset;
                 var bounds = this.owner.sprite.getLocalBounds();
@@ -388,6 +399,8 @@
                 // slow move
                 this.x += this.speed.x * Config.world.updateMS / 1000;
                 this.y += this.speed.y * Config.world.updateMS / 1000;
+                var cfg = Config.world.map;
+                Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
             
                 // slow rotation
                 this.sprite.rotation += this.cfg.rotationSpeed * Config.world.updateMS / 1000;
@@ -560,15 +573,19 @@
             {
                 // update tank position
                 if (this.moveDir.lengthSq() > 1e-6) {
+                    var oldX = this.x;
+                    var oldY = this.y;
+            
                     var angle = this.moveDir.angle();
                     var deltaY = this.cfg.speed * Math.sin(angle) * Config.world.updateMS / 1000;
                     var deltaX = this.cfg.speed * Math.cos(angle) * Config.world.updateMS / 1000;
                     this.x += deltaX;
                     this.y += deltaY;
-                    this.hpbar.x += deltaX;
-                    this.hpbar.y += deltaY;
-                    var cfg = Config.world.walkable;
-                    Util.clampPosition(this, cfg.x, cfg.x + cfg.w, cfg.y, cfg.y + cfg.h);
+                    var cfg = Config.world.map;
+                    Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
+            
+                    this.hpbar.x += (this.x - oldX);
+                    this.hpbar.y += (this.y - oldY);
                 }
             
                 // fire
@@ -650,11 +667,16 @@
                     var pos = this.offset.clone();
                     pos.rotate(this.owner.sprite.rotation);
                     pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
+                    if (pos.x <= 0 || pos.y <= 0 || pos.x >= this.world.w || pos.y >= this.world.h) {
+                        return;
+                    }
+            
                     var angle = this.owner.sprite.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
                     var disturb = this.cfg.disturbDeg * Math.PI / 180;
                     angle += (Math.random() * disturb - disturb / 2);
+            
                     var bullet = new Bullet(this.world, pos, angle, this);
-                    this.world.bullets.push(bullet);
+                    this.world.bullets[bullet.id] = bullet;
                 }
             }
             
@@ -733,12 +755,10 @@
                 document.body.appendChild(this.renderer.view);
             
                 // world objects
-                this.bullets = [];
+                this.bullets = {};
                 this.obstacles = [];
-                this.tank = new Tank(this, "normal", {
-                    x: Config.world.map.w / 2,
-                    y: Config.world.map.h / 2,
-                });
+                this.obstacleCount = 0;
+                this.tank = new Tank(this, "normal", { x: this.w / 2, y: this.h / 2, });
             
                 // die sprites
                 this.dieSprites = [];
@@ -753,8 +773,8 @@
                 var y = this.tank.y;
                 var viewCenterX = Config.world.view.w / 2;
                 var viewCenterY = Config.world.view.h / 2;
-                x = Util.clamp(x, viewCenterX, Config.world.map.w - viewCenterX);
-                y = Util.clamp(y, viewCenterY, Config.world.map.h - viewCenterY);
+                x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
+                y = Util.clamp(y, viewCenterY, this.h - viewCenterY);
                 this.view.x = viewCenterX - x;
                 this.view.y = viewCenterY - y;
             }
@@ -774,7 +794,7 @@
             
             World.prototype.updateObstacles = function()
             {
-                if (this.obstacles.length < Config.obstacles.count) {
+                if (this.obstacleCount < Config.obstacles.count) {
                     var cfgs = [
                         Config.obstacles.small,
                         Config.obstacles.middle,
@@ -786,7 +806,8 @@
                         x: Util.randomBetween(wcfg.x, wcfg.x + wcfg.w),
                         y: Util.randomBetween(wcfg.y, wcfg.y + wcfg.h),
                     });
-                    this.obstacles.push(obstacle);
+                    this.obstacles[obstacle.id] = obstacle;
+                    this.obstacleCount ++;
                 }
             
                 for (var i in this.obstacles) {
@@ -803,9 +824,7 @@
                 for (var i in this.bullets) {
                     var bullet = this.bullets[i];
                     if (bullet.outOfDate() || bullet.outOfBounds()) {
-                        this.bullets.splice(i, 1);
-                        this.dieSprites.push(bullet.sprite);
-                        this.removeUnitFromGrid(bullet);
+                        bullet.die();
                         delete bullet;
                     } else {
                         var oldx = bullet.x;
@@ -904,7 +923,6 @@
                                 var distR = unit.radius + target.radius;
                                 if (distX * distX + distY * distY < distR * distR) {
                                     // TODO: collision
-                                    console.log("frame[" + this.frame + "] collistion: unit[" + unit.id + "] vs unit[" + target.id + "]");
                                 }
                             }
                             unit.collideCheckFrame = this.frame;
@@ -966,7 +984,6 @@
             
                 if (idx != oidx) {
                     delete this.grids[oidx][unit.id];
-                    // console.log("unit[" + unit.id + "] grid[" + oidx + "->" + idx + "]");
                 }
                 this.grids[idx][unit.id] = unit;
             }

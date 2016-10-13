@@ -28,6 +28,7 @@ function HpBar(world, cfg, owner, display)
     this.sprite = new PIXI.Container();
     this.sprite.addChild(this.backSprite);
     this.sprite.addChild(this.frontSprite);
+    this.sprite.alpha = this.cfg.alpha;
 
     this.x = this.owner.x + this.cfg.xOffset;
     var bounds = this.owner.sprite.getLocalBounds();

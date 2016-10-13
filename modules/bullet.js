@@ -33,8 +33,8 @@ Bullet.prototype = {}
 
 Bullet.prototype.outOfBounds = function()
 {
-    if (this.x < 0 || this.x > Config.world.map.w
-        || this.y < 0 || this.y > Config.world.map.h) {
+    if (this.x <= 0 || this.x >= this.world.w
+        || this.y <= 0 || this.y >= this.world.h) {
         return true;
     }
     return false;
@@ -48,12 +48,21 @@ Bullet.prototype.outOfDate = function()
     return false;
 }
 
+Bullet.prototype.die = function()
+{
+    delete this.world.bullets[this.id];
+    this.world.dieSprites.push(this.sprite);
+    this.world.removeUnitFromGrid(this);
+}
+
 Bullet.prototype.update = function()
 {
     var oldx = this.x;
     var oldy = this.y;
     this.x += this.speed * Math.cos(this.angle) * Config.world.updateMS / 1000;
     this.y += this.speed * Math.sin(this.angle) * Config.world.updateMS / 1000;
+    var cfg = Config.world.map;
+    Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
     return 0;
 }
 

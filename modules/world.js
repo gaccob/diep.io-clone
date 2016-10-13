@@ -67,12 +67,10 @@ function World()
     document.body.appendChild(this.renderer.view);
 
     // world objects
-    this.bullets = [];
+    this.bullets = {};
     this.obstacles = [];
-    this.tank = new Tank(this, "normal", {
-        x: Config.world.map.w / 2,
-        y: Config.world.map.h / 2,
-    });
+    this.obstacleCount = 0;
+    this.tank = new Tank(this, "normal", { x: this.w / 2, y: this.h / 2, });
 
     // die sprites
     this.dieSprites = [];
@@ -87,8 +85,8 @@ World.prototype.updateCamera = function()
     var y = this.tank.y;
     var viewCenterX = Config.world.view.w / 2;
     var viewCenterY = Config.world.view.h / 2;
-    x = Util.clamp(x, viewCenterX, Config.world.map.w - viewCenterX);
-    y = Util.clamp(y, viewCenterY, Config.world.map.h - viewCenterY);
+    x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
+    y = Util.clamp(y, viewCenterY, this.h - viewCenterY);
     this.view.x = viewCenterX - x;
     this.view.y = viewCenterY - y;
 }
@@ -108,7 +106,7 @@ World.prototype.updatePlayers = function()
 
 World.prototype.updateObstacles = function()
 {
-    if (this.obstacles.length < Config.obstacles.count) {
+    if (this.obstacleCount < Config.obstacles.count) {
         var cfgs = [
             Config.obstacles.small,
             Config.obstacles.middle,
@@ -120,7 +118,8 @@ World.prototype.updateObstacles = function()
             x: Util.randomBetween(wcfg.x, wcfg.x + wcfg.w),
             y: Util.randomBetween(wcfg.y, wcfg.y + wcfg.h),
         });
-        this.obstacles.push(obstacle);
+        this.obstacles[obstacle.id] = obstacle;
+        this.obstacleCount ++;
     }
 
     for (var i in this.obstacles) {
@@ -137,9 +136,7 @@ World.prototype.updateBullets = function()
     for (var i in this.bullets) {
         var bullet = this.bullets[i];
         if (bullet.outOfDate() || bullet.outOfBounds()) {
-            this.bullets.splice(i, 1);
-            this.dieSprites.push(bullet.sprite);
-            this.removeUnitFromGrid(bullet);
+            bullet.die();
             delete bullet;
         } else {
             var oldx = bullet.x;
@@ -238,7 +235,6 @@ World.prototype.updateCollision = function()
                     var distR = unit.radius + target.radius;
                     if (distX * distX + distY * distY < distR * distR) {
                         // TODO: collision
-                        console.log("frame[" + this.frame + "] collistion: unit[" + unit.id + "] vs unit[" + target.id + "]");
                     }
                 }
                 unit.collideCheckFrame = this.frame;
@@ -300,7 +296,6 @@ World.prototype.updateUnitGrid = function(unit, oldPos)
 
     if (idx != oidx) {
         delete this.grids[oidx][unit.id];
-        // console.log("unit[" + unit.id + "] grid[" + oidx + "->" + idx + "]");
     }
     this.grids[idx][unit.id] = unit;
 }

@@ -41,6 +41,7 @@ var Config =
         yOffset: 35,
         xDisplayRatio: 1,
         yDisplayRatio: 0.8,
+        alpha: 0.75,
     },
 
     dieAnimation: {
@@ -66,7 +67,7 @@ var Config =
     },
 
     obstacles: {
-        count: 10,
+        count: 100,
         small: {
             side: 3,
             radius: 25,
