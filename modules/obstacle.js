@@ -1,16 +1,22 @@
 var Config = require("../modules/config");
+var HpBar = require("../modules/hpbar");
+var Motion = require("../modules/motion");
 var Util = require("../modules/util");
 
 function Obstacle(world, cfg, position)
 {
     this.world = world;
-    this.cfg = cfg;
     this.id = Util.getId();
+    this.type = Util.unitType.obstacle;
+    this.cfg = cfg;
+    this.hp = this.cfg.hp;
+    this.fullHp = this.cfg.hp;
+    this.damage = this.cfg.damage;
 
+    // view
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
     graphics.beginFill(this.cfg.color);
-
     var from = new PIXI.Point(0, this.cfg.radius);
     graphics.moveTo(from.x, from.y);
     for (var i = 1; i < this.cfg.side; ++ i) {
@@ -21,48 +27,60 @@ function Obstacle(world, cfg, position)
         delete p;
     }
     graphics.endFill();
-    this.sprite = new PIXI.Sprite(graphics.generateTexture());
     delete from;
     delete graphics;
-
+    this.sprite = new PIXI.Sprite(graphics.generateTexture());
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = (this.cfg.radius + this.cfg.edge.w) / this.sprite.height;
     world.view.addChild(this.sprite);
 
     this.x = position.x;
     this.y = position.y;
-    this.radius = this.cfg.radius + this.cfg.edge.w;
+    world.addUnitToGrid(this);
 
-    var angle = Math.random() * Math.PI * 2;
-    this.speed = new Victor(this.cfg.moveSpeed * Math.cos(angle),
-        this.cfg.moveSpeed * Math.sin(angle));
+    this.radius = this.cfg.radius + this.cfg.edge.w;
+    this.motion = new Motion(this, this.cfg.moveSpeed, this.cfg.rotationSpeed);
+    this.motion.randomMoveDir();
+    this.hpbar = new HpBar(world, Config.hpbar, this, false);
 }
 
 Obstacle.prototype = {}
 
+Obstacle.prototype.takeDamageByUnit = function(caster)
+{
+    this.hp -= caster.damage;
+    if (this.hp <= 0) {
+        this.die();
+    }
+}
+
+Obstacle.prototype.die = function()
+{
+    delete this.world.obstacles[this.id];
+    this.world.dieSprites.push(this.sprite);
+    this.world.view.removeChild(this.hpbar.sprite);
+    this.world.removeUnitFromGrid(this);
+    this.world.removeUnits.push(this);
+}
+
 Obstacle.prototype.update = function()
 {
-    if (this.x < Config.world.walkable.x) {
-        this.speed.x = - this.speed.x;
-    }
-    if (this.x > Config.world.walkable.x + Config.world.walkable.w) {
-        this.speed.x = - this.speed.x;
-    }
-    if (this.y < Config.world.walkable.y) {
-        this.speed.y = - this.speed.y;
-    }
-    if (this.y > Config.world.walkable.y + Config.world.walkable.h) {
-        this.speed.y = - this.speed.y;
-    }
+    var oldX = this.x;
+    var oldY = this.y;
+    this.motion.update(Config.world.updateMS);
 
-    // slow move
-    this.x += this.speed.x * Config.world.updateMS / 1000;
-    this.y += this.speed.y * Config.world.updateMS / 1000;
-    var cfg = Config.world.map;
-    Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
+    this.hpbar.update(this.hp / this.fullHp);
+    this.hpbar.x += (this.x - oldX);
+    this.hpbar.y += (this.y - oldY);
 
-    // slow rotation
-    this.sprite.rotation += this.cfg.rotationSpeed * Config.world.updateMS / 1000;
+    if (this.x < Config.world.walkable.x
+        || this.x > Config.world.walkable.x + Config.world.walkable.w) {
+        this.motion.reverseMoveDirX();
+    }
+    if (this.y < Config.world.walkable.y
+        || this.y > Config.world.walkable.y + Config.world.walkable.h) {
+        this.motion.reverseMoveDirY();
+    }
 }
 
 Object.defineProperties(Obstacle.prototype, {

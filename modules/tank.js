@@ -1,105 +1,21 @@
 var Config = require("../modules/config");
 var HpBar = require("../modules/hpbar");
+var Motion = require("../modules/motion");
 var Weapon = require("../modules/weapon");
 var Util = require("../modules/util");
-
-function tankHandleKeyDown(tank)
-{
-    document.body.addEventListener('keydown', function(e) {
-        switch (e.key) {
-            case 'w':
-            case 'W':
-                tank.moveDir.y -= 1;
-                if (tank.moveDir.y < -1) {
-                    tank.moveDir.y = -1;
-                }
-                break;
-            case 'd':
-            case 'D':
-                tank.moveDir.x += 1;
-                if (tank.moveDir.x > 1) {
-                    tank.moveDir.x = 1;
-                }
-                break;
-            case 's':
-            case 'S':
-                tank.moveDir.y += 1;
-                if (tank.moveDir.y > 1) {
-                    tank.moveDir.y = 1;
-                }
-                break;
-            case 'a':
-            case 'A':
-                tank.moveDir.x -= 1;
-                if (tank.moveDir.x < -1) {
-                    tank.moveDir.x = -1;
-                }
-                break;
-        }
-    }, false);
-}
-
-function tankHandleKeyUp(tank)
-{
-    document.body.addEventListener('keyup', function(e) {
-        switch (e.key) {
-            case 'w':
-            case 'W':
-                tank.moveDir.y += 1;
-                if (tank.moveDir.y > 1) {
-                    tank.moveDir.y = 1;
-                }
-                break;
-            case 'd':
-            case 'D':
-                tank.moveDir.x -= 1;
-                if (tank.moveDir.x < -1) {
-                    tank.moveDir.x = -1;
-                }
-                break;
-            case 's':
-            case 'S':
-                tank.moveDir.y -= 1;
-                if (tank.moveDir.y < -1) {
-                    tank.moveDir.y = -1;
-                }
-                break;
-            case 'a':
-            case 'A':
-                tank.moveDir.x += 1;
-                if (tank.moveDir.x > 1) {
-                    tank.moveDir.x = 1;
-                }
-                break;
-        }
-    }, false);
-}
-
-function tankHandleMouseMove(tank)
-{
-    document.body.addEventListener('mousemove', function(e) {
-        var targetPos = new Victor(e.x - tank.world.view.x, e.y - tank.world.view.y);
-        var dir = targetPos.subtract(tank.sprite.position);
-        // TODO: rotate speed
-        tank.sprite.rotation = dir.angle() + Math.PI / 2;
-    }, false);
-}
-
-function tankHandleMouseDown(tank) {
-    document.body.addEventListener('mousedown', function(e) {
-        tank.fire();
-    }, false);
-}
 
 function Tank(world, name, position)
 {
     this.world = world;
-
     this.id = Util.getId();
+    this.type = Util.unitType.tank;
     this.cfg = Config.tanks[name];
-    this.autoFire = true;
-    this.moveDir = new Victor(0, 0);
+    this.hp = this.cfg.hp;
+    this.fullHp = this.cfg.hp;
+    this.damage = this.cfg.damage;
+    // this.autoFire = true;
 
+    // view & weapons
     this.sprite = new PIXI.Container();
     this.weapons = [];
     for (var idx in this.cfg.weapons) {
@@ -107,7 +23,6 @@ function Tank(world, name, position)
         this.weapons.push(weapon);
         this.sprite.addChild(weapon.sprite);
     }
-
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
     graphics.beginFill(this.cfg.body.color);
@@ -115,50 +30,53 @@ function Tank(world, name, position)
     graphics.endFill();
     var bodySprite = new PIXI.Sprite(graphics.generateTexture());
     graphics.destroy();
-
     bodySprite.anchor.x = 0.5;
     bodySprite.anchor.y = 0.5;
     this.sprite.addChild(bodySprite);
-
     world.view.addChild(this.sprite);
 
     this.x = position.x;
     this.y = position.y;
+    world.addUnitToGrid(this);
+
     this.radius = this.cfg.body.radius + this.cfg.edge.w;
-
-    // event handlers:
-    tankHandleKeyDown(this);
-    tankHandleKeyUp(this);
-    tankHandleMouseMove(this);
-    tankHandleMouseDown(this);
-
-    // hp bar
+    this.motion = new Motion(this, this.cfg.speed);
     this.hpbar = new HpBar(world, Config.hpbar, this, true);
-    this.hpbar.update(0.5);
 }
 
 Tank.prototype = {}
 
+Tank.prototype.takeDamageByUnit = function(caster)
+{
+    this.hp -= caster.damage;
+    if (this.hp <= 0) {
+        this.die();
+    }
+}
+
+Tank.prototype.die = function()
+{
+    delete this.world.tanks[this.id];
+    this.world.dieSprites.push(this.sprite);
+    this.world.removeUnitFromGrid(this);
+    this.world.removeUnits.push(this);
+
+    // TODO:
+    if (this.world.player == this) {
+        alert("player die");
+    }
+}
+
 Tank.prototype.update = function()
 {
-    // update tank position
-    if (this.moveDir.lengthSq() > 1e-6) {
-        var oldX = this.x;
-        var oldY = this.y;
+    var oldX = this.x;
+    var oldY = this.y;
+    this.motion.update(Config.world.updateMS);
 
-        var angle = this.moveDir.angle();
-        var deltaY = this.cfg.speed * Math.sin(angle) * Config.world.updateMS / 1000;
-        var deltaX = this.cfg.speed * Math.cos(angle) * Config.world.updateMS / 1000;
-        this.x += deltaX;
-        this.y += deltaY;
-        var cfg = Config.world.map;
-        Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
+    this.hpbar.update(this.hp / this.fullHp);
+    this.hpbar.x += (this.x - oldX);
+    this.hpbar.y += (this.y - oldY);
 
-        this.hpbar.x += (this.x - oldX);
-        this.hpbar.y += (this.y - oldY);
-    }
-
-    // fire
     if (this.autoFire == true) {
         this.fire();
     }
@@ -185,6 +103,10 @@ Object.defineProperties(Tank.prototype, {
     },
     w: {
         get: function() { return this.sprite.width; }
+    },
+    rotation: {
+        get: function() { return this.sprite.rotation; },
+        set: function(r) { this.sprite.rotation = r; }
     },
 });
 

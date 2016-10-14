@@ -1,5 +1,6 @@
 var Config = require("../modules/config");
 var Obstacle = require("../modules/obstacle");
+var Player = require("../modules/player")
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
@@ -36,8 +37,8 @@ function World()
     this.h = Config.world.map.h;
 
     this.gridSize = Config.world.map.grid.size;
-    this.gridW = this.w / this.gridSize;
-    this.gridH = this.h / this.gridSize;
+    this.gridW = Math.floor(this.w / this.gridSize) + 1;
+    this.gridH = Math.floor(this.h / this.gridSize) + 1;
     this.grids = [];
     for (var i = 0; i < this.gridH; ++ i) {
         for (var j = 0; j < this.gridW; ++ j) {
@@ -70,10 +71,21 @@ function World()
     this.bullets = {};
     this.obstacles = [];
     this.obstacleCount = 0;
-    this.tank = new Tank(this, "normal", { x: this.w / 2, y: this.h / 2, });
+    this.tanks = [];
+    var idx = 0;
+    for (var i in Config.tanks) {
+        var tank = new Tank(this, i, { x: this.w / 2 + idx * 200, y: this.h / 2 + idx * 200, });
+        this.tanks.push(tank);
+        ++ idx;
+    }
+
+    // player
+    this.player = new Player(this, this.tanks[0]);
+    this.player.addControl();
 
     // die sprites
     this.dieSprites = [];
+    this.removeUnits = [];
 }
 
 World.prototype = {};
@@ -81,8 +93,8 @@ World.prototype.constructor = World;
 
 World.prototype.updateCamera = function()
 {
-    var x = this.tank.x;
-    var y = this.tank.y;
+    var x = this.player.x;
+    var y = this.player.y;
     var viewCenterX = Config.world.view.w / 2;
     var viewCenterY = Config.world.view.h / 2;
     x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
@@ -93,15 +105,18 @@ World.prototype.updateCamera = function()
 
 World.prototype.updateTanks = function()
 {
-    var oldx = this.tank.x;
-    var oldy = this.tank.y;
-    this.tank.update();
-    this.updateUnitGrid(this.tank, { x: oldx, y: oldy });
+    for (var i in this.tanks) {
+        var tank = this.tanks[i];
+        var oldx = tank.x;
+        var oldy = tank.y;
+        tank.update();
+        this.updateUnitGrid(tank, { x: oldx, y: oldy });
+    }
 }
 
 World.prototype.updatePlayers = function()
 {
-    // TODO:
+    this.player.update();
 }
 
 World.prototype.updateObstacles = function()
@@ -137,7 +152,6 @@ World.prototype.updateBullets = function()
         var bullet = this.bullets[i];
         if (bullet.outOfDate() || bullet.outOfBounds()) {
             bullet.die();
-            delete bullet;
         } else {
             var oldx = bullet.x;
             var oldy = bullet.y;
@@ -214,16 +228,68 @@ World.prototype.needCheckCollision = function(unit, target)
     return u1 != u2;
 }
 
+World.prototype.collide = function(unit1, unit2)
+{
+    // Elastic collision
+    // m1, v10
+    // m2, v20
+    // v1 = [(m1-m2)v10 + 2m2v20] / (m1+m2)
+    // v2 = [(m2-m1)v20 + 2m1v10] / (m1+m2)
+
+    // console.log("frame[" + this.frame + "]");
+    // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
+    // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
+    // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
+    // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
+
+    var m1 = unit1.radius * unit1.radius;
+    var m2 = unit2.radius * unit2.radius;
+    var v10 = new Victor(unit1.motion.vx, unit1.motion.vy);
+    var v20 = new Victor(unit2.motion.vx, unit2.motion.vy);
+
+    var v1x = ((m1 - m2) * v10.x + 2 * m2 * v20.x) / (m1 + m2);
+    var v1y = ((m1 - m2) * v10.y + 2 * m2 * v20.y) / (m1 + m2);
+    unit1.motion.ev.x += v1x;
+    unit1.motion.ev.y += v1y;
+
+    var v2x = ((m2 - m1) * v20.x + 2 * m1 * v10.x) / (m1 + m2);
+    var v2y = ((m2 - m1) * v20.y + 2 * m1 * v10.y) / (m1 + m2);
+    unit2.motion.ev.x += v2x;
+    unit2.motion.ev.y += v2y;
+
+    // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
+    // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
+    // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
+    // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
+
+    // damage each other
+    unit1.takeDamageByUnit(unit2);
+    unit2.takeDamageByUnit(unit1);
+}
+
 World.prototype.updateCollision = function()
 {
     for (var x = 0; x < this.gridW; ++ x) {
         for (var y = 0; y < this.gridH; ++ y) {
+
             var idx = y * this.gridW + x;
             for (var i in this.grids[idx]) {
                 var unit = this.grids[idx][i];
+
+                // avoid multi-collision
+                if (unit.collideTime != null) {
+                    if (this.time - unit.collideTime < Config.world.unitCollideCheckMS) {
+                        continue;
+                    }
+                }
+
+                // check collision with targets
                 var targets = this.getUnitsIn9Grids(x, y);
                 for (var j in targets) {
                     var target = targets[j];
+                    if (unit == target) {
+                        continue;
+                    }
                     if (this.needCheckCollision(unit, target) == false) {
                         continue;
                     }
@@ -234,7 +300,10 @@ World.prototype.updateCollision = function()
                     var distY = unit.y - target.y;
                     var distR = unit.radius + target.radius;
                     if (distX * distX + distY * distY < distR * distR) {
-                        // TODO: collision
+                        unit.collideTime = this.time;
+                        target.collideTime = this.time;
+                        this.collide(unit, target);
+                        // console.log("frame=" + this.frame + " collision: " + unit.id + "--" + target.id);
                     }
                 }
                 unit.collideCheckFrame = this.frame;
@@ -306,6 +375,14 @@ World.prototype.removeUnitFromGrid = function(unit)
     var gy = Math.floor(unit.y / this.gridSize);
     var idx = gy * this.gridW + gx;
     delete this.grids[idx][unit.id];
+}
+
+World.prototype.addUnitToGrid = function(unit)
+{
+    var gx = Math.floor(unit.x / this.gridSize);
+    var gy = Math.floor(unit.y / this.gridSize);
+    var idx = gy * this.gridW + gx;
+    this.grids[idx][unit.id] = unit;
 }
 
 World.prototype.update = function()

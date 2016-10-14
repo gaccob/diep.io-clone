@@ -44,7 +44,10 @@
                         h: 3840,
                         color: 0xcdcdcd
                     },
-                    updateMS: 1000 / 30
+                    unitCollideCheckMS: 500,
+                    updateMS: 1000 / 30,
+                    externalVelocityDecPerSecond: 100,
+                    externalVelocityMax: 1000,
                 },
             
                 hpbar: {
@@ -56,10 +59,9 @@
                     h: 20,
                     radius: 10,
                     color: 0x86c680,
-                    xOffset: 0,
-                    yOffset: 35,
-                    xDisplayRatio: 1,
-                    yDisplayRatio: 0.8,
+                    xOffsetRatio: 0,
+                    yOffsetRatio: 1.2,
+                    displayRatio: 0.5,
                     alpha: 0.75,
                 },
             
@@ -80,8 +82,10 @@
                             radius: 10,
                             color: 0x00b2e1
                         },
-                        speed: 400,
-                        duration: 1000
+                        speed: 300,
+                        duration: 1000,
+                        hp: 1,
+                        damage: 10,
                     }
                 },
             
@@ -97,10 +101,12 @@
                         },
                         rotationSpeed: 0.5,
                         moveSpeed: 3,
+                        hp: 10,
+                        damage: 2,
                     },
                     middle: {
                         side: 4,
-                        radius: 30,
+                        radius: 28,
                         color: 0xffe869,
                         edge: {
                             w: 2.5,
@@ -108,10 +114,12 @@
                         },
                         rotationSpeed: 0.5,
                         moveSpeed: 3,
+                        hp: 20,
+                        damage: 4,
                     },
                     large: {
                         side: 5,
-                        radius: 35,
+                        radius: 32,
                         color: 0x768dfc,
                         edge: {
                             w: 2.5,
@@ -119,11 +127,41 @@
                         },
                         rotationSpeed: 0.5,
                         moveSpeed: 3,
+                        hp: 40,
+                        damage: 8,
                     },
                 },
             
                 tanks: {
-                    normal: {
+                    base: {
+                        edge: {
+                            w: 2.5,
+                            color: 0x555555
+                        },
+                        body: {
+                            radius: 30,
+                            color: 0x00b2e1
+                        },
+                        weapons: [
+                            {
+                                w: 15,
+                                h: 50,
+                                x: 0,
+                                y: 0,
+                                bullet: "normal",
+                                angle: 0,
+                                color: 0x999999,
+                                shootOffset: 10,
+                                reloadFrame: 10,
+                                shootDelayFrame: 3,
+                                disturbDeg: 15,
+                            },
+                        ],
+                        speed: 160,
+                        hp: 100,
+                        damage: 10,
+                    },
+                    twin: {
                         edge: {
                             w: 2.5,
                             color: 0x555555
@@ -161,7 +199,76 @@
                             }
                         ],
                         speed: 160,
-                    }
+                        hp: 200,
+                        damage: 10,
+                    },
+                    quad: {
+                        edge: {
+                            w: 2.5,
+                            color: 0x555555
+                        },
+                        body: {
+                            radius: 30,
+                            color: 0x00b2e1
+                        },
+                        weapons: [
+                            {
+                                w: 20,
+                                h: 45,
+                                x: 0,
+                                y: 0,
+                                bullet: "normal",
+                                angle: 0,
+                                color: 0x999999,
+                                shootOffset: 10,
+                                reloadFrame: 10,
+                                shootDelayFrame: 3,
+                                disturbDeg: 15,
+                            },
+                            {
+                                w: 20,
+                                h: 45,
+                                x: 0,
+                                y: 0,
+                                bullet: "normal",
+                                angle: 90,
+                                color: 0x999999,
+                                shootOffset: 10,
+                                reloadFrame: 10,
+                                shootDelayFrame: 3,
+                                disturbDeg: 15,
+                            },
+                            {
+                                w: 20,
+                                h: 45,
+                                x: 0,
+                                y: 0,
+                                bullet: "normal",
+                                angle: 180,
+                                color: 0x999999,
+                                shootOffset: 10,
+                                reloadFrame: 10,
+                                shootDelayFrame: 6,
+                                disturbDeg: 15,
+                            },
+                            {
+                                w: 20,
+                                h: 45,
+                                x: 0,
+                                y: 0,
+                                bullet: "normal",
+                                angle: 270,
+                                color: 0x999999,
+                                shootOffset: 10,
+                                reloadFrame: 10,
+                                shootDelayFrame: 6,
+                                disturbDeg: 15,
+                            },
+                        ],
+                        speed: 160,
+                        hp: 200,
+                        damage: 10,
+                    },
                 }
             };
             
@@ -171,33 +278,38 @@
         <script>
         require.register("./modules/bullet", function(module, exports, require) {
             var Config = require("../modules/config");
+            var Motion = require("../modules/motion");
             var Util = require("../modules/util");
             
             function Bullet(world, position, angle, weapon)
             {
                 this.id = Util.getId();
+                this.type = Util.unitType.bullet;
                 this.world = world;
                 this.owner = weapon.owner;
-                this.angle = angle;
                 this.bornTime = world.time;
-            
                 this.cfg = Config.bullets[weapon.cfg.bullet];
-                this.speed = this.cfg.speed;
+                this.hp = this.cfg.hp;
+                this.damage = this.cfg.damage;
+                this.motion = new Motion(this, this.cfg.speed);
+                this.motion.setMoveDirByAngle(angle);
             
+                // view
                 var graphics = new PIXI.Graphics();
                 graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
                 graphics.beginFill(this.cfg.body.color);
                 graphics.drawCircle(0, 0, this.cfg.body.radius);
                 graphics.endFill();
-                this.sprite = new PIXI.Sprite(graphics.generateTexture());
                 delete graphics;
-            
+                this.sprite = new PIXI.Sprite(graphics.generateTexture());
                 this.sprite.anchor.x = 0.5;
                 this.sprite.anchor.y = 0.5;
                 world.view.addChild(this.sprite);
             
                 this.x = position.x;
                 this.y = position.y;
+                world.addUnitToGrid(this);
+            
                 this.radius = this.cfg.body.radius + this.cfg.edge.w;
             }
             
@@ -220,22 +332,25 @@
                 return false;
             }
             
+            Bullet.prototype.takeDamageByUnit = function(caster)
+            {
+                this.hp -= caster.damage;
+                if (this.hp <= 0) {
+                    this.die();
+                }
+            }
+            
             Bullet.prototype.die = function()
             {
                 delete this.world.bullets[this.id];
                 this.world.dieSprites.push(this.sprite);
                 this.world.removeUnitFromGrid(this);
+                this.world.removeUnits.push(this);
             }
             
             Bullet.prototype.update = function()
             {
-                var oldx = this.x;
-                var oldy = this.y;
-                this.x += this.speed * Math.cos(this.angle) * Config.world.updateMS / 1000;
-                this.y += this.speed * Math.sin(this.angle) * Config.world.updateMS / 1000;
-                var cfg = Config.world.map;
-                Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
-                return 0;
+                this.motion.update(Config.world.updateMS);
             }
             
             Object.defineProperties(Bullet.prototype, {
@@ -287,13 +402,26 @@
                 this.sprite.addChild(this.frontSprite);
                 this.sprite.alpha = this.cfg.alpha;
             
-                this.x = this.owner.x + this.cfg.xOffset;
                 var bounds = this.owner.sprite.getLocalBounds();
-                this.y = this.owner.y + (bounds.height + bounds.y) + this.cfg.yOffset;
             
-                var scale = this.owner.w / this.w;
-                this.scale.x = this.cfg.xDisplayRatio * scale;
-                this.scale.y = this.cfg.yDisplayRatio * scale;
+                // long side
+                var x1 = bounds.width + bounds.x;
+                var x2 = Math.abs(bounds.x);
+                if (x1 > x2) {
+                    this.x = this.owner.x + x1 * this.cfg.xOffsetRatio;
+                } else {
+                    this.x = this.owner.x + x2 * this.cfg.xOffsetRatio;
+                }
+                var y1 = bounds.height + bounds.y;
+                var y2 = Math.abs(bounds.y);
+                if (y1 > y2) {
+                    this.y = this.owner.y + y1 * this.cfg.yOffsetRatio;
+                } else {
+                    this.y = this.owner.y + y2 * this.cfg.yOffsetRatio;
+                }
+            
+                this.scale.x = this.cfg.displayRatio;
+                this.scale.y = this.cfg.displayRatio;
             
                 world.view.addChild(this.sprite);
             }
@@ -302,9 +430,14 @@
             
             HpBar.prototype.update = function(percent)
             {
+                if (this.percent == percent) {
+                    return;
+                }
+            
+                this.frontSprite.x += this.cfg.w * (1 - this.percent) / 2;
                 this.percent = percent;
                 this.frontSprite.width = this.cfg.w * percent;
-                this.frontSprite.x -= this.frontSprite.width * (1 - percent);
+                this.frontSprite.x -= this.cfg.w * (1 - this.percent) / 2;
             
                 // full hp & default not display
                 if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
@@ -338,20 +471,109 @@
         });
         </script>
         <script>
+        require.register("./modules/motion", function(module, exports, require) {
+            var Config = require("../modules/config");
+            var Util = require("../modules/util");
+            
+            var epsilon = 1e-6;
+            
+            function Motion(owner, velocity, rotate)
+            {
+                this.owner = owner;
+                this.moveDir = new Victor(0, 0);
+                this.velocity = velocity;
+                this.rotate = rotate;
+                this.iv = new Victor(0, 0); // internal
+                this.ev = new Victor(0, 0); // external
+            }
+            
+            Motion.prototype = {}
+            
+            Motion.prototype.randomMoveDir = function()
+            {
+                var angle = Math.random() * Math.PI * 2;
+                this.moveDir.x = Math.cos(angle);
+                this.moveDir.y = Math.sin(angle);
+            }
+            
+            Motion.prototype.setMoveDirByAngle = function(angle)
+            {
+                this.moveDir.x = Math.cos(angle);
+                this.moveDir.y = Math.sin(angle);
+            }
+            
+            Motion.prototype.reverseMoveDirX = function()
+            {
+                this.moveDir.x = -this.moveDir.x;
+            }
+            
+            Motion.prototype.reverseMoveDirY = function()
+            {
+                this.moveDir.y = -this.moveDir.y;
+            }
+            
+            Motion.prototype.update = function(deltaMS)
+            {
+                if (this.moveDir.length() > epsilon) {
+                    var angle = this.moveDir.angle();
+                    this.iv.x = this.velocity * Math.cos(angle);
+                    this.iv.y = this.velocity * Math.sin(angle);
+                } else {
+                    this.iv.x = 0;
+                    this.iv.y = 0;
+                }
+            
+                var elen = this.ev.length();
+                if (elen > epsilon) {
+                    var dec = Config.world.externalVelocityDecPerSecond * deltaMS / 1000;
+                    elen = elen > dec ? (elen - dec) : 0;
+                    this.ev.norm().multiply(new Victor(elen, elen));
+                }
+            
+                this.owner.x += (this.iv.x + this.ev.x) * deltaMS / 1000;
+                this.owner.y += (this.iv.y + this.ev.y) * deltaMS / 1000;
+            
+                var cfg = Config.world.map;
+                Util.clampPosition(this.owner, 0, cfg.w, 0, cfg.h);
+            
+                if (this.rotate != null && Math.abs(this.rotate) > epsilon) {
+                    this.owner.sprite.rotation += this.rotate * deltaMS / 1000;
+                }
+            }
+            
+            Object.defineProperties(Motion.prototype, {
+                vx: {
+                    get: function() { return this.iv.x + this.ev.x; }
+                },
+                vy: {
+                    get: function() { return this.iv.y + this.ev.y; }
+                },
+            });
+            
+            module.exports = Motion;
+        });
+        </script>
+        <script>
         require.register("./modules/obstacle", function(module, exports, require) {
             var Config = require("../modules/config");
+            var HpBar = require("../modules/hpbar");
+            var Motion = require("../modules/motion");
             var Util = require("../modules/util");
             
             function Obstacle(world, cfg, position)
             {
                 this.world = world;
-                this.cfg = cfg;
                 this.id = Util.getId();
+                this.type = Util.unitType.obstacle;
+                this.cfg = cfg;
+                this.hp = this.cfg.hp;
+                this.fullHp = this.cfg.hp;
+                this.damage = this.cfg.damage;
             
+                // view
                 var graphics = new PIXI.Graphics();
                 graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
                 graphics.beginFill(this.cfg.color);
-            
                 var from = new PIXI.Point(0, this.cfg.radius);
                 graphics.moveTo(from.x, from.y);
                 for (var i = 1; i < this.cfg.side; ++ i) {
@@ -362,48 +584,60 @@
                     delete p;
                 }
                 graphics.endFill();
-                this.sprite = new PIXI.Sprite(graphics.generateTexture());
                 delete from;
                 delete graphics;
-            
+                this.sprite = new PIXI.Sprite(graphics.generateTexture());
                 this.sprite.anchor.x = 0.5;
                 this.sprite.anchor.y = (this.cfg.radius + this.cfg.edge.w) / this.sprite.height;
                 world.view.addChild(this.sprite);
             
                 this.x = position.x;
                 this.y = position.y;
-                this.radius = this.cfg.radius + this.cfg.edge.w;
+                world.addUnitToGrid(this);
             
-                var angle = Math.random() * Math.PI * 2;
-                this.speed = new Victor(this.cfg.moveSpeed * Math.cos(angle),
-                    this.cfg.moveSpeed * Math.sin(angle));
+                this.radius = this.cfg.radius + this.cfg.edge.w;
+                this.motion = new Motion(this, this.cfg.moveSpeed, this.cfg.rotationSpeed);
+                this.motion.randomMoveDir();
+                this.hpbar = new HpBar(world, Config.hpbar, this, false);
             }
             
             Obstacle.prototype = {}
             
+            Obstacle.prototype.takeDamageByUnit = function(caster)
+            {
+                this.hp -= caster.damage;
+                if (this.hp <= 0) {
+                    this.die();
+                }
+            }
+            
+            Obstacle.prototype.die = function()
+            {
+                delete this.world.obstacles[this.id];
+                this.world.dieSprites.push(this.sprite);
+                this.world.view.removeChild(this.hpbar.sprite);
+                this.world.removeUnitFromGrid(this);
+                this.world.removeUnits.push(this);
+            }
+            
             Obstacle.prototype.update = function()
             {
-                if (this.x < Config.world.walkable.x) {
-                    this.speed.x = - this.speed.x;
-                }
-                if (this.x > Config.world.walkable.x + Config.world.walkable.w) {
-                    this.speed.x = - this.speed.x;
-                }
-                if (this.y < Config.world.walkable.y) {
-                    this.speed.y = - this.speed.y;
-                }
-                if (this.y > Config.world.walkable.y + Config.world.walkable.h) {
-                    this.speed.y = - this.speed.y;
-                }
+                var oldX = this.x;
+                var oldY = this.y;
+                this.motion.update(Config.world.updateMS);
             
-                // slow move
-                this.x += this.speed.x * Config.world.updateMS / 1000;
-                this.y += this.speed.y * Config.world.updateMS / 1000;
-                var cfg = Config.world.map;
-                Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
+                this.hpbar.update(this.hp / this.fullHp);
+                this.hpbar.x += (this.x - oldX);
+                this.hpbar.y += (this.y - oldY);
             
-                // slow rotation
-                this.sprite.rotation += this.cfg.rotationSpeed * Config.world.updateMS / 1000;
+                if (this.x < Config.world.walkable.x
+                    || this.x > Config.world.walkable.x + Config.world.walkable.w) {
+                    this.motion.reverseMoveDirX();
+                }
+                if (this.y < Config.world.walkable.y
+                    || this.y > Config.world.walkable.y + Config.world.walkable.h) {
+                    this.motion.reverseMoveDirY();
+                }
             }
             
             Object.defineProperties(Obstacle.prototype, {
@@ -427,109 +661,161 @@
         });
         </script>
         <script>
+        require.register("./modules/player", function(module, exports, require) {
+            function Player(world, tank)
+            {
+                this.world = world;
+                this.tank = tank;
+                // TODO: client info
+            }
+            
+            Player.prototype = {}
+            
+            function handleKeyDown(player)
+            {
+                document.body.addEventListener('keydown', function(e) {
+                    if (player.tank == null) {
+                        return;
+                    }
+                    switch (e.key) {
+                        case 'w':
+                        case 'W':
+                            player.tank.motion.moveDir.y -= 1;
+                            if (player.tank.motion.moveDir.y < -1) {
+                                player.tank.motion.moveDir.y = -1;
+                            }
+                            break;
+                        case 'd':
+                        case 'D':
+                            player.tank.motion.moveDir.x += 1;
+                            if (player.tank.motion.moveDir.x > 1) {
+                                player.tank.motion.moveDir.x = 1;
+                            }
+                            break;
+                        case 's':
+                        case 'S':
+                            player.tank.motion.moveDir.y += 1;
+                            if (player.tank.motion.moveDir.y > 1) {
+                                player.tank.motion.moveDir.y = 1;
+                            }
+                            break;
+                        case 'a':
+                        case 'A':
+                            player.tank.motion.moveDir.x -= 1;
+                            if (player.tank.motion.moveDir.x < -1) {
+                                player.tank.motion.moveDir.x = -1;
+                            }
+                            break;
+                    }
+                }, false);
+            }
+            
+            function handleKeyUp(player)
+            {
+                document.body.addEventListener('keyup', function(e) {
+                    if (player.tank == null) {
+                        return;
+                    }
+                    switch (e.key) {
+                        case 'w':
+                        case 'W':
+                            player.tank.motion.moveDir.y += 1;
+                            if (player.tank.motion.moveDir.y > 1) {
+                                player.tank.motion.moveDir.y = 1;
+                            }
+                            break;
+                        case 'd':
+                        case 'D':
+                            player.tank.motion.moveDir.x -= 1;
+                            if (player.tank.motion.moveDir.x < -1) {
+                                player.tank.motion.moveDir.x = -1;
+                            }
+                            break;
+                        case 's':
+                        case 'S':
+                            player.tank.motion.moveDir.y -= 1;
+                            if (player.tank.motion.moveDir.y < -1) {
+                                player.tank.motion.moveDir.y = -1;
+                            }
+                            break;
+                        case 'a':
+                        case 'A':
+                            player.tank.motion.moveDir.x += 1;
+                            if (player.tank.motion.moveDir.x > 1) {
+                                player.tank.motion.moveDir.x = 1;
+                            }
+                            break;
+                    }
+                }, false);
+            }
+            
+            function handleMouseMove(player)
+            {
+                document.body.addEventListener('mousemove', function(e) {
+                    var targetPos = new Victor(e.x - player.world.view.x, e.y - player.world.view.y);
+                    if (player.tank != null) {
+                        // TODO: rotate speed
+                        var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
+                        player.tank.rotation = dir.angle() + Math.PI / 2;
+                    }
+                }, false);
+            }
+            
+            function handleMouseDown(player) {
+                document.body.addEventListener('mousedown', function(e) {
+                    if (player.tank != null) {
+                        player.tank.fire();
+                    }
+                }, false);
+            }
+            
+            Player.prototype.addControl = function()
+            {
+                if (this.tank) {
+                    handleKeyDown(this);
+                    handleKeyUp(this);
+                    handleMouseMove(this);
+                    handleMouseDown(this);
+                }
+            }
+            
+            Player.prototype.update = function()
+            {
+            }
+            
+            Object.defineProperties(Player.prototype, {
+                x: {
+                    get: function() { return this.tank.x; }
+                },
+                y: {
+                    get: function() { return this.tank.y; }
+                },
+            });
+            
+            module.exports = Player;
+            
+        });
+        </script>
+        <script>
         require.register("./modules/tank", function(module, exports, require) {
             var Config = require("../modules/config");
             var HpBar = require("../modules/hpbar");
+            var Motion = require("../modules/motion");
             var Weapon = require("../modules/weapon");
             var Util = require("../modules/util");
-            
-            function tankHandleKeyDown(tank)
-            {
-                document.body.addEventListener('keydown', function(e) {
-                    switch (e.key) {
-                        case 'w':
-                        case 'W':
-                            tank.moveDir.y -= 1;
-                            if (tank.moveDir.y < -1) {
-                                tank.moveDir.y = -1;
-                            }
-                            break;
-                        case 'd':
-                        case 'D':
-                            tank.moveDir.x += 1;
-                            if (tank.moveDir.x > 1) {
-                                tank.moveDir.x = 1;
-                            }
-                            break;
-                        case 's':
-                        case 'S':
-                            tank.moveDir.y += 1;
-                            if (tank.moveDir.y > 1) {
-                                tank.moveDir.y = 1;
-                            }
-                            break;
-                        case 'a':
-                        case 'A':
-                            tank.moveDir.x -= 1;
-                            if (tank.moveDir.x < -1) {
-                                tank.moveDir.x = -1;
-                            }
-                            break;
-                    }
-                }, false);
-            }
-            
-            function tankHandleKeyUp(tank)
-            {
-                document.body.addEventListener('keyup', function(e) {
-                    switch (e.key) {
-                        case 'w':
-                        case 'W':
-                            tank.moveDir.y += 1;
-                            if (tank.moveDir.y > 1) {
-                                tank.moveDir.y = 1;
-                            }
-                            break;
-                        case 'd':
-                        case 'D':
-                            tank.moveDir.x -= 1;
-                            if (tank.moveDir.x < -1) {
-                                tank.moveDir.x = -1;
-                            }
-                            break;
-                        case 's':
-                        case 'S':
-                            tank.moveDir.y -= 1;
-                            if (tank.moveDir.y < -1) {
-                                tank.moveDir.y = -1;
-                            }
-                            break;
-                        case 'a':
-                        case 'A':
-                            tank.moveDir.x += 1;
-                            if (tank.moveDir.x > 1) {
-                                tank.moveDir.x = 1;
-                            }
-                            break;
-                    }
-                }, false);
-            }
-            
-            function tankHandleMouseMove(tank)
-            {
-                document.body.addEventListener('mousemove', function(e) {
-                    var targetPos = new Victor(e.x - tank.world.view.x, e.y - tank.world.view.y);
-                    var dir = targetPos.subtract(tank.sprite.position);
-                    // TODO: rotate speed
-                    tank.sprite.rotation = dir.angle() + Math.PI / 2;
-                }, false);
-            }
-            
-            function tankHandleMouseDown(tank) {
-                document.body.addEventListener('mousedown', function(e) {
-                    tank.fire();
-                }, false);
-            }
             
             function Tank(world, name, position)
             {
                 this.world = world;
-            
                 this.id = Util.getId();
+                this.type = Util.unitType.tank;
                 this.cfg = Config.tanks[name];
-                this.autoFire = true;
-                this.moveDir = new Victor(0, 0);
+                this.hp = this.cfg.hp;
+                this.fullHp = this.cfg.hp;
+                this.damage = this.cfg.damage;
+                // this.autoFire = true;
             
+                // view & weapons
                 this.sprite = new PIXI.Container();
                 this.weapons = [];
                 for (var idx in this.cfg.weapons) {
@@ -537,7 +823,6 @@
                     this.weapons.push(weapon);
                     this.sprite.addChild(weapon.sprite);
                 }
-            
                 var graphics = new PIXI.Graphics();
                 graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
                 graphics.beginFill(this.cfg.body.color);
@@ -545,50 +830,53 @@
                 graphics.endFill();
                 var bodySprite = new PIXI.Sprite(graphics.generateTexture());
                 graphics.destroy();
-            
                 bodySprite.anchor.x = 0.5;
                 bodySprite.anchor.y = 0.5;
                 this.sprite.addChild(bodySprite);
-            
                 world.view.addChild(this.sprite);
             
                 this.x = position.x;
                 this.y = position.y;
+                world.addUnitToGrid(this);
+            
                 this.radius = this.cfg.body.radius + this.cfg.edge.w;
-            
-                // event handlers:
-                tankHandleKeyDown(this);
-                tankHandleKeyUp(this);
-                tankHandleMouseMove(this);
-                tankHandleMouseDown(this);
-            
-                // hp bar
+                this.motion = new Motion(this, this.cfg.speed);
                 this.hpbar = new HpBar(world, Config.hpbar, this, true);
-                this.hpbar.update(0.5);
             }
             
             Tank.prototype = {}
             
+            Tank.prototype.takeDamageByUnit = function(caster)
+            {
+                this.hp -= caster.damage;
+                if (this.hp <= 0) {
+                    this.die();
+                }
+            }
+            
+            Tank.prototype.die = function()
+            {
+                delete this.world.tanks[this.id];
+                this.world.dieSprites.push(this.sprite);
+                this.world.removeUnitFromGrid(this);
+                this.world.removeUnits.push(this);
+            
+                // TODO:
+                if (this.world.player == this) {
+                    alert("player die");
+                }
+            }
+            
             Tank.prototype.update = function()
             {
-                // update tank position
-                if (this.moveDir.lengthSq() > 1e-6) {
-                    var oldX = this.x;
-                    var oldY = this.y;
+                var oldX = this.x;
+                var oldY = this.y;
+                this.motion.update(Config.world.updateMS);
             
-                    var angle = this.moveDir.angle();
-                    var deltaY = this.cfg.speed * Math.sin(angle) * Config.world.updateMS / 1000;
-                    var deltaX = this.cfg.speed * Math.cos(angle) * Config.world.updateMS / 1000;
-                    this.x += deltaX;
-                    this.y += deltaY;
-                    var cfg = Config.world.map;
-                    Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
+                this.hpbar.update(this.hp / this.fullHp);
+                this.hpbar.x += (this.x - oldX);
+                this.hpbar.y += (this.y - oldY);
             
-                    this.hpbar.x += (this.x - oldX);
-                    this.hpbar.y += (this.y - oldY);
-                }
-            
-                // fire
                 if (this.autoFire == true) {
                     this.fire();
                 }
@@ -616,6 +904,10 @@
                 w: {
                     get: function() { return this.sprite.width; }
                 },
+                rotation: {
+                    get: function() { return this.sprite.rotation; },
+                    set: function(r) { this.sprite.rotation = r; }
+                },
             });
             
             module.exports = Tank;
@@ -625,6 +917,7 @@
         <script>
         require.register("./modules/weapon", function(module, exports, require) {
             var Bullet = require("../modules/bullet");
+            var Util = require("../modules/util");
             
             function weaponCreateView(weapon)
             {
@@ -633,6 +926,8 @@
             function Weapon(world, tank, cfg)
             {
                 this.world = world;
+                this.id = Util.getId();
+                this.type = Util.unitType.weapon;
                 this.owner = tank;
                 this.cfg = cfg;
                 this.angle = this.cfg.angle;
@@ -641,6 +936,7 @@
                            .add(new Victor(this.cfg.x, this.cfg.y));
                 this.fireFrame = world.frame + this.cfg.shootDelayFrame;
             
+                // view
                 var graphics = new PIXI.Graphics();
                 graphics.lineStyle(this.owner.cfg.edge.w, this.owner.cfg.edge.color);
                 graphics.beginFill(this.cfg.color);
@@ -648,7 +944,6 @@
                 graphics.endFill();
                 this.sprite = new PIXI.Sprite(graphics.generateTexture());
                 graphics.destroy();
-            
                 this.sprite.anchor.x = 0.5;
                 this.sprite.anchor.y = 1.0;
                 this.sprite.rotation = this.cfg.angle * Math.PI / 180;
@@ -665,13 +960,13 @@
                     this.fireFrame = this.world.frame;
             
                     var pos = this.offset.clone();
-                    pos.rotate(this.owner.sprite.rotation);
+                    pos.rotate(this.owner.rotation);
                     pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
                     if (pos.x <= 0 || pos.y <= 0 || pos.x >= this.world.w || pos.y >= this.world.h) {
                         return;
                     }
             
-                    var angle = this.owner.sprite.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
+                    var angle = this.owner.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
                     var disturb = this.cfg.disturbDeg * Math.PI / 180;
                     angle += (Math.random() * disturb - disturb / 2);
             
@@ -688,6 +983,7 @@
         require.register("./modules/world", function(module, exports, require) {
             var Config = require("../modules/config");
             var Obstacle = require("../modules/obstacle");
+            var Player = require("../modules/player")
             var Tank = require("../modules/tank");
             var Util = require("../modules/util");
             
@@ -724,8 +1020,8 @@
                 this.h = Config.world.map.h;
             
                 this.gridSize = Config.world.map.grid.size;
-                this.gridW = this.w / this.gridSize;
-                this.gridH = this.h / this.gridSize;
+                this.gridW = Math.floor(this.w / this.gridSize) + 1;
+                this.gridH = Math.floor(this.h / this.gridSize) + 1;
                 this.grids = [];
                 for (var i = 0; i < this.gridH; ++ i) {
                     for (var j = 0; j < this.gridW; ++ j) {
@@ -758,10 +1054,21 @@
                 this.bullets = {};
                 this.obstacles = [];
                 this.obstacleCount = 0;
-                this.tank = new Tank(this, "normal", { x: this.w / 2, y: this.h / 2, });
+                this.tanks = [];
+                var idx = 0;
+                for (var i in Config.tanks) {
+                    var tank = new Tank(this, i, { x: this.w / 2 + idx * 200, y: this.h / 2 + idx * 200, });
+                    this.tanks.push(tank);
+                    ++ idx;
+                }
+            
+                // player
+                this.player = new Player(this, this.tanks[0]);
+                this.player.addControl();
             
                 // die sprites
                 this.dieSprites = [];
+                this.removeUnits = [];
             }
             
             World.prototype = {};
@@ -769,8 +1076,8 @@
             
             World.prototype.updateCamera = function()
             {
-                var x = this.tank.x;
-                var y = this.tank.y;
+                var x = this.player.x;
+                var y = this.player.y;
                 var viewCenterX = Config.world.view.w / 2;
                 var viewCenterY = Config.world.view.h / 2;
                 x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
@@ -781,15 +1088,18 @@
             
             World.prototype.updateTanks = function()
             {
-                var oldx = this.tank.x;
-                var oldy = this.tank.y;
-                this.tank.update();
-                this.updateUnitGrid(this.tank, { x: oldx, y: oldy });
+                for (var i in this.tanks) {
+                    var tank = this.tanks[i];
+                    var oldx = tank.x;
+                    var oldy = tank.y;
+                    tank.update();
+                    this.updateUnitGrid(tank, { x: oldx, y: oldy });
+                }
             }
             
             World.prototype.updatePlayers = function()
             {
-                // TODO:
+                this.player.update();
             }
             
             World.prototype.updateObstacles = function()
@@ -825,7 +1135,6 @@
                     var bullet = this.bullets[i];
                     if (bullet.outOfDate() || bullet.outOfBounds()) {
                         bullet.die();
-                        delete bullet;
                     } else {
                         var oldx = bullet.x;
                         var oldy = bullet.y;
@@ -902,16 +1211,68 @@
                 return u1 != u2;
             }
             
+            World.prototype.collide = function(unit1, unit2)
+            {
+                // Elastic collision
+                // m1, v10
+                // m2, v20
+                // v1 = [(m1-m2)v10 + 2m2v20] / (m1+m2)
+                // v2 = [(m2-m1)v20 + 2m1v10] / (m1+m2)
+            
+                // console.log("frame[" + this.frame + "]");
+                // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
+                // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
+                // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
+                // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
+            
+                var m1 = unit1.radius * unit1.radius;
+                var m2 = unit2.radius * unit2.radius;
+                var v10 = new Victor(unit1.motion.vx, unit1.motion.vy);
+                var v20 = new Victor(unit2.motion.vx, unit2.motion.vy);
+            
+                var v1x = ((m1 - m2) * v10.x + 2 * m2 * v20.x) / (m1 + m2);
+                var v1y = ((m1 - m2) * v10.y + 2 * m2 * v20.y) / (m1 + m2);
+                unit1.motion.ev.x += v1x;
+                unit1.motion.ev.y += v1y;
+            
+                var v2x = ((m2 - m1) * v20.x + 2 * m1 * v10.x) / (m1 + m2);
+                var v2y = ((m2 - m1) * v20.y + 2 * m1 * v10.y) / (m1 + m2);
+                unit2.motion.ev.x += v2x;
+                unit2.motion.ev.y += v2y;
+            
+                // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
+                // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
+                // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
+                // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
+            
+                // damage each other
+                unit1.takeDamageByUnit(unit2);
+                unit2.takeDamageByUnit(unit1);
+            }
+            
             World.prototype.updateCollision = function()
             {
                 for (var x = 0; x < this.gridW; ++ x) {
                     for (var y = 0; y < this.gridH; ++ y) {
+            
                         var idx = y * this.gridW + x;
                         for (var i in this.grids[idx]) {
                             var unit = this.grids[idx][i];
+            
+                            // avoid multi-collision
+                            if (unit.collideTime != null) {
+                                if (this.time - unit.collideTime < Config.world.unitCollideCheckMS) {
+                                    continue;
+                                }
+                            }
+            
+                            // check collision with targets
                             var targets = this.getUnitsIn9Grids(x, y);
                             for (var j in targets) {
                                 var target = targets[j];
+                                if (unit == target) {
+                                    continue;
+                                }
                                 if (this.needCheckCollision(unit, target) == false) {
                                     continue;
                                 }
@@ -922,7 +1283,10 @@
                                 var distY = unit.y - target.y;
                                 var distR = unit.radius + target.radius;
                                 if (distX * distX + distY * distY < distR * distR) {
-                                    // TODO: collision
+                                    unit.collideTime = this.time;
+                                    target.collideTime = this.time;
+                                    this.collide(unit, target);
+                                    // console.log("frame=" + this.frame + " collision: " + unit.id + "--" + target.id);
                                 }
                             }
                             unit.collideCheckFrame = this.frame;
@@ -996,6 +1360,14 @@
                 delete this.grids[idx][unit.id];
             }
             
+            World.prototype.addUnitToGrid = function(unit)
+            {
+                var gx = Math.floor(unit.x / this.gridSize);
+                var gy = Math.floor(unit.y / this.gridSize);
+                var idx = gy * this.gridW + gx;
+                this.grids[idx][unit.id] = unit;
+            }
+            
             World.prototype.update = function()
             {
                 this.updateLogic();
@@ -1014,10 +1386,10 @@
                 id: 0,
             
                 unitType: {
-                    "tank": 1,
-                    "weapon": 2,
-                    "bullet": 3,
-                    "obstacle": 4
+                    tank: 1,
+                    weapon: 2,
+                    bullet: 3,
+                    obstacle: 4
                 },
             
                 clamp: function(value, min, max) {

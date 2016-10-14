@@ -1,4 +1,5 @@
 var Bullet = require("../modules/bullet");
+var Util = require("../modules/util");
 
 function weaponCreateView(weapon)
 {
@@ -7,6 +8,8 @@ function weaponCreateView(weapon)
 function Weapon(world, tank, cfg)
 {
     this.world = world;
+    this.id = Util.getId();
+    this.type = Util.unitType.weapon;
     this.owner = tank;
     this.cfg = cfg;
     this.angle = this.cfg.angle;
@@ -15,6 +18,7 @@ function Weapon(world, tank, cfg)
                .add(new Victor(this.cfg.x, this.cfg.y));
     this.fireFrame = world.frame + this.cfg.shootDelayFrame;
 
+    // view
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.owner.cfg.edge.w, this.owner.cfg.edge.color);
     graphics.beginFill(this.cfg.color);
@@ -22,7 +26,6 @@ function Weapon(world, tank, cfg)
     graphics.endFill();
     this.sprite = new PIXI.Sprite(graphics.generateTexture());
     graphics.destroy();
-
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = 1.0;
     this.sprite.rotation = this.cfg.angle * Math.PI / 180;
@@ -39,13 +42,13 @@ Weapon.prototype.fire = function()
         this.fireFrame = this.world.frame;
 
         var pos = this.offset.clone();
-        pos.rotate(this.owner.sprite.rotation);
+        pos.rotate(this.owner.rotation);
         pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
         if (pos.x <= 0 || pos.y <= 0 || pos.x >= this.world.w || pos.y >= this.world.h) {
             return;
         }
 
-        var angle = this.owner.sprite.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
+        var angle = this.owner.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
         angle += (Math.random() * disturb - disturb / 2);
 

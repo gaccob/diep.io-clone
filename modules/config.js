@@ -25,7 +25,10 @@ var Config =
             h: 3840,
             color: 0xcdcdcd
         },
-        updateMS: 1000 / 30
+        unitCollideCheckMS: 500,
+        updateMS: 1000 / 30,
+        externalVelocityDecPerSecond: 100,
+        externalVelocityMax: 1000,
     },
 
     hpbar: {
@@ -37,10 +40,9 @@ var Config =
         h: 20,
         radius: 10,
         color: 0x86c680,
-        xOffset: 0,
-        yOffset: 35,
-        xDisplayRatio: 1,
-        yDisplayRatio: 0.8,
+        xOffsetRatio: 0,
+        yOffsetRatio: 1.2,
+        displayRatio: 0.5,
         alpha: 0.75,
     },
 
@@ -61,8 +63,10 @@ var Config =
                 radius: 10,
                 color: 0x00b2e1
             },
-            speed: 400,
-            duration: 1000
+            speed: 300,
+            duration: 1000,
+            hp: 1,
+            damage: 10,
         }
     },
 
@@ -78,10 +82,12 @@ var Config =
             },
             rotationSpeed: 0.5,
             moveSpeed: 3,
+            hp: 10,
+            damage: 2,
         },
         middle: {
             side: 4,
-            radius: 30,
+            radius: 28,
             color: 0xffe869,
             edge: {
                 w: 2.5,
@@ -89,10 +95,12 @@ var Config =
             },
             rotationSpeed: 0.5,
             moveSpeed: 3,
+            hp: 20,
+            damage: 4,
         },
         large: {
             side: 5,
-            radius: 35,
+            radius: 32,
             color: 0x768dfc,
             edge: {
                 w: 2.5,
@@ -100,11 +108,41 @@ var Config =
             },
             rotationSpeed: 0.5,
             moveSpeed: 3,
+            hp: 40,
+            damage: 8,
         },
     },
 
     tanks: {
-        normal: {
+        base: {
+            edge: {
+                w: 2.5,
+                color: 0x555555
+            },
+            body: {
+                radius: 30,
+                color: 0x00b2e1
+            },
+            weapons: [
+                {
+                    w: 15,
+                    h: 50,
+                    x: 0,
+                    y: 0,
+                    bullet: "normal",
+                    angle: 0,
+                    color: 0x999999,
+                    shootOffset: 10,
+                    reloadFrame: 10,
+                    shootDelayFrame: 3,
+                    disturbDeg: 15,
+                },
+            ],
+            speed: 160,
+            hp: 100,
+            damage: 10,
+        },
+        twin: {
             edge: {
                 w: 2.5,
                 color: 0x555555
@@ -142,7 +180,76 @@ var Config =
                 }
             ],
             speed: 160,
-        }
+            hp: 200,
+            damage: 10,
+        },
+        quad: {
+            edge: {
+                w: 2.5,
+                color: 0x555555
+            },
+            body: {
+                radius: 30,
+                color: 0x00b2e1
+            },
+            weapons: [
+                {
+                    w: 20,
+                    h: 45,
+                    x: 0,
+                    y: 0,
+                    bullet: "normal",
+                    angle: 0,
+                    color: 0x999999,
+                    shootOffset: 10,
+                    reloadFrame: 10,
+                    shootDelayFrame: 3,
+                    disturbDeg: 15,
+                },
+                {
+                    w: 20,
+                    h: 45,
+                    x: 0,
+                    y: 0,
+                    bullet: "normal",
+                    angle: 90,
+                    color: 0x999999,
+                    shootOffset: 10,
+                    reloadFrame: 10,
+                    shootDelayFrame: 3,
+                    disturbDeg: 15,
+                },
+                {
+                    w: 20,
+                    h: 45,
+                    x: 0,
+                    y: 0,
+                    bullet: "normal",
+                    angle: 180,
+                    color: 0x999999,
+                    shootOffset: 10,
+                    reloadFrame: 10,
+                    shootDelayFrame: 6,
+                    disturbDeg: 15,
+                },
+                {
+                    w: 20,
+                    h: 45,
+                    x: 0,
+                    y: 0,
+                    bullet: "normal",
+                    angle: 270,
+                    color: 0x999999,
+                    shootOffset: 10,
+                    reloadFrame: 10,
+                    shootDelayFrame: 6,
+                    disturbDeg: 15,
+                },
+            ],
+            speed: 160,
+            hp: 200,
+            damage: 10,
+        },
     }
 };
 

@@ -1,31 +1,36 @@
 var Config = require("../modules/config");
+var Motion = require("../modules/motion");
 var Util = require("../modules/util");
 
 function Bullet(world, position, angle, weapon)
 {
     this.id = Util.getId();
+    this.type = Util.unitType.bullet;
     this.world = world;
     this.owner = weapon.owner;
-    this.angle = angle;
     this.bornTime = world.time;
-
     this.cfg = Config.bullets[weapon.cfg.bullet];
-    this.speed = this.cfg.speed;
+    this.hp = this.cfg.hp;
+    this.damage = this.cfg.damage;
+    this.motion = new Motion(this, this.cfg.speed);
+    this.motion.setMoveDirByAngle(angle);
 
+    // view
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
     graphics.beginFill(this.cfg.body.color);
     graphics.drawCircle(0, 0, this.cfg.body.radius);
     graphics.endFill();
-    this.sprite = new PIXI.Sprite(graphics.generateTexture());
     delete graphics;
-
+    this.sprite = new PIXI.Sprite(graphics.generateTexture());
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = 0.5;
     world.view.addChild(this.sprite);
 
     this.x = position.x;
     this.y = position.y;
+    world.addUnitToGrid(this);
+
     this.radius = this.cfg.body.radius + this.cfg.edge.w;
 }
 
@@ -48,22 +53,25 @@ Bullet.prototype.outOfDate = function()
     return false;
 }
 
+Bullet.prototype.takeDamageByUnit = function(caster)
+{
+    this.hp -= caster.damage;
+    if (this.hp <= 0) {
+        this.die();
+    }
+}
+
 Bullet.prototype.die = function()
 {
     delete this.world.bullets[this.id];
     this.world.dieSprites.push(this.sprite);
     this.world.removeUnitFromGrid(this);
+    this.world.removeUnits.push(this);
 }
 
 Bullet.prototype.update = function()
 {
-    var oldx = this.x;
-    var oldy = this.y;
-    this.x += this.speed * Math.cos(this.angle) * Config.world.updateMS / 1000;
-    this.y += this.speed * Math.sin(this.angle) * Config.world.updateMS / 1000;
-    var cfg = Config.world.map;
-    Util.clampPosition(this, 0, cfg.w, 0, cfg.h);
-    return 0;
+    this.motion.update(Config.world.updateMS);
 }
 
 Object.defineProperties(Bullet.prototype, {

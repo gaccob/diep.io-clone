@@ -30,13 +30,26 @@ function HpBar(world, cfg, owner, display)
     this.sprite.addChild(this.frontSprite);
     this.sprite.alpha = this.cfg.alpha;
 
-    this.x = this.owner.x + this.cfg.xOffset;
     var bounds = this.owner.sprite.getLocalBounds();
-    this.y = this.owner.y + (bounds.height + bounds.y) + this.cfg.yOffset;
 
-    var scale = this.owner.w / this.w;
-    this.scale.x = this.cfg.xDisplayRatio * scale;
-    this.scale.y = this.cfg.yDisplayRatio * scale;
+    // long side
+    var x1 = bounds.width + bounds.x;
+    var x2 = Math.abs(bounds.x);
+    if (x1 > x2) {
+        this.x = this.owner.x + x1 * this.cfg.xOffsetRatio;
+    } else {
+        this.x = this.owner.x + x2 * this.cfg.xOffsetRatio;
+    }
+    var y1 = bounds.height + bounds.y;
+    var y2 = Math.abs(bounds.y);
+    if (y1 > y2) {
+        this.y = this.owner.y + y1 * this.cfg.yOffsetRatio;
+    } else {
+        this.y = this.owner.y + y2 * this.cfg.yOffsetRatio;
+    }
+
+    this.scale.x = this.cfg.displayRatio;
+    this.scale.y = this.cfg.displayRatio;
 
     world.view.addChild(this.sprite);
 }
@@ -45,9 +58,14 @@ HpBar.prototype = {}
 
 HpBar.prototype.update = function(percent)
 {
+    if (this.percent == percent) {
+        return;
+    }
+
+    this.frontSprite.x += this.cfg.w * (1 - this.percent) / 2;
     this.percent = percent;
     this.frontSprite.width = this.cfg.w * percent;
-    this.frontSprite.x -= this.frontSprite.width * (1 - percent);
+    this.frontSprite.x -= this.cfg.w * (1 - this.percent) / 2;
 
     // full hp & default not display
     if (Math.abs(percent - 1) < 1e-6 && this.display == false) {

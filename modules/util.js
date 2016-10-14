@@ -3,10 +3,10 @@ var Util = {
     id: 0,
 
     unitType: {
-        "tank": 1,
-        "weapon": 2,
-        "bullet": 3,
-        "obstacle": 4
+        tank: 1,
+        weapon: 2,
+        bullet: 3,
+        obstacle: 4
     },
 
     clamp: function(value, min, max) {
