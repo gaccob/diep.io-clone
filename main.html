@@ -21,8 +21,8 @@
             {
                 world: {
                     map: {
-                        w: 4096,
-                        h: 4096,
+                        w: 1024,
+                        h: 1024,
                         color: 0x808080,
                         grid: {
                             size: 128,
@@ -37,17 +37,15 @@
                             color: 0xa0a0a0
                         },
                     },
-                    walkable: {
-                        x: 128,
-                        y: 128,
-                        w: 3840,
-                        h: 3840,
+                    spawnRegion: {
+                        wRatio: 0.92,
+                        hRatio: 0.92,
                         color: 0xcdcdcd
                     },
                     unitCollideCheckMS: 500,
                     updateMS: 1000 / 30,
-                    externalVelocityDecPerSecond: 100,
-                    externalVelocityMax: 1000,
+                    externalVelocityDecPerSecond: 300,
+                    externalVelocityMax: 800,
                 },
             
                 hpbar: {
@@ -60,8 +58,9 @@
                     radius: 10,
                     color: 0x86c680,
                     xOffsetRatio: 0,
-                    yOffsetRatio: 1.2,
-                    displayRatio: 0.5,
+                    yOffsetRatio: 1.3,
+                    xDisplayRatio: 0.6,
+                    yDisplayRatio: 0.6,
                     alpha: 0.75,
                 },
             
@@ -79,8 +78,9 @@
                             color: 0x555555
                         },
                         body: {
-                            radius: 10,
-                            color: 0x00b2e1
+                            radius: 8,
+                            color: 0xf14e54,
+                            playerColor: 0x00b2e1,
                         },
                         speed: 300,
                         duration: 1000,
@@ -90,10 +90,10 @@
                 },
             
                 obstacles: {
-                    count: 100,
+                    count: 10,
                     small: {
                         side: 3,
-                        radius: 25,
+                        radius: 20,
                         color: 0xfc7676,
                         edge: {
                             w: 2.5,
@@ -101,12 +101,12 @@
                         },
                         rotationSpeed: 0.5,
                         moveSpeed: 3,
-                        hp: 10,
+                        hp: 20,
                         damage: 2,
                     },
                     middle: {
                         side: 4,
-                        radius: 28,
+                        radius: 20,
                         color: 0xffe869,
                         edge: {
                             w: 2.5,
@@ -114,12 +114,12 @@
                         },
                         rotationSpeed: 0.5,
                         moveSpeed: 3,
-                        hp: 20,
+                        hp: 40,
                         damage: 4,
                     },
                     large: {
                         side: 5,
-                        radius: 32,
+                        radius: 24,
                         color: 0x768dfc,
                         edge: {
                             w: 2.5,
@@ -127,7 +127,7 @@
                         },
                         rotationSpeed: 0.5,
                         moveSpeed: 3,
-                        hp: 40,
+                        hp: 80,
                         damage: 8,
                     },
                 },
@@ -139,13 +139,14 @@
                             color: 0x555555
                         },
                         body: {
-                            radius: 30,
-                            color: 0x00b2e1
+                            radius: 20,
+                            color: 0xf14e54,
+                            playerColor: 0x00b2e1,
                         },
                         weapons: [
                             {
                                 w: 15,
-                                h: 50,
+                                h: 32,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -167,14 +168,15 @@
                             color: 0x555555
                         },
                         body: {
-                            radius: 30,
-                            color: 0x00b2e1
+                            radius: 24,
+                            color: 0xf14e54,
+                            playerColor: 0x00b2e1,
                         },
                         weapons: [
                             {
-                                w: 15,
-                                h: 50,
-                                x: -10,
+                                w: 12,
+                                h: 38,
+                                x: -8,
                                 y: 0,
                                 bullet: "normal",
                                 angle: 0,
@@ -185,9 +187,9 @@
                                 disturbDeg: 15,
                             },
                             {
-                                w: 15,
-                                h: 50,
-                                x: 10,
+                                w: 12,
+                                h: 38,
+                                x: 8,
                                 y: 0,
                                 bullet: "normal",
                                 angle: 0,
@@ -208,13 +210,14 @@
                             color: 0x555555
                         },
                         body: {
-                            radius: 30,
-                            color: 0x00b2e1
+                            radius: 24,
+                            color: 0xf14e54,
+                            playerColor: 0x00b2e1,
                         },
                         weapons: [
                             {
-                                w: 20,
-                                h: 45,
+                                w: 16,
+                                h: 34,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -226,8 +229,8 @@
                                 disturbDeg: 15,
                             },
                             {
-                                w: 20,
-                                h: 45,
+                                w: 16,
+                                h: 34,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -239,8 +242,8 @@
                                 disturbDeg: 15,
                             },
                             {
-                                w: 20,
-                                h: 45,
+                                w: 16,
+                                h: 34,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -252,8 +255,8 @@
                                 disturbDeg: 15,
                             },
                             {
-                                w: 20,
-                                h: 45,
+                                w: 16,
+                                h: 34,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -297,20 +300,24 @@
                 // view
                 var graphics = new PIXI.Graphics();
                 graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-                graphics.beginFill(this.cfg.body.color);
+                if (this.world.player.tank == this.owner) {
+                    graphics.beginFill(this.cfg.body.playerColor);
+                } else {
+                    graphics.beginFill(this.cfg.body.color);
+                }
                 graphics.drawCircle(0, 0, this.cfg.body.radius);
                 graphics.endFill();
-                delete graphics;
-                this.sprite = new PIXI.Sprite(graphics.generateTexture());
-                this.sprite.anchor.x = 0.5;
-                this.sprite.anchor.y = 0.5;
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+                bodySprite.anchor.x = 0.5;
+                bodySprite.anchor.y = 0.5;
+                this.sprite = new PIXI.Container();
+                this.sprite.addChild(bodySprite);
                 world.view.addChild(this.sprite);
             
                 this.x = position.x;
                 this.y = position.y;
                 world.addUnitToGrid(this);
-            
-                this.radius = this.cfg.body.radius + this.cfg.edge.w;
             }
             
             Bullet.prototype = {}
@@ -362,6 +369,9 @@
                     get: function() { return this.sprite.y; },
                     set: function(v) { this.sprite.y = v; }
                 },
+                radius: {
+                    get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+                },
             });
             
             module.exports = Bullet;
@@ -371,6 +381,7 @@
         <script>
         require.register("./modules/hpbar", function(module, exports, require) {
             var Config = require("../modules/config");
+            var Util = require("../modules/util");
             
             function HpBar(world, cfg, owner, display)
             {
@@ -402,34 +413,33 @@
                 this.sprite.addChild(this.frontSprite);
                 this.sprite.alpha = this.cfg.alpha;
             
-                var bounds = this.owner.sprite.getLocalBounds();
+                this.x = this.owner.x + this.owner.radius * this.cfg.xOffsetRatio;
+                this.y = this.owner.y + this.owner.radius * this.cfg.yOffsetRatio;
             
-                // long side
-                var x1 = bounds.width + bounds.x;
-                var x2 = Math.abs(bounds.x);
-                if (x1 > x2) {
-                    this.x = this.owner.x + x1 * this.cfg.xOffsetRatio;
-                } else {
-                    this.x = this.owner.x + x2 * this.cfg.xOffsetRatio;
-                }
-                var y1 = bounds.height + bounds.y;
-                var y2 = Math.abs(bounds.y);
-                if (y1 > y2) {
-                    this.y = this.owner.y + y1 * this.cfg.yOffsetRatio;
-                } else {
-                    this.y = this.owner.y + y2 * this.cfg.yOffsetRatio;
-                }
-            
-                this.scale.x = this.cfg.displayRatio;
-                this.scale.y = this.cfg.displayRatio;
+                this.scale.x = this.cfg.xDisplayRatio * 2 * this.owner.radius / this.cfg.w;
+                this.scale.y = this.cfg.yDisplayRatio * 2 * this.owner.radius / this.cfg.w;
             
                 world.view.addChild(this.sprite);
             }
             
             HpBar.prototype = {}
             
+            HpBar.prototype.die = function()
+            {
+                if (this.sprite && this.sprite.parent != null) {
+                    this.sprite.parent.removeChild(this.sprite);
+                }
+                delete this.sprite;
+            }
+            
             HpBar.prototype.update = function(percent)
             {
+                if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
+                    this.visible = false;
+                } else {
+                    this.visible = true;
+                }
+            
                 if (this.percent == percent) {
                     return;
                 }
@@ -438,11 +448,6 @@
                 this.percent = percent;
                 this.frontSprite.width = this.cfg.w * percent;
                 this.frontSprite.x -= this.cfg.w * (1 - this.percent) / 2;
-            
-                // full hp & default not display
-                if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
-                    this.visible = false;
-                }
             }
             
             Object.defineProperties(HpBar.prototype, {
@@ -457,6 +462,10 @@
                 scale: {
                     get: function() { return this.sprite.scale; },
                     set: function(s) { this.sprite.scale = s; }
+                },
+                visible: {
+                    get: function() { return this.sprite.visible; },
+                    set: function(v) { this.sprite.visible = v; }
                 },
                 w: {
                     get: function() { return this.sprite.width; }
@@ -571,10 +580,11 @@
                 this.damage = this.cfg.damage;
             
                 // view
+                this.sprite = new PIXI.Container();
                 var graphics = new PIXI.Graphics();
                 graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
                 graphics.beginFill(this.cfg.color);
-                var from = new PIXI.Point(0, this.cfg.radius);
+                var from = new PIXI.Point(0, - this.cfg.radius);
                 graphics.moveTo(from.x, from.y);
                 for (var i = 1; i < this.cfg.side; ++ i) {
                     var p = new Victor(from.x, from.y);
@@ -585,17 +595,17 @@
                 }
                 graphics.endFill();
                 delete from;
-                delete graphics;
-                this.sprite = new PIXI.Sprite(graphics.generateTexture());
-                this.sprite.anchor.x = 0.5;
-                this.sprite.anchor.y = (this.cfg.radius + this.cfg.edge.w) / this.sprite.height;
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+                bodySprite.pivot.x = bodySprite.width / 2;
+                bodySprite.pivot.y = this.cfg.radius + this.cfg.edge.w;
+                this.sprite.addChild(bodySprite);
                 world.view.addChild(this.sprite);
             
                 this.x = position.x;
                 this.y = position.y;
                 world.addUnitToGrid(this);
             
-                this.radius = this.cfg.radius + this.cfg.edge.w;
                 this.motion = new Motion(this, this.cfg.moveSpeed, this.cfg.rotationSpeed);
                 this.motion.randomMoveDir();
                 this.hpbar = new HpBar(world, Config.hpbar, this, false);
@@ -613,9 +623,11 @@
             
             Obstacle.prototype.die = function()
             {
-                delete this.world.obstacles[this.id];
+                this.hpbar.die();
                 this.world.dieSprites.push(this.sprite);
-                this.world.view.removeChild(this.hpbar.sprite);
+            
+                delete this.world.obstacles[this.id];
+                -- this.world.obstacleCount;
                 this.world.removeUnitFromGrid(this);
                 this.world.removeUnits.push(this);
             }
@@ -630,12 +642,12 @@
                 this.hpbar.x += (this.x - oldX);
                 this.hpbar.y += (this.y - oldY);
             
-                if (this.x < Config.world.walkable.x
-                    || this.x > Config.world.walkable.x + Config.world.walkable.w) {
+                if (this.x < this.world.spawnRegion.x
+                    || this.x > this.world.spawnRegion.x + this.world.spawnRegion.w) {
                     this.motion.reverseMoveDirX();
                 }
-                if (this.y < Config.world.walkable.y
-                    || this.y > Config.world.walkable.y + Config.world.walkable.h) {
+                if (this.y < this.world.spawnRegion.y
+                    || this.y > this.world.spawnRegion.y + this.world.spawnRegion.h) {
                     this.motion.reverseMoveDirY();
                 }
             }
@@ -648,6 +660,9 @@
                 y: {
                     get: function() { return this.sprite.y; },
                     set: function(v) { this.sprite.y = v; }
+                },
+                radius: {
+                    get: function() { return this.cfg.radius + this.cfg.edge.w; }
                 },
                 h: {
                     get: function() { return this.sprite.height; }
@@ -662,11 +677,13 @@
         </script>
         <script>
         require.register("./modules/player", function(module, exports, require) {
-            function Player(world, tank)
+            var Tank = require("../modules/tank");
+            var Util = require("../modules/util");
+            
+            function Player(world)
             {
                 this.world = world;
-                this.tank = tank;
-                // TODO: client info
+                this.tank = null;
             }
             
             Player.prototype = {}
@@ -752,9 +769,8 @@
             function handleMouseMove(player)
             {
                 document.body.addEventListener('mousemove', function(e) {
-                    var targetPos = new Victor(e.x - player.world.view.x, e.y - player.world.view.y);
+                    var targetPos = new Victor(e.offsetX - player.world.view.x, e.offsetY - player.world.view.y);
                     if (player.tank != null) {
-                        // TODO: rotate speed
                         var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
                         player.tank.rotation = dir.angle() + Math.PI / 2;
                     }
@@ -771,16 +787,21 @@
             
             Player.prototype.addControl = function()
             {
-                if (this.tank) {
-                    handleKeyDown(this);
-                    handleKeyUp(this);
-                    handleMouseMove(this);
-                    handleMouseDown(this);
-                }
+                handleKeyDown(this);
+                handleKeyUp(this);
+                handleMouseMove(this);
+                handleMouseDown(this);
             }
             
             Player.prototype.update = function()
             {
+                if (!this.tank) {
+                    this.tank = new Tank(this.world, "base", {
+                        x: Math.random() * this.world.w,
+                        y: Math.random() * this.world.h
+                    }, this);
+                    this.world.tanks[this.tank.id] = this.tank;
+                }
             }
             
             Object.defineProperties(Player.prototype, {
@@ -804,16 +825,17 @@
             var Weapon = require("../modules/weapon");
             var Util = require("../modules/util");
             
-            function Tank(world, name, position)
+            function Tank(world, name, position, player)
             {
                 this.world = world;
                 this.id = Util.getId();
                 this.type = Util.unitType.tank;
                 this.cfg = Config.tanks[name];
+                this.player = player;
                 this.hp = this.cfg.hp;
                 this.fullHp = this.cfg.hp;
                 this.damage = this.cfg.damage;
-                // this.autoFire = true;
+                this.autoFire = true;
             
                 // view & weapons
                 this.sprite = new PIXI.Container();
@@ -825,7 +847,11 @@
                 }
                 var graphics = new PIXI.Graphics();
                 graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-                graphics.beginFill(this.cfg.body.color);
+                if (this.player) {
+                    graphics.beginFill(this.cfg.body.playerColor);
+                } else {
+                    graphics.beginFill(this.cfg.body.color);
+                }
                 graphics.drawCircle(0, 0, this.cfg.body.radius);
                 graphics.endFill();
                 var bodySprite = new PIXI.Sprite(graphics.generateTexture());
@@ -839,7 +865,6 @@
                 this.y = position.y;
                 world.addUnitToGrid(this);
             
-                this.radius = this.cfg.body.radius + this.cfg.edge.w;
                 this.motion = new Motion(this, this.cfg.speed);
                 this.hpbar = new HpBar(world, Config.hpbar, this, true);
             }
@@ -856,14 +881,18 @@
             
             Tank.prototype.die = function()
             {
-                delete this.world.tanks[this.id];
+                this.hpbar.die();
                 this.world.dieSprites.push(this.sprite);
+            
+                delete this.world.tanks[this.id];
                 this.world.removeUnitFromGrid(this);
                 this.world.removeUnits.push(this);
             
-                // TODO:
-                if (this.world.player == this) {
-                    alert("player die");
+                if (this.world.player.tank == this) {
+                    this.world.player.tank = null;
+                    this.world.gameend = true;
+                    alert("Lose! Click To Restart!");
+                    this.world.player.update();
                 }
             }
             
@@ -897,6 +926,9 @@
                 y: {
                     get: function() { return this.sprite.y; },
                     set: function(v) { this.sprite.y = v; }
+                },
+                radius: {
+                    get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
                 },
                 h: {
                     get: function() { return this.sprite.height; }
@@ -942,13 +974,17 @@
                 graphics.beginFill(this.cfg.color);
                 graphics.drawRect(0, 0, this.cfg.w, this.cfg.h);
                 graphics.endFill();
-                this.sprite = new PIXI.Sprite(graphics.generateTexture());
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
                 graphics.destroy();
-                this.sprite.anchor.x = 0.5;
-                this.sprite.anchor.y = 1.0;
+                bodySprite.anchor.x = 0.5;
+                bodySprite.anchor.y = 1.0;
+                this.sprite = new PIXI.Container();
+                this.sprite.addChild(bodySprite);
+            
+                // rotation & position
                 this.sprite.rotation = this.cfg.angle * Math.PI / 180;
-                this.sprite.x += this.cfg.x;
-                this.sprite.y += this.cfg.y;
+                this.x += this.cfg.x;
+                this.y += this.cfg.y;
             }
             
             Weapon.prototype = {}
@@ -975,6 +1011,17 @@
                 }
             }
             
+            Object.defineProperties(Weapon.prototype, {
+                x: {
+                    get: function() { return this.sprite.x; },
+                    set: function(v) { this.sprite.x = v; }
+                },
+                y: {
+                    get: function() { return this.sprite.y; },
+                    set: function(v) { this.sprite.y = v; }
+                },
+            });
+            
             module.exports = Weapon;
             
         });
@@ -987,15 +1034,15 @@
             var Tank = require("../modules/tank");
             var Util = require("../modules/util");
             
-            function getWorldBackground()
+            function getWorldBackground(world)
             {
                 var cfg = Config.world;
                 var graphics = new PIXI.Graphics();
             
-                // background walkable region
-                graphics.beginFill(cfg.walkable.color);
-                graphics.drawRect(cfg.walkable.x, cfg.walkable.y,
-                    cfg.walkable.w, cfg.walkable.h);
+                // background spawn region
+                graphics.beginFill(cfg.spawnRegion.color);
+                graphics.drawRect(world.spawnRegion.x, world.spawnRegion.y,
+                    world.spawnRegion.w, world.spawnRegion.h);
                 graphics.endFill();
             
                 // background grids
@@ -1015,11 +1062,18 @@
             function World()
             {
                 this.frame = 0;
+                this.cfg = Config.world;
             
-                this.w = Config.world.map.w;
-                this.h = Config.world.map.h;
+                this.w = this.cfg.map.w;
+                this.h = this.cfg.map.h;
             
-                this.gridSize = Config.world.map.grid.size;
+                this.spawnRegion = {}
+                this.spawnRegion.x = this.cfg.map.w * (1 - this.cfg.spawnRegion.wRatio) / 2;
+                this.spawnRegion.w = this.cfg.map.w * this.cfg.spawnRegion.wRatio;
+                this.spawnRegion.y = this.cfg.map.h * (1 - this.cfg.spawnRegion.hRatio) / 2;
+                this.spawnRegion.h = this.cfg.map.h * this.cfg.spawnRegion.hRatio;
+            
+                this.gridSize = this.cfg.map.grid.size;
                 this.gridW = Math.floor(this.w / this.gridSize) + 1;
                 this.gridH = Math.floor(this.h / this.gridSize) + 1;
                 this.grids = [];
@@ -1034,41 +1088,40 @@
             
                 this.stage = new PIXI.Container();
             
-                // main view (camera bind)
                 this.view = new PIXI.Container();
-                this.view.addChild(getWorldBackground());
+                this.view.addChild(getWorldBackground(this));
                 this.stage.addChild(this.view);
             
-                // UI & HUD
                 this.ui = new PIXI.Container();
                 this.stage.addChild(this.ui);
             
-                this.renderer = new PIXI.CanvasRenderer(Config.world.view.w, Config.world.view.h, {
-                        backgroundColor: Config.world.map.color,
+                this.renderer = new PIXI.CanvasRenderer(this.cfg.view.w, this.cfg.view.h, {
+                        backgroundColor: this.cfg.map.color,
                         antialias: true,
                         autoResize: true,
                     });
                 document.body.appendChild(this.renderer.view);
             
-                // world objects
                 this.bullets = {};
-                this.obstacles = [];
+                this.obstacles = {};
                 this.obstacleCount = 0;
-                this.tanks = [];
+                this.tanks = {};
                 var idx = 0;
                 for (var i in Config.tanks) {
                     var tank = new Tank(this, i, { x: this.w / 2 + idx * 200, y: this.h / 2 + idx * 200, });
-                    this.tanks.push(tank);
+                    this.tanks[tank.id] = tank;
                     ++ idx;
                 }
             
-                // player
-                this.player = new Player(this, this.tanks[0]);
+                this.player = new Player(this);
                 this.player.addControl();
+                this.player.update();
             
-                // die sprites
                 this.dieSprites = [];
+            
                 this.removeUnits = [];
+            
+                this.gameend = false;
             }
             
             World.prototype = {};
@@ -1078,8 +1131,8 @@
             {
                 var x = this.player.x;
                 var y = this.player.y;
-                var viewCenterX = Config.world.view.w / 2;
-                var viewCenterY = Config.world.view.h / 2;
+                var viewCenterX = this.cfg.view.w / 2;
+                var viewCenterY = this.cfg.view.h / 2;
                 x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
                 y = Util.clamp(y, viewCenterY, this.h - viewCenterY);
                 this.view.x = viewCenterX - x;
@@ -1111,10 +1164,9 @@
                         Config.obstacles.large
                     ];
                     var cfg = cfgs[Math.floor((Math.random() * cfgs.length))];
-                    var wcfg = Config.world.walkable;
                     var obstacle = new Obstacle(this, cfg, {
-                        x: Util.randomBetween(wcfg.x, wcfg.x + wcfg.w),
-                        y: Util.randomBetween(wcfg.y, wcfg.y + wcfg.h),
+                        x: Util.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
+                        y: Util.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
                     });
                     this.obstacles[obstacle.id] = obstacle;
                     this.obstacleCount ++;
@@ -1261,7 +1313,7 @@
             
                             // avoid multi-collision
                             if (unit.collideTime != null) {
-                                if (this.time - unit.collideTime < Config.world.unitCollideCheckMS) {
+                                if (this.time - unit.collideTime < this.cfg.unitCollideCheckMS) {
                                     continue;
                                 }
                             }
@@ -1286,7 +1338,6 @@
                                     unit.collideTime = this.time;
                                     target.collideTime = this.time;
                                     this.collide(unit, target);
-                                    // console.log("frame=" + this.frame + " collision: " + unit.id + "--" + target.id);
                                 }
                             }
                             unit.collideCheckFrame = this.frame;
@@ -1308,8 +1359,9 @@
                     sprite.scale.x += cfg.scaleIncrease;
                     sprite.scale.y += cfg.scaleIncrease;
                     if (sprite.alpha < cfg.alphaEnd) {
-                        var idx = this.view.getChildIndex(sprite);
-                        this.view.removeChildAt(idx);
+                        if (sprite.parent) {
+                            sprite.parent.removeChild(sprite);
+                        }
                         this.dieSprites.splice(i, 1);
                         delete sprite;
                     }
@@ -1320,11 +1372,11 @@
             {
                 var dateTime = new Date();
                 var ms = dateTime.getTime();
-                while (ms > this.time + Config.world.updateMS) {
-                    this.time += Config.world.updateMS;
+                while (ms > this.time + this.cfg.updateMS) {
+                    this.time += this.cfg.updateMS;
                     this.frame ++;
-                    this.updateTanks();
                     this.updatePlayers();
+                    this.updateTanks();
                     this.updateObstacles();
                     this.updateBullets();
                     this.updateCollision();

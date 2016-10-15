@@ -14,10 +14,11 @@ function Obstacle(world, cfg, position)
     this.damage = this.cfg.damage;
 
     // view
+    this.sprite = new PIXI.Container();
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
     graphics.beginFill(this.cfg.color);
-    var from = new PIXI.Point(0, this.cfg.radius);
+    var from = new PIXI.Point(0, - this.cfg.radius);
     graphics.moveTo(from.x, from.y);
     for (var i = 1; i < this.cfg.side; ++ i) {
         var p = new Victor(from.x, from.y);
@@ -28,17 +29,17 @@ function Obstacle(world, cfg, position)
     }
     graphics.endFill();
     delete from;
-    delete graphics;
-    this.sprite = new PIXI.Sprite(graphics.generateTexture());
-    this.sprite.anchor.x = 0.5;
-    this.sprite.anchor.y = (this.cfg.radius + this.cfg.edge.w) / this.sprite.height;
+    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+    graphics.destroy();
+    bodySprite.pivot.x = bodySprite.width / 2;
+    bodySprite.pivot.y = this.cfg.radius + this.cfg.edge.w;
+    this.sprite.addChild(bodySprite);
     world.view.addChild(this.sprite);
 
     this.x = position.x;
     this.y = position.y;
     world.addUnitToGrid(this);
 
-    this.radius = this.cfg.radius + this.cfg.edge.w;
     this.motion = new Motion(this, this.cfg.moveSpeed, this.cfg.rotationSpeed);
     this.motion.randomMoveDir();
     this.hpbar = new HpBar(world, Config.hpbar, this, false);
@@ -56,9 +57,11 @@ Obstacle.prototype.takeDamageByUnit = function(caster)
 
 Obstacle.prototype.die = function()
 {
-    delete this.world.obstacles[this.id];
+    this.hpbar.die();
     this.world.dieSprites.push(this.sprite);
-    this.world.view.removeChild(this.hpbar.sprite);
+
+    delete this.world.obstacles[this.id];
+    -- this.world.obstacleCount;
     this.world.removeUnitFromGrid(this);
     this.world.removeUnits.push(this);
 }
@@ -73,12 +76,12 @@ Obstacle.prototype.update = function()
     this.hpbar.x += (this.x - oldX);
     this.hpbar.y += (this.y - oldY);
 
-    if (this.x < Config.world.walkable.x
-        || this.x > Config.world.walkable.x + Config.world.walkable.w) {
+    if (this.x < this.world.spawnRegion.x
+        || this.x > this.world.spawnRegion.x + this.world.spawnRegion.w) {
         this.motion.reverseMoveDirX();
     }
-    if (this.y < Config.world.walkable.y
-        || this.y > Config.world.walkable.y + Config.world.walkable.h) {
+    if (this.y < this.world.spawnRegion.y
+        || this.y > this.world.spawnRegion.y + this.world.spawnRegion.h) {
         this.motion.reverseMoveDirY();
     }
 }
@@ -91,6 +94,9 @@ Object.defineProperties(Obstacle.prototype, {
     y: {
         get: function() { return this.sprite.y; },
         set: function(v) { this.sprite.y = v; }
+    },
+    radius: {
+        get: function() { return this.cfg.radius + this.cfg.edge.w; }
     },
     h: {
         get: function() { return this.sprite.height; }

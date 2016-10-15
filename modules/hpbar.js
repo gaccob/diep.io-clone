@@ -1,4 +1,5 @@
 var Config = require("../modules/config");
+var Util = require("../modules/util");
 
 function HpBar(world, cfg, owner, display)
 {
@@ -30,34 +31,33 @@ function HpBar(world, cfg, owner, display)
     this.sprite.addChild(this.frontSprite);
     this.sprite.alpha = this.cfg.alpha;
 
-    var bounds = this.owner.sprite.getLocalBounds();
+    this.x = this.owner.x + this.owner.radius * this.cfg.xOffsetRatio;
+    this.y = this.owner.y + this.owner.radius * this.cfg.yOffsetRatio;
 
-    // long side
-    var x1 = bounds.width + bounds.x;
-    var x2 = Math.abs(bounds.x);
-    if (x1 > x2) {
-        this.x = this.owner.x + x1 * this.cfg.xOffsetRatio;
-    } else {
-        this.x = this.owner.x + x2 * this.cfg.xOffsetRatio;
-    }
-    var y1 = bounds.height + bounds.y;
-    var y2 = Math.abs(bounds.y);
-    if (y1 > y2) {
-        this.y = this.owner.y + y1 * this.cfg.yOffsetRatio;
-    } else {
-        this.y = this.owner.y + y2 * this.cfg.yOffsetRatio;
-    }
-
-    this.scale.x = this.cfg.displayRatio;
-    this.scale.y = this.cfg.displayRatio;
+    this.scale.x = this.cfg.xDisplayRatio * 2 * this.owner.radius / this.cfg.w;
+    this.scale.y = this.cfg.yDisplayRatio * 2 * this.owner.radius / this.cfg.w;
 
     world.view.addChild(this.sprite);
 }
 
 HpBar.prototype = {}
 
+HpBar.prototype.die = function()
+{
+    if (this.sprite && this.sprite.parent != null) {
+        this.sprite.parent.removeChild(this.sprite);
+    }
+    delete this.sprite;
+}
+
 HpBar.prototype.update = function(percent)
 {
+    if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
+        this.visible = false;
+    } else {
+        this.visible = true;
+    }
+
     if (this.percent == percent) {
         return;
     }
@@ -66,11 +66,6 @@ HpBar.prototype.update = function(percent)
     this.percent = percent;
     this.frontSprite.width = this.cfg.w * percent;
     this.frontSprite.x -= this.cfg.w * (1 - this.percent) / 2;
-
-    // full hp & default not display
-    if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
-        this.visible = false;
-    }
 }
 
 Object.defineProperties(HpBar.prototype, {
@@ -85,6 +80,10 @@ Object.defineProperties(HpBar.prototype, {
     scale: {
         get: function() { return this.sprite.scale; },
         set: function(s) { this.sprite.scale = s; }
+    },
+    visible: {
+        get: function() { return this.sprite.visible; },
+        set: function(v) { this.sprite.visible = v; }
     },
     w: {
         get: function() { return this.sprite.width; }

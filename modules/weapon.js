@@ -24,13 +24,17 @@ function Weapon(world, tank, cfg)
     graphics.beginFill(this.cfg.color);
     graphics.drawRect(0, 0, this.cfg.w, this.cfg.h);
     graphics.endFill();
-    this.sprite = new PIXI.Sprite(graphics.generateTexture());
+    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
     graphics.destroy();
-    this.sprite.anchor.x = 0.5;
-    this.sprite.anchor.y = 1.0;
+    bodySprite.anchor.x = 0.5;
+    bodySprite.anchor.y = 1.0;
+    this.sprite = new PIXI.Container();
+    this.sprite.addChild(bodySprite);
+
+    // rotation & position
     this.sprite.rotation = this.cfg.angle * Math.PI / 180;
-    this.sprite.x += this.cfg.x;
-    this.sprite.y += this.cfg.y;
+    this.x += this.cfg.x;
+    this.y += this.cfg.y;
 }
 
 Weapon.prototype = {}
@@ -56,6 +60,17 @@ Weapon.prototype.fire = function()
         this.world.bullets[bullet.id] = bullet;
     }
 }
+
+Object.defineProperties(Weapon.prototype, {
+    x: {
+        get: function() { return this.sprite.x; },
+        set: function(v) { this.sprite.x = v; }
+    },
+    y: {
+        get: function() { return this.sprite.y; },
+        set: function(v) { this.sprite.y = v; }
+    },
+});
 
 module.exports = Weapon;
 

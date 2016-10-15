@@ -4,16 +4,17 @@ var Motion = require("../modules/motion");
 var Weapon = require("../modules/weapon");
 var Util = require("../modules/util");
 
-function Tank(world, name, position)
+function Tank(world, name, position, player)
 {
     this.world = world;
     this.id = Util.getId();
     this.type = Util.unitType.tank;
     this.cfg = Config.tanks[name];
+    this.player = player;
     this.hp = this.cfg.hp;
     this.fullHp = this.cfg.hp;
     this.damage = this.cfg.damage;
-    // this.autoFire = true;
+    this.autoFire = true;
 
     // view & weapons
     this.sprite = new PIXI.Container();
@@ -25,7 +26,11 @@ function Tank(world, name, position)
     }
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-    graphics.beginFill(this.cfg.body.color);
+    if (this.player) {
+        graphics.beginFill(this.cfg.body.playerColor);
+    } else {
+        graphics.beginFill(this.cfg.body.color);
+    }
     graphics.drawCircle(0, 0, this.cfg.body.radius);
     graphics.endFill();
     var bodySprite = new PIXI.Sprite(graphics.generateTexture());
@@ -39,7 +44,6 @@ function Tank(world, name, position)
     this.y = position.y;
     world.addUnitToGrid(this);
 
-    this.radius = this.cfg.body.radius + this.cfg.edge.w;
     this.motion = new Motion(this, this.cfg.speed);
     this.hpbar = new HpBar(world, Config.hpbar, this, true);
 }
@@ -56,14 +60,18 @@ Tank.prototype.takeDamageByUnit = function(caster)
 
 Tank.prototype.die = function()
 {
-    delete this.world.tanks[this.id];
+    this.hpbar.die();
     this.world.dieSprites.push(this.sprite);
+
+    delete this.world.tanks[this.id];
     this.world.removeUnitFromGrid(this);
     this.world.removeUnits.push(this);
 
-    // TODO:
-    if (this.world.player == this) {
-        alert("player die");
+    if (this.world.player.tank == this) {
+        this.world.player.tank = null;
+        this.world.gameend = true;
+        alert("Lose! Click To Restart!");
+        this.world.player.update();
     }
 }
 
@@ -97,6 +105,9 @@ Object.defineProperties(Tank.prototype, {
     y: {
         get: function() { return this.sprite.y; },
         set: function(v) { this.sprite.y = v; }
+    },
+    radius: {
+        get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
     },
     h: {
         get: function() { return this.sprite.height; }

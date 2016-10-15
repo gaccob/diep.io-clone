@@ -4,15 +4,15 @@ var Player = require("../modules/player")
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
-function getWorldBackground()
+function getWorldBackground(world)
 {
     var cfg = Config.world;
     var graphics = new PIXI.Graphics();
 
-    // background walkable region
-    graphics.beginFill(cfg.walkable.color);
-    graphics.drawRect(cfg.walkable.x, cfg.walkable.y,
-        cfg.walkable.w, cfg.walkable.h);
+    // background spawn region
+    graphics.beginFill(cfg.spawnRegion.color);
+    graphics.drawRect(world.spawnRegion.x, world.spawnRegion.y,
+        world.spawnRegion.w, world.spawnRegion.h);
     graphics.endFill();
 
     // background grids
@@ -32,11 +32,18 @@ function getWorldBackground()
 function World()
 {
     this.frame = 0;
+    this.cfg = Config.world;
 
-    this.w = Config.world.map.w;
-    this.h = Config.world.map.h;
+    this.w = this.cfg.map.w;
+    this.h = this.cfg.map.h;
 
-    this.gridSize = Config.world.map.grid.size;
+    this.spawnRegion = {}
+    this.spawnRegion.x = this.cfg.map.w * (1 - this.cfg.spawnRegion.wRatio) / 2;
+    this.spawnRegion.w = this.cfg.map.w * this.cfg.spawnRegion.wRatio;
+    this.spawnRegion.y = this.cfg.map.h * (1 - this.cfg.spawnRegion.hRatio) / 2;
+    this.spawnRegion.h = this.cfg.map.h * this.cfg.spawnRegion.hRatio;
+
+    this.gridSize = this.cfg.map.grid.size;
     this.gridW = Math.floor(this.w / this.gridSize) + 1;
     this.gridH = Math.floor(this.h / this.gridSize) + 1;
     this.grids = [];
@@ -51,41 +58,40 @@ function World()
 
     this.stage = new PIXI.Container();
 
-    // main view (camera bind)
     this.view = new PIXI.Container();
-    this.view.addChild(getWorldBackground());
+    this.view.addChild(getWorldBackground(this));
     this.stage.addChild(this.view);
 
-    // UI & HUD
     this.ui = new PIXI.Container();
     this.stage.addChild(this.ui);
 
-    this.renderer = new PIXI.CanvasRenderer(Config.world.view.w, Config.world.view.h, {
-            backgroundColor: Config.world.map.color,
+    this.renderer = new PIXI.CanvasRenderer(this.cfg.view.w, this.cfg.view.h, {
+            backgroundColor: this.cfg.map.color,
             antialias: true,
             autoResize: true,
         });
     document.body.appendChild(this.renderer.view);
 
-    // world objects
     this.bullets = {};
-    this.obstacles = [];
+    this.obstacles = {};
     this.obstacleCount = 0;
-    this.tanks = [];
+    this.tanks = {};
     var idx = 0;
     for (var i in Config.tanks) {
         var tank = new Tank(this, i, { x: this.w / 2 + idx * 200, y: this.h / 2 + idx * 200, });
-        this.tanks.push(tank);
+        this.tanks[tank.id] = tank;
         ++ idx;
     }
 
-    // player
-    this.player = new Player(this, this.tanks[0]);
+    this.player = new Player(this);
     this.player.addControl();
+    this.player.update();
 
-    // die sprites
     this.dieSprites = [];
+
     this.removeUnits = [];
+
+    this.gameend = false;
 }
 
 World.prototype = {};
@@ -95,8 +101,8 @@ World.prototype.updateCamera = function()
 {
     var x = this.player.x;
     var y = this.player.y;
-    var viewCenterX = Config.world.view.w / 2;
-    var viewCenterY = Config.world.view.h / 2;
+    var viewCenterX = this.cfg.view.w / 2;
+    var viewCenterY = this.cfg.view.h / 2;
     x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
     y = Util.clamp(y, viewCenterY, this.h - viewCenterY);
     this.view.x = viewCenterX - x;
@@ -128,10 +134,9 @@ World.prototype.updateObstacles = function()
             Config.obstacles.large
         ];
         var cfg = cfgs[Math.floor((Math.random() * cfgs.length))];
-        var wcfg = Config.world.walkable;
         var obstacle = new Obstacle(this, cfg, {
-            x: Util.randomBetween(wcfg.x, wcfg.x + wcfg.w),
-            y: Util.randomBetween(wcfg.y, wcfg.y + wcfg.h),
+            x: Util.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
+            y: Util.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
         });
         this.obstacles[obstacle.id] = obstacle;
         this.obstacleCount ++;
@@ -278,7 +283,7 @@ World.prototype.updateCollision = function()
 
                 // avoid multi-collision
                 if (unit.collideTime != null) {
-                    if (this.time - unit.collideTime < Config.world.unitCollideCheckMS) {
+                    if (this.time - unit.collideTime < this.cfg.unitCollideCheckMS) {
                         continue;
                     }
                 }
@@ -303,7 +308,6 @@ World.prototype.updateCollision = function()
                         unit.collideTime = this.time;
                         target.collideTime = this.time;
                         this.collide(unit, target);
-                        // console.log("frame=" + this.frame + " collision: " + unit.id + "--" + target.id);
                     }
                 }
                 unit.collideCheckFrame = this.frame;
@@ -325,8 +329,9 @@ World.prototype.updateDieAnimations = function()
         sprite.scale.x += cfg.scaleIncrease;
         sprite.scale.y += cfg.scaleIncrease;
         if (sprite.alpha < cfg.alphaEnd) {
-            var idx = this.view.getChildIndex(sprite);
-            this.view.removeChildAt(idx);
+            if (sprite.parent) {
+                sprite.parent.removeChild(sprite);
+            }
             this.dieSprites.splice(i, 1);
             delete sprite;
         }
@@ -337,11 +342,11 @@ World.prototype.updateLogic = function()
 {
     var dateTime = new Date();
     var ms = dateTime.getTime();
-    while (ms > this.time + Config.world.updateMS) {
-        this.time += Config.world.updateMS;
+    while (ms > this.time + this.cfg.updateMS) {
+        this.time += this.cfg.updateMS;
         this.frame ++;
-        this.updateTanks();
         this.updatePlayers();
+        this.updateTanks();
         this.updateObstacles();
         this.updateBullets();
         this.updateCollision();

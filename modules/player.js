@@ -1,8 +1,10 @@
-function Player(world, tank)
+var Tank = require("../modules/tank");
+var Util = require("../modules/util");
+
+function Player(world)
 {
     this.world = world;
-    this.tank = tank;
-    // TODO: client info
+    this.tank = null;
 }
 
 Player.prototype = {}
@@ -88,9 +90,8 @@ function handleKeyUp(player)
 function handleMouseMove(player)
 {
     document.body.addEventListener('mousemove', function(e) {
-        var targetPos = new Victor(e.x - player.world.view.x, e.y - player.world.view.y);
+        var targetPos = new Victor(e.offsetX - player.world.view.x, e.offsetY - player.world.view.y);
         if (player.tank != null) {
-            // TODO: rotate speed
             var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
             player.tank.rotation = dir.angle() + Math.PI / 2;
         }
@@ -107,16 +108,21 @@ function handleMouseDown(player) {
 
 Player.prototype.addControl = function()
 {
-    if (this.tank) {
-        handleKeyDown(this);
-        handleKeyUp(this);
-        handleMouseMove(this);
-        handleMouseDown(this);
-    }
+    handleKeyDown(this);
+    handleKeyUp(this);
+    handleMouseMove(this);
+    handleMouseDown(this);
 }
 
 Player.prototype.update = function()
 {
+    if (!this.tank) {
+        this.tank = new Tank(this.world, "base", {
+            x: Math.random() * this.world.w,
+            y: Math.random() * this.world.h
+        }, this);
+        this.world.tanks[this.tank.id] = this.tank;
+    }
 }
 
 Object.defineProperties(Player.prototype, {

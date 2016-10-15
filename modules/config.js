@@ -2,8 +2,8 @@ var Config =
 {
     world: {
         map: {
-            w: 4096,
-            h: 4096,
+            w: 1024,
+            h: 1024,
             color: 0x808080,
             grid: {
                 size: 128,
@@ -18,17 +18,15 @@ var Config =
                 color: 0xa0a0a0
             },
         },
-        walkable: {
-            x: 128,
-            y: 128,
-            w: 3840,
-            h: 3840,
+        spawnRegion: {
+            wRatio: 0.92,
+            hRatio: 0.92,
             color: 0xcdcdcd
         },
         unitCollideCheckMS: 500,
         updateMS: 1000 / 30,
-        externalVelocityDecPerSecond: 100,
-        externalVelocityMax: 1000,
+        externalVelocityDecPerSecond: 300,
+        externalVelocityMax: 800,
     },
 
     hpbar: {
@@ -41,8 +39,9 @@ var Config =
         radius: 10,
         color: 0x86c680,
         xOffsetRatio: 0,
-        yOffsetRatio: 1.2,
-        displayRatio: 0.5,
+        yOffsetRatio: 1.3,
+        xDisplayRatio: 0.6,
+        yDisplayRatio: 0.6,
         alpha: 0.75,
     },
 
@@ -60,8 +59,9 @@ var Config =
                 color: 0x555555
             },
             body: {
-                radius: 10,
-                color: 0x00b2e1
+                radius: 8,
+                color: 0xf14e54,
+                playerColor: 0x00b2e1,
             },
             speed: 300,
             duration: 1000,
@@ -71,10 +71,10 @@ var Config =
     },
 
     obstacles: {
-        count: 100,
+        count: 10,
         small: {
             side: 3,
-            radius: 25,
+            radius: 20,
             color: 0xfc7676,
             edge: {
                 w: 2.5,
@@ -82,12 +82,12 @@ var Config =
             },
             rotationSpeed: 0.5,
             moveSpeed: 3,
-            hp: 10,
+            hp: 20,
             damage: 2,
         },
         middle: {
             side: 4,
-            radius: 28,
+            radius: 20,
             color: 0xffe869,
             edge: {
                 w: 2.5,
@@ -95,12 +95,12 @@ var Config =
             },
             rotationSpeed: 0.5,
             moveSpeed: 3,
-            hp: 20,
+            hp: 40,
             damage: 4,
         },
         large: {
             side: 5,
-            radius: 32,
+            radius: 24,
             color: 0x768dfc,
             edge: {
                 w: 2.5,
@@ -108,7 +108,7 @@ var Config =
             },
             rotationSpeed: 0.5,
             moveSpeed: 3,
-            hp: 40,
+            hp: 80,
             damage: 8,
         },
     },
@@ -120,13 +120,14 @@ var Config =
                 color: 0x555555
             },
             body: {
-                radius: 30,
-                color: 0x00b2e1
+                radius: 20,
+                color: 0xf14e54,
+                playerColor: 0x00b2e1,
             },
             weapons: [
                 {
                     w: 15,
-                    h: 50,
+                    h: 32,
                     x: 0,
                     y: 0,
                     bullet: "normal",
@@ -148,14 +149,15 @@ var Config =
                 color: 0x555555
             },
             body: {
-                radius: 30,
-                color: 0x00b2e1
+                radius: 24,
+                color: 0xf14e54,
+                playerColor: 0x00b2e1,
             },
             weapons: [
                 {
-                    w: 15,
-                    h: 50,
-                    x: -10,
+                    w: 12,
+                    h: 38,
+                    x: -8,
                     y: 0,
                     bullet: "normal",
                     angle: 0,
@@ -166,9 +168,9 @@ var Config =
                     disturbDeg: 15,
                 },
                 {
-                    w: 15,
-                    h: 50,
-                    x: 10,
+                    w: 12,
+                    h: 38,
+                    x: 8,
                     y: 0,
                     bullet: "normal",
                     angle: 0,
@@ -189,13 +191,14 @@ var Config =
                 color: 0x555555
             },
             body: {
-                radius: 30,
-                color: 0x00b2e1
+                radius: 24,
+                color: 0xf14e54,
+                playerColor: 0x00b2e1,
             },
             weapons: [
                 {
-                    w: 20,
-                    h: 45,
+                    w: 16,
+                    h: 34,
                     x: 0,
                     y: 0,
                     bullet: "normal",
@@ -207,8 +210,8 @@ var Config =
                     disturbDeg: 15,
                 },
                 {
-                    w: 20,
-                    h: 45,
+                    w: 16,
+                    h: 34,
                     x: 0,
                     y: 0,
                     bullet: "normal",
@@ -220,8 +223,8 @@ var Config =
                     disturbDeg: 15,
                 },
                 {
-                    w: 20,
-                    h: 45,
+                    w: 16,
+                    h: 34,
                     x: 0,
                     y: 0,
                     bullet: "normal",
@@ -233,8 +236,8 @@ var Config =
                     disturbDeg: 15,
                 },
                 {
-                    w: 20,
-                    h: 45,
+                    w: 16,
+                    h: 34,
                     x: 0,
                     y: 0,
                     bullet: "normal",

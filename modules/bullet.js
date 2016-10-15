@@ -18,20 +18,24 @@ function Bullet(world, position, angle, weapon)
     // view
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-    graphics.beginFill(this.cfg.body.color);
+    if (this.world.player.tank == this.owner) {
+        graphics.beginFill(this.cfg.body.playerColor);
+    } else {
+        graphics.beginFill(this.cfg.body.color);
+    }
     graphics.drawCircle(0, 0, this.cfg.body.radius);
     graphics.endFill();
-    delete graphics;
-    this.sprite = new PIXI.Sprite(graphics.generateTexture());
-    this.sprite.anchor.x = 0.5;
-    this.sprite.anchor.y = 0.5;
+    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+    graphics.destroy();
+    bodySprite.anchor.x = 0.5;
+    bodySprite.anchor.y = 0.5;
+    this.sprite = new PIXI.Container();
+    this.sprite.addChild(bodySprite);
     world.view.addChild(this.sprite);
 
     this.x = position.x;
     this.y = position.y;
     world.addUnitToGrid(this);
-
-    this.radius = this.cfg.body.radius + this.cfg.edge.w;
 }
 
 Bullet.prototype = {}
@@ -82,6 +86,9 @@ Object.defineProperties(Bullet.prototype, {
     y: {
         get: function() { return this.sprite.y; },
         set: function(v) { this.sprite.y = v; }
+    },
+    radius: {
+        get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
     },
 });
 
