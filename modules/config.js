@@ -2,26 +2,27 @@ var Config =
 {
     world: {
         map: {
-            w: 1024,
-            h: 1024,
+            w: 2048,
+            h: 2048,
             color: 0x808080,
             grid: {
                 size: 128,
             },
         },
         view: {
-            w: 600,
-            h: 800,
+            w: document.documentElement.clientWidth,
+            h: document.documentElement.clientHeight - 10,
             grid: {
                 size: 32,
                 edge: 1,
                 color: 0xa0a0a0
             },
         },
-        spawnRegion: {
+        obstacleSpawn: {
             wRatio: 0.92,
             hRatio: 0.92,
-            color: 0xcdcdcd
+            color: 0xcdcdcd,
+            maxCount: 30,
         },
         unitCollideCheckMS: 500,
         updateMS: 1000 / 30,
@@ -71,7 +72,6 @@ var Config =
     },
 
     obstacles: {
-        count: 10,
         small: {
             side: 3,
             radius: 20,

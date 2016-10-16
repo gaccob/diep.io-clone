@@ -21,26 +21,27 @@
             {
                 world: {
                     map: {
-                        w: 1024,
-                        h: 1024,
+                        w: 2048,
+                        h: 2048,
                         color: 0x808080,
                         grid: {
                             size: 128,
                         },
                     },
                     view: {
-                        w: 600,
-                        h: 800,
+                        w: document.documentElement.clientWidth,
+                        h: document.documentElement.clientHeight - 10,
                         grid: {
                             size: 32,
                             edge: 1,
                             color: 0xa0a0a0
                         },
                     },
-                    spawnRegion: {
+                    obstacleSpawn: {
                         wRatio: 0.92,
                         hRatio: 0.92,
-                        color: 0xcdcdcd
+                        color: 0xcdcdcd,
+                        maxCount: 30,
                     },
                     unitCollideCheckMS: 500,
                     updateMS: 1000 / 30,
@@ -90,7 +91,6 @@
                 },
             
                 obstacles: {
-                    count: 10,
                     small: {
                         side: 3,
                         radius: 20,
@@ -684,12 +684,19 @@
             {
                 this.world = world;
                 this.tank = null;
+                this.control = {
+                    left: 0,
+                    right: 0,
+                    up: 0,
+                    down: 0,
+                };
             }
             
             Player.prototype = {}
             
-            function handleKeyDown(player)
+            Player.prototype.handleKeyDown = function()
             {
+                var player = this;
                 document.body.addEventListener('keydown', function(e) {
                     if (player.tank == null) {
                         return;
@@ -697,38 +704,27 @@
                     switch (e.key) {
                         case 'w':
                         case 'W':
-                            player.tank.motion.moveDir.y -= 1;
-                            if (player.tank.motion.moveDir.y < -1) {
-                                player.tank.motion.moveDir.y = -1;
-                            }
+                            player.control.up = 1;
                             break;
                         case 'd':
                         case 'D':
-                            player.tank.motion.moveDir.x += 1;
-                            if (player.tank.motion.moveDir.x > 1) {
-                                player.tank.motion.moveDir.x = 1;
-                            }
+                            player.control.right = 1;
                             break;
                         case 's':
                         case 'S':
-                            player.tank.motion.moveDir.y += 1;
-                            if (player.tank.motion.moveDir.y > 1) {
-                                player.tank.motion.moveDir.y = 1;
-                            }
+                            player.control.down = 1;
                             break;
                         case 'a':
                         case 'A':
-                            player.tank.motion.moveDir.x -= 1;
-                            if (player.tank.motion.moveDir.x < -1) {
-                                player.tank.motion.moveDir.x = -1;
-                            }
+                            player.control.left = 1;
                             break;
                     }
                 }, false);
             }
             
-            function handleKeyUp(player)
+            Player.prototype.handleKeyUp = function()
             {
+                var player = this;
                 document.body.addEventListener('keyup', function(e) {
                     if (player.tank == null) {
                         return;
@@ -736,38 +732,27 @@
                     switch (e.key) {
                         case 'w':
                         case 'W':
-                            player.tank.motion.moveDir.y += 1;
-                            if (player.tank.motion.moveDir.y > 1) {
-                                player.tank.motion.moveDir.y = 1;
-                            }
+                            player.control.up = 0;
                             break;
                         case 'd':
                         case 'D':
-                            player.tank.motion.moveDir.x -= 1;
-                            if (player.tank.motion.moveDir.x < -1) {
-                                player.tank.motion.moveDir.x = -1;
-                            }
+                            player.control.right = 0;
                             break;
                         case 's':
                         case 'S':
-                            player.tank.motion.moveDir.y -= 1;
-                            if (player.tank.motion.moveDir.y < -1) {
-                                player.tank.motion.moveDir.y = -1;
-                            }
+                            player.control.down = 0;
                             break;
                         case 'a':
                         case 'A':
-                            player.tank.motion.moveDir.x += 1;
-                            if (player.tank.motion.moveDir.x > 1) {
-                                player.tank.motion.moveDir.x = 1;
-                            }
+                            player.control.left = 0;
                             break;
                     }
                 }, false);
             }
             
-            function handleMouseMove(player)
+            Player.prototype.handleMouseMove = function()
             {
+                var player = this;
                 document.body.addEventListener('mousemove', function(e) {
                     var targetPos = new Victor(e.offsetX - player.world.view.x, e.offsetY - player.world.view.y);
                     if (player.tank != null) {
@@ -777,7 +762,9 @@
                 }, false);
             }
             
-            function handleMouseDown(player) {
+            Player.prototype.handleMouseDown = function()
+            {
+                var player = this;
                 document.body.addEventListener('mousedown', function(e) {
                     if (player.tank != null) {
                         player.tank.fire();
@@ -787,10 +774,18 @@
             
             Player.prototype.addControl = function()
             {
-                handleKeyDown(this);
-                handleKeyUp(this);
-                handleMouseMove(this);
-                handleMouseDown(this);
+                this.handleKeyDown();
+                this.handleKeyUp();
+                this.handleMouseMove();
+                this.handleMouseDown();
+            }
+            
+            Player.prototype.resetControl = function()
+            {
+                this.control.left = 0;
+                this.control.right = 0;
+                this.control.up = 0;
+                this.control.down = 0;
             }
             
             Player.prototype.update = function()
@@ -801,6 +796,24 @@
                         y: Math.random() * this.world.h
                     }, this);
                     this.world.tanks[this.tank.id] = this.tank;
+                    this.resetControl();
+                }
+                // motion move direction
+                else {
+                    this.tank.motion.moveDir.x = 0;
+                    this.tank.motion.moveDir.y = 0;
+                    if (this.control.left == 1) {
+                        this.tank.motion.moveDir.x -= 1;
+                    }
+                    if (this.control.right == 1) {
+                        this.tank.motion.moveDir.x += 1;
+                    }
+                    if (this.control.up == 1) {
+                        this.tank.motion.moveDir.y -= 1;
+                    }
+                    if (this.control.down == 1) {
+                        this.tank.motion.moveDir.y += 1;
+                    }
                 }
             }
             
@@ -1040,7 +1053,7 @@
                 var graphics = new PIXI.Graphics();
             
                 // background spawn region
-                graphics.beginFill(cfg.spawnRegion.color);
+                graphics.beginFill(cfg.obstacleSpawn.color);
                 graphics.drawRect(world.spawnRegion.x, world.spawnRegion.y,
                     world.spawnRegion.w, world.spawnRegion.h);
                 graphics.endFill();
@@ -1068,10 +1081,10 @@
                 this.h = this.cfg.map.h;
             
                 this.spawnRegion = {}
-                this.spawnRegion.x = this.cfg.map.w * (1 - this.cfg.spawnRegion.wRatio) / 2;
-                this.spawnRegion.w = this.cfg.map.w * this.cfg.spawnRegion.wRatio;
-                this.spawnRegion.y = this.cfg.map.h * (1 - this.cfg.spawnRegion.hRatio) / 2;
-                this.spawnRegion.h = this.cfg.map.h * this.cfg.spawnRegion.hRatio;
+                this.spawnRegion.x = this.cfg.map.w * (1 - this.cfg.obstacleSpawn.wRatio) / 2;
+                this.spawnRegion.w = this.cfg.map.w * this.cfg.obstacleSpawn.wRatio;
+                this.spawnRegion.y = this.cfg.map.h * (1 - this.cfg.obstacleSpawn.hRatio) / 2;
+                this.spawnRegion.h = this.cfg.map.h * this.cfg.obstacleSpawn.hRatio;
             
                 this.gridSize = this.cfg.map.grid.size;
                 this.gridW = Math.floor(this.w / this.gridSize) + 1;
@@ -1115,7 +1128,6 @@
             
                 this.player = new Player(this);
                 this.player.addControl();
-                this.player.update();
             
                 this.dieSprites = [];
             
@@ -1157,7 +1169,7 @@
             
             World.prototype.updateObstacles = function()
             {
-                if (this.obstacleCount < Config.obstacles.count) {
+                if (this.obstacleCount < this.cfg.obstacleSpawn.maxCount) {
                     var cfgs = [
                         Config.obstacles.small,
                         Config.obstacles.middle,
@@ -1271,11 +1283,7 @@
                 // v1 = [(m1-m2)v10 + 2m2v20] / (m1+m2)
                 // v2 = [(m2-m1)v20 + 2m1v10] / (m1+m2)
             
-                // console.log("frame[" + this.frame + "]");
-                // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
-                // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
-                // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
-                // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
+                // TODO: simple transform
             
                 var m1 = unit1.radius * unit1.radius;
                 var m2 = unit2.radius * unit2.radius;
@@ -1291,11 +1299,6 @@
                 var v2y = ((m2 - m1) * v20.y + 2 * m1 * v10.y) / (m1 + m2);
                 unit2.motion.ev.x += v2x;
                 unit2.motion.ev.y += v2y;
-            
-                // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
-                // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
-                // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
-                // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
             
                 // damage each other
                 unit1.takeDamageByUnit(unit2);

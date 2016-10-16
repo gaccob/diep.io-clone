@@ -5,12 +5,19 @@ function Player(world)
 {
     this.world = world;
     this.tank = null;
+    this.control = {
+        left: 0,
+        right: 0,
+        up: 0,
+        down: 0,
+    };
 }
 
 Player.prototype = {}
 
-function handleKeyDown(player)
+Player.prototype.handleKeyDown = function()
 {
+    var player = this;
     document.body.addEventListener('keydown', function(e) {
         if (player.tank == null) {
             return;
@@ -18,38 +25,27 @@ function handleKeyDown(player)
         switch (e.key) {
             case 'w':
             case 'W':
-                player.tank.motion.moveDir.y -= 1;
-                if (player.tank.motion.moveDir.y < -1) {
-                    player.tank.motion.moveDir.y = -1;
-                }
+                player.control.up = 1;
                 break;
             case 'd':
             case 'D':
-                player.tank.motion.moveDir.x += 1;
-                if (player.tank.motion.moveDir.x > 1) {
-                    player.tank.motion.moveDir.x = 1;
-                }
+                player.control.right = 1;
                 break;
             case 's':
             case 'S':
-                player.tank.motion.moveDir.y += 1;
-                if (player.tank.motion.moveDir.y > 1) {
-                    player.tank.motion.moveDir.y = 1;
-                }
+                player.control.down = 1;
                 break;
             case 'a':
             case 'A':
-                player.tank.motion.moveDir.x -= 1;
-                if (player.tank.motion.moveDir.x < -1) {
-                    player.tank.motion.moveDir.x = -1;
-                }
+                player.control.left = 1;
                 break;
         }
     }, false);
 }
 
-function handleKeyUp(player)
+Player.prototype.handleKeyUp = function()
 {
+    var player = this;
     document.body.addEventListener('keyup', function(e) {
         if (player.tank == null) {
             return;
@@ -57,38 +53,27 @@ function handleKeyUp(player)
         switch (e.key) {
             case 'w':
             case 'W':
-                player.tank.motion.moveDir.y += 1;
-                if (player.tank.motion.moveDir.y > 1) {
-                    player.tank.motion.moveDir.y = 1;
-                }
+                player.control.up = 0;
                 break;
             case 'd':
             case 'D':
-                player.tank.motion.moveDir.x -= 1;
-                if (player.tank.motion.moveDir.x < -1) {
-                    player.tank.motion.moveDir.x = -1;
-                }
+                player.control.right = 0;
                 break;
             case 's':
             case 'S':
-                player.tank.motion.moveDir.y -= 1;
-                if (player.tank.motion.moveDir.y < -1) {
-                    player.tank.motion.moveDir.y = -1;
-                }
+                player.control.down = 0;
                 break;
             case 'a':
             case 'A':
-                player.tank.motion.moveDir.x += 1;
-                if (player.tank.motion.moveDir.x > 1) {
-                    player.tank.motion.moveDir.x = 1;
-                }
+                player.control.left = 0;
                 break;
         }
     }, false);
 }
 
-function handleMouseMove(player)
+Player.prototype.handleMouseMove = function()
 {
+    var player = this;
     document.body.addEventListener('mousemove', function(e) {
         var targetPos = new Victor(e.offsetX - player.world.view.x, e.offsetY - player.world.view.y);
         if (player.tank != null) {
@@ -98,7 +83,9 @@ function handleMouseMove(player)
     }, false);
 }
 
-function handleMouseDown(player) {
+Player.prototype.handleMouseDown = function()
+{
+    var player = this;
     document.body.addEventListener('mousedown', function(e) {
         if (player.tank != null) {
             player.tank.fire();
@@ -108,10 +95,18 @@ function handleMouseDown(player) {
 
 Player.prototype.addControl = function()
 {
-    handleKeyDown(this);
-    handleKeyUp(this);
-    handleMouseMove(this);
-    handleMouseDown(this);
+    this.handleKeyDown();
+    this.handleKeyUp();
+    this.handleMouseMove();
+    this.handleMouseDown();
+}
+
+Player.prototype.resetControl = function()
+{
+    this.control.left = 0;
+    this.control.right = 0;
+    this.control.up = 0;
+    this.control.down = 0;
 }
 
 Player.prototype.update = function()
@@ -122,6 +117,24 @@ Player.prototype.update = function()
             y: Math.random() * this.world.h
         }, this);
         this.world.tanks[this.tank.id] = this.tank;
+        this.resetControl();
+    }
+    // motion move direction
+    else {
+        this.tank.motion.moveDir.x = 0;
+        this.tank.motion.moveDir.y = 0;
+        if (this.control.left == 1) {
+            this.tank.motion.moveDir.x -= 1;
+        }
+        if (this.control.right == 1) {
+            this.tank.motion.moveDir.x += 1;
+        }
+        if (this.control.up == 1) {
+            this.tank.motion.moveDir.y -= 1;
+        }
+        if (this.control.down == 1) {
+            this.tank.motion.moveDir.y += 1;
+        }
     }
 }
 

@@ -10,7 +10,7 @@ function getWorldBackground(world)
     var graphics = new PIXI.Graphics();
 
     // background spawn region
-    graphics.beginFill(cfg.spawnRegion.color);
+    graphics.beginFill(cfg.obstacleSpawn.color);
     graphics.drawRect(world.spawnRegion.x, world.spawnRegion.y,
         world.spawnRegion.w, world.spawnRegion.h);
     graphics.endFill();
@@ -38,10 +38,10 @@ function World()
     this.h = this.cfg.map.h;
 
     this.spawnRegion = {}
-    this.spawnRegion.x = this.cfg.map.w * (1 - this.cfg.spawnRegion.wRatio) / 2;
-    this.spawnRegion.w = this.cfg.map.w * this.cfg.spawnRegion.wRatio;
-    this.spawnRegion.y = this.cfg.map.h * (1 - this.cfg.spawnRegion.hRatio) / 2;
-    this.spawnRegion.h = this.cfg.map.h * this.cfg.spawnRegion.hRatio;
+    this.spawnRegion.x = this.cfg.map.w * (1 - this.cfg.obstacleSpawn.wRatio) / 2;
+    this.spawnRegion.w = this.cfg.map.w * this.cfg.obstacleSpawn.wRatio;
+    this.spawnRegion.y = this.cfg.map.h * (1 - this.cfg.obstacleSpawn.hRatio) / 2;
+    this.spawnRegion.h = this.cfg.map.h * this.cfg.obstacleSpawn.hRatio;
 
     this.gridSize = this.cfg.map.grid.size;
     this.gridW = Math.floor(this.w / this.gridSize) + 1;
@@ -85,7 +85,6 @@ function World()
 
     this.player = new Player(this);
     this.player.addControl();
-    this.player.update();
 
     this.dieSprites = [];
 
@@ -127,7 +126,7 @@ World.prototype.updatePlayers = function()
 
 World.prototype.updateObstacles = function()
 {
-    if (this.obstacleCount < Config.obstacles.count) {
+    if (this.obstacleCount < this.cfg.obstacleSpawn.maxCount) {
         var cfgs = [
             Config.obstacles.small,
             Config.obstacles.middle,
@@ -241,11 +240,7 @@ World.prototype.collide = function(unit1, unit2)
     // v1 = [(m1-m2)v10 + 2m2v20] / (m1+m2)
     // v2 = [(m2-m1)v20 + 2m1v10] / (m1+m2)
 
-    // console.log("frame[" + this.frame + "]");
-    // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
-    // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
-    // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
-    // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
+    // TODO: simple transform
 
     var m1 = unit1.radius * unit1.radius;
     var m2 = unit2.radius * unit2.radius;
@@ -261,11 +256,6 @@ World.prototype.collide = function(unit1, unit2)
     var v2y = ((m2 - m1) * v20.y + 2 * m1 * v10.y) / (m1 + m2);
     unit2.motion.ev.x += v2x;
     unit2.motion.ev.y += v2y;
-
-    // console.log("unit1: ev{" + unit1.motion.ev.x + "," + unit1.motion.ev.y + "}");
-    // console.log("unit1: iv{" + unit1.motion.iv.x + "," + unit1.motion.iv.y + "}");
-    // console.log("unit2: ev{" + unit2.motion.ev.x + "," + unit2.motion.ev.y + "}");
-    // console.log("unit2: iv{" + unit2.motion.iv.x + "," + unit2.motion.iv.y + "}");
 
     // damage each other
     unit1.takeDamageByUnit(unit2);
