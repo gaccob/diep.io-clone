@@ -59,7 +59,7 @@
                     radius: 10,
                     color: 0x86c680,
                     xOffsetRatio: 0,
-                    yOffsetRatio: 1.3,
+                    yOffsetRatio: 1.4,
                     xDisplayRatio: 0.6,
                     yDisplayRatio: 0.6,
                     alpha: 0.75,
@@ -179,7 +179,7 @@
                         weapons: [
                             {
                                 w: 15,
-                                h: 32,
+                                h: 35,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -190,6 +190,8 @@
                                 shootDelayFrame: 3,
                                 disturbDeg: 15,
                                 recoil: 10000,
+                                fireAnimFrame: 16,
+                                fireAnimDistance: 5,
                             },
                         ],
                         hp: 1000,
@@ -218,7 +220,7 @@
                         weapons: [
                             {
                                 w: 12,
-                                h: 38,
+                                h: 40,
                                 x: -8,
                                 y: 0,
                                 bullet: "normal",
@@ -229,10 +231,12 @@
                                 shootDelayFrame: 3,
                                 disturbDeg: 15,
                                 recoil: 10000,
+                                fireAnimFrame: 16,
+                                fireAnimDistance: 5,
                             },
                             {
                                 w: 12,
-                                h: 38,
+                                h: 40,
                                 x: 8,
                                 y: 0,
                                 bullet: "normal",
@@ -243,6 +247,8 @@
                                 shootDelayFrame: 6,
                                 disturbDeg: 15,
                                 recoil: 10000,
+                                fireAnimFrame: 16,
+                                fireAnimDistance: 5,
                             }
                         ],
                         hp: 2000,
@@ -271,7 +277,7 @@
                         weapons: [
                             {
                                 w: 16,
-                                h: 34,
+                                h: 38,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -282,10 +288,12 @@
                                 shootDelayFrame: 3,
                                 disturbDeg: 15,
                                 recoil: 10000,
+                                fireAnimFrame: 16,
+                                fireAnimDistance: 5,
                             },
                             {
                                 w: 16,
-                                h: 34,
+                                h: 38,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -296,10 +304,12 @@
                                 shootDelayFrame: 6,
                                 disturbDeg: 15,
                                 recoil: 10000,
+                                fireAnimFrame: 16,
+                                fireAnimDistance: 5,
                             },
                             {
                                 w: 16,
-                                h: 34,
+                                h: 38,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -310,10 +320,12 @@
                                 shootDelayFrame: 3,
                                 disturbDeg: 15,
                                 recoil: 10000,
+                                fireAnimFrame: 16,
+                                fireAnimDistance: 5,
                             },
                             {
                                 w: 16,
-                                h: 34,
+                                h: 38,
                                 x: 0,
                                 y: 0,
                                 bullet: "normal",
@@ -324,6 +336,8 @@
                                 shootDelayFrame: 6,
                                 disturbDeg: 15,
                                 recoil: 10000,
+                                fireAnimFrame: 16,
+                                fireAnimDistance: 5,
                             },
                         ],
                         hp: 2000,
@@ -921,7 +935,7 @@
             Player.prototype.update = function()
             {
                 if (!this.tank) {
-                    this.tank = new Tank(this.world, "quad", {
+                    this.tank = new Tank(this.world, "base", {
                         x: Math.random() * this.world.w,
                         y: Math.random() * this.world.h
                     }, this);
@@ -1042,6 +1056,10 @@
                 if (this.autoFire == true) {
                     this.fire();
                 }
+            
+                for (var idx in this.weapons) {
+                    this.weapons[idx].update();
+                }
             }
             
             Tank.prototype.fire = function()
@@ -1130,9 +1148,14 @@
                 this.sprite.addChild(bodySprite);
             
                 // rotation & position
-                this.sprite.rotation = this.cfg.angle * Math.PI / 180;
+                this.rotation = this.cfg.angle * Math.PI / 180;
                 this.x += this.cfg.x;
                 this.y += this.cfg.y;
+            
+                // fire animation
+                this.fireAnimFrame = null;
+                this.originalX = this.x;
+                this.originalY = this.y;
             }
             
             Weapon.prototype = {}
@@ -1142,11 +1165,26 @@
                 this.fireFrame = this.world.frame + this.cfg.shootDelayFrame;
             }
             
+            Weapon.prototype.update = function()
+            {
+                if (this.fireAnimFrame) {
+                    var frame = this.world.frame - this.fireAnimFrame;
+                    if (frame > this.cfg.fireAnimFrame) {
+                        this.fireAnimFrame = null;
+                    } else {
+                        var delta = Math.abs(frame / this.cfg.fireAnimFrame * 2 - 1) * this.cfg.fireAnimDistance;
+                        this.x = this.originalX + Math.cos(this.rotation + Math.PI / 2) * delta;
+                        this.y = this.originalY + Math.sin(this.rotation + Math.PI / 2) * delta;
+                    }
+                }
+            }
+            
             Weapon.prototype.fire = function()
             {
                 if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
             
                     this.fireFrame = this.world.frame;
+                    this.fireAnimFrame = this.world.frame;
             
                     var pos = this.offset.clone();
                     pos.rotate(this.owner.rotation);
@@ -1177,6 +1215,10 @@
                 y: {
                     get: function() { return this.sprite.y; },
                     set: function(v) { this.sprite.y = v; }
+                },
+                rotation: {
+                    get: function() { return this.sprite.rotation; },
+                    set: function(r) { this.sprite.rotation = r; }
                 },
             });
             
@@ -1267,6 +1309,7 @@
                 var idx = 0;
                 for (var i in Config.tanks) {
                     var tank = new Tank(this, i, { x: this.w / 2 + idx * 200, y: this.h / 2 + idx * 200, });
+                    tank.autoFire = true;
                     this.tanks[tank.id] = tank;
                     ++ idx;
                 }

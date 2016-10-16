@@ -88,6 +88,10 @@ Tank.prototype.update = function()
     if (this.autoFire == true) {
         this.fire();
     }
+
+    for (var idx in this.weapons) {
+        this.weapons[idx].update();
+    }
 }
 
 Tank.prototype.fire = function()

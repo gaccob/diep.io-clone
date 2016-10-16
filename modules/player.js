@@ -112,7 +112,7 @@ Player.prototype.resetControl = function()
 Player.prototype.update = function()
 {
     if (!this.tank) {
-        this.tank = new Tank(this.world, "quad", {
+        this.tank = new Tank(this.world, "base", {
             x: Math.random() * this.world.w,
             y: Math.random() * this.world.h
         }, this);

@@ -79,6 +79,7 @@ function World()
     var idx = 0;
     for (var i in Config.tanks) {
         var tank = new Tank(this, i, { x: this.w / 2 + idx * 200, y: this.h / 2 + idx * 200, });
+        tank.autoFire = true;
         this.tanks[tank.id] = tank;
         ++ idx;
     }

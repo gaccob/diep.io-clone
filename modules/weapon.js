@@ -32,9 +32,14 @@ function Weapon(world, tank, cfg)
     this.sprite.addChild(bodySprite);
 
     // rotation & position
-    this.sprite.rotation = this.cfg.angle * Math.PI / 180;
+    this.rotation = this.cfg.angle * Math.PI / 180;
     this.x += this.cfg.x;
     this.y += this.cfg.y;
+
+    // fire animation
+    this.fireAnimFrame = null;
+    this.originalX = this.x;
+    this.originalY = this.y;
 }
 
 Weapon.prototype = {}
@@ -44,11 +49,26 @@ Weapon.prototype.resetFireDelay = function()
     this.fireFrame = this.world.frame + this.cfg.shootDelayFrame;
 }
 
+Weapon.prototype.update = function()
+{
+    if (this.fireAnimFrame) {
+        var frame = this.world.frame - this.fireAnimFrame;
+        if (frame > this.cfg.fireAnimFrame) {
+            this.fireAnimFrame = null;
+        } else {
+            var delta = Math.abs(frame / this.cfg.fireAnimFrame * 2 - 1) * this.cfg.fireAnimDistance;
+            this.x = this.originalX + Math.cos(this.rotation + Math.PI / 2) * delta;
+            this.y = this.originalY + Math.sin(this.rotation + Math.PI / 2) * delta;
+        }
+    }
+}
+
 Weapon.prototype.fire = function()
 {
     if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
 
         this.fireFrame = this.world.frame;
+        this.fireAnimFrame = this.world.frame;
 
         var pos = this.offset.clone();
         pos.rotate(this.owner.rotation);
@@ -79,6 +99,10 @@ Object.defineProperties(Weapon.prototype, {
     y: {
         get: function() { return this.sprite.y; },
         set: function(v) { this.sprite.y = v; }
+    },
+    rotation: {
+        get: function() { return this.sprite.rotation; },
+        set: function(r) { this.sprite.rotation = r; }
     },
 });
 
