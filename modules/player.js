@@ -130,10 +130,10 @@ Player.prototype.update = function()
 
 Object.defineProperties(Player.prototype, {
     x: {
-        get: function() { return this.tank.x; }
+        get: function() { return this.tank ? this.tank.x : 0; }
     },
     y: {
-        get: function() { return this.tank.y; }
+        get: function() { return this.tank ? this.tank.y : 0; }
     },
 });
 
