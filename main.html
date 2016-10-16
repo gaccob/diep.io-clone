@@ -45,8 +45,6 @@
                     },
                     unitCollideCheckMS: 500,
                     updateMS: 1000 / 30,
-                    externalVelocityDecPerSecond: 80,
-                    externalVelocityMax: 160,
                     springVelocityBase: 20,
                     springVelocityAdd: 30,
                 },
@@ -85,11 +83,19 @@
                             color: 0xf14e54,
                             playerColor: 0x00b2e1,
                         },
-                        speed: 300,
                         duration: 1000,
                         hp: 1,
                         damage: 10,
                         density: 1,
+                        velocity: {
+                            ivInit: 300,
+                            ivAcc: 200,
+                            ivMax: 300,
+                            ivMin: 200,
+                            evDec: 80,
+                            evMax: 160,
+                            rotate: 0,
+                        },
                     }
                 },
             
@@ -102,11 +108,18 @@
                             w: 2.5,
                             color: 0x555555
                         },
-                        rotationSpeed: 0.5,
-                        moveSpeed: 3,
                         hp: 20,
                         damage: 2,
                         density: 1,
+                        velocity: {
+                            ivInit: 3,
+                            ivAcc: 0,
+                            ivMax: 3,
+                            ivMin: 3,
+                            evDec: 80,
+                            evMax: 160,
+                            rotate: 0.5,
+                        },
                     },
                     middle: {
                         side: 4,
@@ -116,11 +129,18 @@
                             w: 2.5,
                             color: 0x555555
                         },
-                        rotationSpeed: 0.5,
-                        moveSpeed: 3,
                         hp: 40,
                         damage: 4,
                         density: 1,
+                        velocity: {
+                            ivInit: 3,
+                            ivAcc: 0,
+                            ivMax: 3,
+                            ivMin: 3,
+                            evDec: 80,
+                            evMax: 160,
+                            rotate: 0.5,
+                        },
                     },
                     large: {
                         side: 5,
@@ -130,11 +150,18 @@
                             w: 2.5,
                             color: 0x555555
                         },
-                        rotationSpeed: 0.5,
-                        moveSpeed: 3,
                         hp: 80,
                         damage: 8,
                         density: 1,
+                        velocity: {
+                            ivInit: 3,
+                            ivAcc: 0,
+                            ivMax: 3,
+                            ivMin: 3,
+                            evDec: 80,
+                            evMax: 160,
+                            rotate: 0.5,
+                        },
                     },
                 },
             
@@ -145,7 +172,7 @@
                             color: 0x555555
                         },
                         body: {
-                            radius: 20,
+                            radius: 22,
                             color: 0xf14e54,
                             playerColor: 0x00b2e1,
                         },
@@ -165,10 +192,18 @@
                                 recoil: 10000,
                             },
                         ],
-                        speed: 160,
                         hp: 1000,
                         damage: 10,
                         density: 1,
+                        velocity: {
+                            ivInit: 0,
+                            ivAcc: 400,
+                            ivMax: 160,
+                            ivMin: 0,
+                            evDec: 80,
+                            evMax: 160,
+                            rotate: 0,
+                        },
                     },
                     twin: {
                         edge: {
@@ -210,10 +245,18 @@
                                 recoil: 10000,
                             }
                         ],
-                        speed: 160,
                         hp: 2000,
                         damage: 10,
                         density: 1,
+                        velocity: {
+                            ivInit: 0,
+                            ivAcc: 400,
+                            ivMax: 160,
+                            ivMin: 0,
+                            evDec: 80,
+                            evMax: 160,
+                            rotate: 0,
+                        },
                     },
                     quad: {
                         edge: {
@@ -283,10 +326,18 @@
                                 recoil: 10000,
                             },
                         ],
-                        speed: 160,
                         hp: 2000,
                         damage: 10,
                         density: 1,
+                        velocity: {
+                            ivInit: 0,
+                            ivAcc: 400,
+                            ivMax: 160,
+                            ivMin: 0,
+                            evDec: 80,
+                            evMax: 160,
+                            rotate: 0,
+                        },
                     },
                 }
             };
@@ -311,8 +362,7 @@
                 this.hp = this.cfg.hp;
                 this.damage = this.cfg.damage;
                 this.density = this.cfg.density;
-                this.motion = new Motion(this, this.cfg.speed);
-                this.motion.setMoveDirByAngle(angle);
+                this.motion = new Motion(this, this.cfg.velocity, angle);
             
                 // view
                 var graphics = new PIXI.Graphics();
@@ -506,14 +556,19 @@
             
             var epsilon = 1e-6;
             
-            function Motion(owner, velocity, rotate)
+            function Motion(owner, cfg, angle)
             {
                 this.owner = owner;
                 this.moveDir = new Victor(0, 0);
-                this.velocity = velocity;
-                this.rotate = rotate;
-                this.iv = new Victor(0, 0); // internal
-                this.ev = new Victor(0, 0); // external
+                this.iv = new Victor(cfg.ivInit * Math.cos(angle),
+                    cfg.ivInit * Math.sin(angle));
+                this.ev = new Victor(0, 0);
+                this.ivAcc = cfg.ivAcc;
+                this.ivMax = cfg.ivMax;
+                this.ivMin = cfg.ivMin;
+                this.evDec = cfg.evDec;
+                this.evMax = cfg.evMax;
+                this.rotate = cfg.rotate;
             }
             
             Motion.prototype = {}
@@ -540,6 +595,24 @@
                 this.moveDir.y = Math.sin(angle);
             }
             
+            Motion.prototype.setMoveDirByFlag = function(left, right, up, down)
+            {
+                this.moveDir.x = 0;
+                this.moveDir.y = 0;
+                if (left == 1) {
+                    this.moveDir.x -= 1;
+                }
+                if (right == 1) {
+                    this.moveDir.x += 1;
+                }
+                if (up == 1) {
+                    this.moveDir.y -= 1;
+                }
+                if (down == 1) {
+                    this.moveDir.y += 1;
+                }
+            }
+            
             Motion.prototype.reverseMoveDirX = function()
             {
                 this.moveDir.x = -this.moveDir.x;
@@ -550,28 +623,45 @@
                 this.moveDir.y = -this.moveDir.y;
             }
             
+            Motion.prototype.addRecoil = function(recoil, angle)
+            {
+                this.ev.x -= recoil * Math.cos(angle);
+                this.ev.y -= recoil * Math.sin(angle);
+            }
+            
             Motion.prototype.update = function(deltaMS)
             {
+                // internal velocity decrese
+                var ilen = this.iv.length();
+                if (ilen > this.ivMin) {
+                    var dec = (this.ivAcc / 2) * deltaMS / 1000;
+                    ilen = ilen > dec ? (ilen - dec) : 0;
+                    ilen = ilen < this.ivMin ? this.ivMin : ilen;
+                    this.iv.norm().multiply(new Victor(ilen, ilen));
+                }
+            
+                // internal velocity increse
                 if (this.moveDir.length() > epsilon) {
                     var angle = this.moveDir.angle();
-                    this.iv.x = this.velocity * Math.cos(angle);
-                    this.iv.y = this.velocity * Math.sin(angle);
-                } else {
-                    this.iv.x = 0;
-                    this.iv.y = 0;
+                    this.iv.x += this.ivAcc * Math.cos(angle) * deltaMS / 1000;
+                    this.iv.y += this.ivAcc * Math.sin(angle) * deltaMS / 1000;
+                    var ilen = this.iv.length();
+                    if (ilen > this.ivMax) {
+                        ilen = this.ivMax;
+                        this.iv.norm().multiply(new Victor(ilen, ilen));
+                    }
                 }
             
+                // eternal velocity decrese
                 var elen = this.ev.length();
-                if (elen > Config.world.externalVelocityMax) {
-                    elen = Config.world.externalVelocityMax;
-                    this.ev.norm().multiply(new Victor(elen, elen));
-                }
                 if (elen > epsilon) {
-                    var dec = Config.world.externalVelocityDecPerSecond * deltaMS / 1000;
+                    var dec = this.evDec * deltaMS / 1000;
                     elen = elen > dec ? (elen - dec) : 0;
+                    elen = elen > this.evMax ? this.evMax : elen;
                     this.ev.norm().multiply(new Victor(elen, elen));
                 }
             
+                // update position
                 this.owner.x += (this.iv.x + this.ev.x) * deltaMS / 1000;
                 this.owner.y += (this.iv.y + this.ev.y) * deltaMS / 1000;
             
@@ -643,8 +733,8 @@
                 this.y = position.y;
                 world.addUnitToGrid(this);
             
-                this.motion = new Motion(this, this.cfg.moveSpeed, this.cfg.rotationSpeed);
-                this.motion.randomMoveDir();
+                var angle = Math.random() * Math.PI * 2;
+                this.motion = new Motion(this, this.cfg.velocity, angle);
                 this.hpbar = new HpBar(world, Config.hpbar, this, false);
             }
             
@@ -840,20 +930,10 @@
                 }
                 // motion move direction
                 else {
-                    this.tank.motion.moveDir.x = 0;
-                    this.tank.motion.moveDir.y = 0;
-                    if (this.control.left == 1) {
-                        this.tank.motion.moveDir.x -= 1;
-                    }
-                    if (this.control.right == 1) {
-                        this.tank.motion.moveDir.x += 1;
-                    }
-                    if (this.control.up == 1) {
-                        this.tank.motion.moveDir.y -= 1;
-                    }
-                    if (this.control.down == 1) {
-                        this.tank.motion.moveDir.y += 1;
-                    }
+                    this.tank.motion.setMoveDirByFlag(this.control.left,
+                        this.control.right,
+                        this.control.up,
+                        this.control.down);
                 }
             }
             
@@ -918,7 +998,7 @@
                 this.y = position.y;
                 world.addUnitToGrid(this);
             
-                this.motion = new Motion(this, this.cfg.speed);
+                this.motion = new Motion(this, this.cfg.velocity, 0);
                 this.hpbar = new HpBar(world, Config.hpbar, this, true);
             }
             
@@ -1084,8 +1164,7 @@
             
                     var recoil = this.cfg.recoil / this.owner.m;
                     // console.log("frame:" + this.world.frame + ", recoil:" + recoil + ","  + this.owner.motion.toString());
-                    this.owner.motion.ev.x -= recoil * Math.cos(angle);
-                    this.owner.motion.ev.y -= recoil * Math.sin(angle);
+                    this.owner.motion.addRecoil(recoil, angle);
                     // console.log("frame:" + this.world.frame + "," + this.owner.motion.toString());
                 }
             }

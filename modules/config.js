@@ -26,8 +26,6 @@ var Config =
         },
         unitCollideCheckMS: 500,
         updateMS: 1000 / 30,
-        externalVelocityDecPerSecond: 80,
-        externalVelocityMax: 160,
         springVelocityBase: 20,
         springVelocityAdd: 30,
     },
@@ -66,11 +64,19 @@ var Config =
                 color: 0xf14e54,
                 playerColor: 0x00b2e1,
             },
-            speed: 300,
             duration: 1000,
             hp: 1,
             damage: 10,
             density: 1,
+            velocity: {
+                ivInit: 300,
+                ivAcc: 200,
+                ivMax: 300,
+                ivMin: 200,
+                evDec: 80,
+                evMax: 160,
+                rotate: 0,
+            },
         }
     },
 
@@ -83,11 +89,18 @@ var Config =
                 w: 2.5,
                 color: 0x555555
             },
-            rotationSpeed: 0.5,
-            moveSpeed: 3,
             hp: 20,
             damage: 2,
             density: 1,
+            velocity: {
+                ivInit: 3,
+                ivAcc: 0,
+                ivMax: 3,
+                ivMin: 3,
+                evDec: 80,
+                evMax: 160,
+                rotate: 0.5,
+            },
         },
         middle: {
             side: 4,
@@ -97,11 +110,18 @@ var Config =
                 w: 2.5,
                 color: 0x555555
             },
-            rotationSpeed: 0.5,
-            moveSpeed: 3,
             hp: 40,
             damage: 4,
             density: 1,
+            velocity: {
+                ivInit: 3,
+                ivAcc: 0,
+                ivMax: 3,
+                ivMin: 3,
+                evDec: 80,
+                evMax: 160,
+                rotate: 0.5,
+            },
         },
         large: {
             side: 5,
@@ -111,11 +131,18 @@ var Config =
                 w: 2.5,
                 color: 0x555555
             },
-            rotationSpeed: 0.5,
-            moveSpeed: 3,
             hp: 80,
             damage: 8,
             density: 1,
+            velocity: {
+                ivInit: 3,
+                ivAcc: 0,
+                ivMax: 3,
+                ivMin: 3,
+                evDec: 80,
+                evMax: 160,
+                rotate: 0.5,
+            },
         },
     },
 
@@ -126,7 +153,7 @@ var Config =
                 color: 0x555555
             },
             body: {
-                radius: 20,
+                radius: 22,
                 color: 0xf14e54,
                 playerColor: 0x00b2e1,
             },
@@ -146,10 +173,18 @@ var Config =
                     recoil: 10000,
                 },
             ],
-            speed: 160,
             hp: 1000,
             damage: 10,
             density: 1,
+            velocity: {
+                ivInit: 0,
+                ivAcc: 400,
+                ivMax: 160,
+                ivMin: 0,
+                evDec: 80,
+                evMax: 160,
+                rotate: 0,
+            },
         },
         twin: {
             edge: {
@@ -191,10 +226,18 @@ var Config =
                     recoil: 10000,
                 }
             ],
-            speed: 160,
             hp: 2000,
             damage: 10,
             density: 1,
+            velocity: {
+                ivInit: 0,
+                ivAcc: 400,
+                ivMax: 160,
+                ivMin: 0,
+                evDec: 80,
+                evMax: 160,
+                rotate: 0,
+            },
         },
         quad: {
             edge: {
@@ -264,10 +307,18 @@ var Config =
                     recoil: 10000,
                 },
             ],
-            speed: 160,
             hp: 2000,
             damage: 10,
             density: 1,
+            velocity: {
+                ivInit: 0,
+                ivAcc: 400,
+                ivMax: 160,
+                ivMin: 0,
+                evDec: 80,
+                evMax: 160,
+                rotate: 0,
+            },
         },
     }
 };

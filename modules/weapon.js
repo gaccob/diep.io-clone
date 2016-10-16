@@ -66,8 +66,7 @@ Weapon.prototype.fire = function()
 
         var recoil = this.cfg.recoil / this.owner.m;
         // console.log("frame:" + this.world.frame + ", recoil:" + recoil + ","  + this.owner.motion.toString());
-        this.owner.motion.ev.x -= recoil * Math.cos(angle);
-        this.owner.motion.ev.y -= recoil * Math.sin(angle);
+        this.owner.motion.addRecoil(recoil, angle);
         // console.log("frame:" + this.world.frame + "," + this.owner.motion.toString());
     }
 }

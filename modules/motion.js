@@ -3,14 +3,19 @@ var Util = require("../modules/util");
 
 var epsilon = 1e-6;
 
-function Motion(owner, velocity, rotate)
+function Motion(owner, cfg, angle)
 {
     this.owner = owner;
     this.moveDir = new Victor(0, 0);
-    this.velocity = velocity;
-    this.rotate = rotate;
-    this.iv = new Victor(0, 0); // internal
-    this.ev = new Victor(0, 0); // external
+    this.iv = new Victor(cfg.ivInit * Math.cos(angle),
+        cfg.ivInit * Math.sin(angle));
+    this.ev = new Victor(0, 0);
+    this.ivAcc = cfg.ivAcc;
+    this.ivMax = cfg.ivMax;
+    this.ivMin = cfg.ivMin;
+    this.evDec = cfg.evDec;
+    this.evMax = cfg.evMax;
+    this.rotate = cfg.rotate;
 }
 
 Motion.prototype = {}
@@ -37,6 +42,24 @@ Motion.prototype.setMoveDirByAngle = function(angle)
     this.moveDir.y = Math.sin(angle);
 }
 
+Motion.prototype.setMoveDirByFlag = function(left, right, up, down)
+{
+    this.moveDir.x = 0;
+    this.moveDir.y = 0;
+    if (left == 1) {
+        this.moveDir.x -= 1;
+    }
+    if (right == 1) {
+        this.moveDir.x += 1;
+    }
+    if (up == 1) {
+        this.moveDir.y -= 1;
+    }
+    if (down == 1) {
+        this.moveDir.y += 1;
+    }
+}
+
 Motion.prototype.reverseMoveDirX = function()
 {
     this.moveDir.x = -this.moveDir.x;
@@ -47,28 +70,45 @@ Motion.prototype.reverseMoveDirY = function()
     this.moveDir.y = -this.moveDir.y;
 }
 
+Motion.prototype.addRecoil = function(recoil, angle)
+{
+    this.ev.x -= recoil * Math.cos(angle);
+    this.ev.y -= recoil * Math.sin(angle);
+}
+
 Motion.prototype.update = function(deltaMS)
 {
+    // internal velocity decrese
+    var ilen = this.iv.length();
+    if (ilen > this.ivMin) {
+        var dec = (this.ivAcc / 2) * deltaMS / 1000;
+        ilen = ilen > dec ? (ilen - dec) : 0;
+        ilen = ilen < this.ivMin ? this.ivMin : ilen;
+        this.iv.norm().multiply(new Victor(ilen, ilen));
+    }
+
+    // internal velocity increse
     if (this.moveDir.length() > epsilon) {
         var angle = this.moveDir.angle();
-        this.iv.x = this.velocity * Math.cos(angle);
-        this.iv.y = this.velocity * Math.sin(angle);
-    } else {
-        this.iv.x = 0;
-        this.iv.y = 0;
+        this.iv.x += this.ivAcc * Math.cos(angle) * deltaMS / 1000;
+        this.iv.y += this.ivAcc * Math.sin(angle) * deltaMS / 1000;
+        var ilen = this.iv.length();
+        if (ilen > this.ivMax) {
+            ilen = this.ivMax;
+            this.iv.norm().multiply(new Victor(ilen, ilen));
+        }
     }
 
+    // eternal velocity decrese
     var elen = this.ev.length();
-    if (elen > Config.world.externalVelocityMax) {
-        elen = Config.world.externalVelocityMax;
-        this.ev.norm().multiply(new Victor(elen, elen));
-    }
     if (elen > epsilon) {
-        var dec = Config.world.externalVelocityDecPerSecond * deltaMS / 1000;
+        var dec = this.evDec * deltaMS / 1000;
         elen = elen > dec ? (elen - dec) : 0;
+        elen = elen > this.evMax ? this.evMax : elen;
         this.ev.norm().multiply(new Victor(elen, elen));
     }
 
+    // update position
     this.owner.x += (this.iv.x + this.ev.x) * deltaMS / 1000;
     this.owner.y += (this.iv.y + this.ev.y) * deltaMS / 1000;
 

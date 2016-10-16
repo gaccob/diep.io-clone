@@ -13,8 +13,7 @@ function Bullet(world, position, angle, weapon)
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
     this.density = this.cfg.density;
-    this.motion = new Motion(this, this.cfg.speed);
-    this.motion.setMoveDirByAngle(angle);
+    this.motion = new Motion(this, this.cfg.velocity, angle);
 
     // view
     var graphics = new PIXI.Graphics();

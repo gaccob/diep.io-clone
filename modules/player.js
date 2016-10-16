@@ -121,20 +121,10 @@ Player.prototype.update = function()
     }
     // motion move direction
     else {
-        this.tank.motion.moveDir.x = 0;
-        this.tank.motion.moveDir.y = 0;
-        if (this.control.left == 1) {
-            this.tank.motion.moveDir.x -= 1;
-        }
-        if (this.control.right == 1) {
-            this.tank.motion.moveDir.x += 1;
-        }
-        if (this.control.up == 1) {
-            this.tank.motion.moveDir.y -= 1;
-        }
-        if (this.control.down == 1) {
-            this.tank.motion.moveDir.y += 1;
-        }
+        this.tank.motion.setMoveDirByFlag(this.control.left,
+            this.control.right,
+            this.control.up,
+            this.control.down);
     }
 }
 

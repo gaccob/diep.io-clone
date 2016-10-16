@@ -44,7 +44,7 @@ function Tank(world, name, position, player)
     this.y = position.y;
     world.addUnitToGrid(this);
 
-    this.motion = new Motion(this, this.cfg.speed);
+    this.motion = new Motion(this, this.cfg.velocity, 0);
     this.hpbar = new HpBar(world, Config.hpbar, this, true);
 }
 

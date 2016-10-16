@@ -41,8 +41,8 @@ function Obstacle(world, cfg, position)
     this.y = position.y;
     world.addUnitToGrid(this);
 
-    this.motion = new Motion(this, this.cfg.moveSpeed, this.cfg.rotationSpeed);
-    this.motion.randomMoveDir();
+    var angle = Math.random() * Math.PI * 2;
+    this.motion = new Motion(this, this.cfg.velocity, angle);
     this.hpbar = new HpBar(world, Config.hpbar, this, false);
 }
 
