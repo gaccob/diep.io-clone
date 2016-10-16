@@ -88,7 +88,7 @@ Player.prototype.handleMouseDown = function()
     var player = this;
     document.body.addEventListener('mousedown', function(e) {
         if (player.tank != null) {
-            player.tank.fire();
+            player.tank.revertFireStatus();
         }
     }, false);
 }
@@ -112,7 +112,7 @@ Player.prototype.resetControl = function()
 Player.prototype.update = function()
 {
     if (!this.tank) {
-        this.tank = new Tank(this.world, "base", {
+        this.tank = new Tank(this.world, "quad", {
             x: Math.random() * this.world.w,
             y: Math.random() * this.world.h
         }, this);

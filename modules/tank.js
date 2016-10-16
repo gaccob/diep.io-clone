@@ -14,7 +14,7 @@ function Tank(world, name, position, player)
     this.hp = this.cfg.hp;
     this.fullHp = this.cfg.hp;
     this.damage = this.cfg.damage;
-    this.autoFire = true;
+    this.density = this.cfg.density;
 
     // view & weapons
     this.sprite = new PIXI.Container();
@@ -97,6 +97,18 @@ Tank.prototype.fire = function()
     }
 }
 
+Tank.prototype.revertFireStatus = function()
+{
+    if (this.autoFire == true) {
+        this.autoFire = false;
+    } else {
+        this.autoFire = true;
+        for (var idx in this.weapons) {
+            this.weapons[idx].resetFireDelay();
+        }
+    }
+}
+
 Object.defineProperties(Tank.prototype, {
     x: {
         get: function() { return this.sprite.x; },
@@ -108,6 +120,9 @@ Object.defineProperties(Tank.prototype, {
     },
     radius: {
         get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+    },
+    m: {
+        get: function() { return this.radius * this.radius * this.density; }
     },
     h: {
         get: function() { return this.sprite.height; }

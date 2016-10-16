@@ -12,6 +12,7 @@ function Bullet(world, position, angle, weapon)
     this.cfg = Config.bullets[weapon.cfg.bullet];
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
+    this.density = this.cfg.density;
     this.motion = new Motion(this, this.cfg.speed);
     this.motion.setMoveDirByAngle(angle);
 
@@ -89,6 +90,9 @@ Object.defineProperties(Bullet.prototype, {
     },
     radius: {
         get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+    },
+    m: {
+        get: function() { return this.radius * this.radius * this.density; }
     },
 });
 

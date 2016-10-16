@@ -12,6 +12,7 @@ function Obstacle(world, cfg, position)
     this.hp = this.cfg.hp;
     this.fullHp = this.cfg.hp;
     this.damage = this.cfg.damage;
+    this.density = this.cfg.density;
 
     // view
     this.sprite = new PIXI.Container();
@@ -97,6 +98,9 @@ Object.defineProperties(Obstacle.prototype, {
     },
     radius: {
         get: function() { return this.cfg.radius + this.cfg.edge.w; }
+    },
+    m: {
+        get: function() { return this.radius * this.radius * this.density; }
     },
     h: {
         get: function() { return this.sprite.height; }

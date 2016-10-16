@@ -39,6 +39,11 @@ function Weapon(world, tank, cfg)
 
 Weapon.prototype = {}
 
+Weapon.prototype.resetFireDelay = function()
+{
+    this.fireFrame = this.world.frame + this.cfg.shootDelayFrame;
+}
+
 Weapon.prototype.fire = function()
 {
     if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
@@ -54,10 +59,16 @@ Weapon.prototype.fire = function()
 
         var angle = this.owner.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
-        angle += (Math.random() * disturb - disturb / 2);
+        var bulletAngle = angle + (Math.random() * disturb - disturb / 2);
 
-        var bullet = new Bullet(this.world, pos, angle, this);
+        var bullet = new Bullet(this.world, pos, bulletAngle, this);
         this.world.bullets[bullet.id] = bullet;
+
+        var recoil = this.cfg.recoil / this.owner.m;
+        // console.log("frame:" + this.world.frame + ", recoil:" + recoil + ","  + this.owner.motion.toString());
+        this.owner.motion.ev.x -= recoil * Math.cos(angle);
+        this.owner.motion.ev.y -= recoil * Math.sin(angle);
+        // console.log("frame:" + this.world.frame + "," + this.owner.motion.toString());
     }
 }
 

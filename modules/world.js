@@ -232,7 +232,7 @@ World.prototype.needCheckCollision = function(unit, target)
     return u1 != u2;
 }
 
-World.prototype.collide = function(unit1, unit2)
+World.prototype.elasticCollide = function(unit1, unit2)
 {
     // Elastic collision
     // m1, v10
@@ -240,24 +240,41 @@ World.prototype.collide = function(unit1, unit2)
     // v1 = [(m1-m2)v10 + 2m2v20] / (m1+m2)
     // v2 = [(m2-m1)v20 + 2m1v10] / (m1+m2)
 
-    // TODO: simple transform
-
-    var m1 = unit1.radius * unit1.radius;
-    var m2 = unit2.radius * unit2.radius;
     var v10 = new Victor(unit1.motion.vx, unit1.motion.vy);
     var v20 = new Victor(unit2.motion.vx, unit2.motion.vy);
 
-    var v1x = ((m1 - m2) * v10.x + 2 * m2 * v20.x) / (m1 + m2);
-    var v1y = ((m1 - m2) * v10.y + 2 * m2 * v20.y) / (m1 + m2);
+    var v1x = ((unit1.m - unit2.m) * v10.x + 2 * unit2.m * v20.x) / (unit1.m + unit2.m);
+    var v1y = ((unit1.m - unit2.m) * v10.y + 2 * unit2.m * v20.y) / (unit1.m + unit2.m);
     unit1.motion.ev.x += v1x;
     unit1.motion.ev.y += v1y;
 
-    var v2x = ((m2 - m1) * v20.x + 2 * m1 * v10.x) / (m1 + m2);
-    var v2y = ((m2 - m1) * v20.y + 2 * m1 * v10.y) / (m1 + m2);
+    var v2x = ((unit2.m - unit1.m) * v20.x + 2 * unit1.m * v10.x) / (unit1.m + unit2.m);
+    var v2y = ((unit2.m - unit1.m) * v20.y + 2 * unit1.m * v10.y) / (unit1.m + unit2.m);
     unit2.motion.ev.x += v2x;
     unit2.motion.ev.y += v2y;
+}
 
-    // damage each other
+World.prototype.simpleCollide = function(unit1, unit2, distRatio)
+{
+    var dir = new Victor(unit1.x - unit2.x, unit1.y - unit2.y);
+    dir.norm();
+    var v1 = unit1.motion.v;
+    var v2 = unit2.motion.v;
+    var spring = this.cfg.springVelocityBase + (1.0 - distRatio) * this.cfg.springVelocityAdd;
+    // console.log(unit1.motion.toString());
+    // console.log(unit2.motion.toString());
+    // console.log("spring=" + spring + ", m1=" + unit1.m + ", m2=" + unit2.m);
+    unit1.motion.ev.x += (v2 + spring) * dir.x * unit2.m / unit1.m;
+    unit1.motion.ev.y += (v2 + spring) * dir.y * unit2.m / unit1.m;
+    unit2.motion.ev.x -= (v1 + spring) * dir.x * unit1.m / unit2.m;
+    unit2.motion.ev.y -= (v1 + spring) * dir.y * unit1.m / unit2.m;
+    // console.log(unit1.motion.toString());
+    // console.log(unit2.motion.toString());
+}
+
+World.prototype.collide = function(unit1, unit2, distRatio)
+{
+    this.simpleCollide(unit1, unit2, distRatio);
     unit1.takeDamageByUnit(unit2);
     unit2.takeDamageByUnit(unit1);
 }
@@ -294,10 +311,11 @@ World.prototype.updateCollision = function()
                     var distX = unit.x - target.x;
                     var distY = unit.y - target.y;
                     var distR = unit.radius + target.radius;
-                    if (distX * distX + distY * distY < distR * distR) {
+                    var dist2 = distX * distX + distY * distY;
+                    if (dist2 < distR * distR) {
                         unit.collideTime = this.time;
                         target.collideTime = this.time;
-                        this.collide(unit, target);
+                        this.collide(unit, target, dist2 / (distR * distR));
                     }
                 }
                 unit.collideCheckFrame = this.frame;

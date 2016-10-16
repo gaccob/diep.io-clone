@@ -22,12 +22,14 @@ var Config =
             wRatio: 0.92,
             hRatio: 0.92,
             color: 0xcdcdcd,
-            maxCount: 30,
+            maxCount: 50,
         },
         unitCollideCheckMS: 500,
         updateMS: 1000 / 30,
-        externalVelocityDecPerSecond: 300,
-        externalVelocityMax: 800,
+        externalVelocityDecPerSecond: 80,
+        externalVelocityMax: 160,
+        springVelocityBase: 20,
+        springVelocityAdd: 30,
     },
 
     hpbar: {
@@ -68,6 +70,7 @@ var Config =
             duration: 1000,
             hp: 1,
             damage: 10,
+            density: 1,
         }
     },
 
@@ -84,6 +87,7 @@ var Config =
             moveSpeed: 3,
             hp: 20,
             damage: 2,
+            density: 1,
         },
         middle: {
             side: 4,
@@ -97,6 +101,7 @@ var Config =
             moveSpeed: 3,
             hp: 40,
             damage: 4,
+            density: 1,
         },
         large: {
             side: 5,
@@ -110,6 +115,7 @@ var Config =
             moveSpeed: 3,
             hp: 80,
             damage: 8,
+            density: 1,
         },
     },
 
@@ -137,11 +143,13 @@ var Config =
                     reloadFrame: 10,
                     shootDelayFrame: 3,
                     disturbDeg: 15,
+                    recoil: 10000,
                 },
             ],
             speed: 160,
-            hp: 100,
+            hp: 1000,
             damage: 10,
+            density: 1,
         },
         twin: {
             edge: {
@@ -166,6 +174,7 @@ var Config =
                     reloadFrame: 10,
                     shootDelayFrame: 3,
                     disturbDeg: 15,
+                    recoil: 10000,
                 },
                 {
                     w: 12,
@@ -179,11 +188,13 @@ var Config =
                     reloadFrame: 10,
                     shootDelayFrame: 6,
                     disturbDeg: 15,
+                    recoil: 10000,
                 }
             ],
             speed: 160,
-            hp: 200,
+            hp: 2000,
             damage: 10,
+            density: 1,
         },
         quad: {
             edge: {
@@ -208,6 +219,7 @@ var Config =
                     reloadFrame: 10,
                     shootDelayFrame: 3,
                     disturbDeg: 15,
+                    recoil: 10000,
                 },
                 {
                     w: 16,
@@ -219,8 +231,9 @@ var Config =
                     color: 0x999999,
                     shootOffset: 10,
                     reloadFrame: 10,
-                    shootDelayFrame: 3,
+                    shootDelayFrame: 6,
                     disturbDeg: 15,
+                    recoil: 10000,
                 },
                 {
                     w: 16,
@@ -232,8 +245,9 @@ var Config =
                     color: 0x999999,
                     shootOffset: 10,
                     reloadFrame: 10,
-                    shootDelayFrame: 6,
+                    shootDelayFrame: 3,
                     disturbDeg: 15,
+                    recoil: 10000,
                 },
                 {
                     w: 16,
@@ -247,11 +261,13 @@ var Config =
                     reloadFrame: 10,
                     shootDelayFrame: 6,
                     disturbDeg: 15,
+                    recoil: 10000,
                 },
             ],
             speed: 160,
-            hp: 200,
+            hp: 2000,
             damage: 10,
+            density: 1,
         },
     }
 };

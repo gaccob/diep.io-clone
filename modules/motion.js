@@ -15,6 +15,15 @@ function Motion(owner, velocity, rotate)
 
 Motion.prototype = {}
 
+Motion.prototype.toString = function()
+{
+    return "unit[" + this.owner.id + "] "
+        + "move dir={" + this.moveDir.x + "," + this.moveDir.y + "} "
+        + "iv={" + this.iv.x + "," + this.iv.y + "} "
+        + "ev={" + this.ev.x + "," + this.ev.y + "} "
+        + "v=" + this.v;
+}
+
 Motion.prototype.randomMoveDir = function()
 {
     var angle = Math.random() * Math.PI * 2;
@@ -50,6 +59,10 @@ Motion.prototype.update = function(deltaMS)
     }
 
     var elen = this.ev.length();
+    if (elen > Config.world.externalVelocityMax) {
+        elen = Config.world.externalVelocityMax;
+        this.ev.norm().multiply(new Victor(elen, elen));
+    }
     if (elen > epsilon) {
         var dec = Config.world.externalVelocityDecPerSecond * deltaMS / 1000;
         elen = elen > dec ? (elen - dec) : 0;
@@ -73,6 +86,9 @@ Object.defineProperties(Motion.prototype, {
     },
     vy: {
         get: function() { return this.iv.y + this.ev.y; }
+    },
+    v: {
+        get: function() { return Math.sqrt(this.vx * this.vx + this.vy * this.vy); }
     },
 });
 

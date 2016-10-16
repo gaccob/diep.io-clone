@@ -41,12 +41,14 @@
                         wRatio: 0.92,
                         hRatio: 0.92,
                         color: 0xcdcdcd,
-                        maxCount: 30,
+                        maxCount: 50,
                     },
                     unitCollideCheckMS: 500,
                     updateMS: 1000 / 30,
-                    externalVelocityDecPerSecond: 300,
-                    externalVelocityMax: 800,
+                    externalVelocityDecPerSecond: 80,
+                    externalVelocityMax: 160,
+                    springVelocityBase: 20,
+                    springVelocityAdd: 30,
                 },
             
                 hpbar: {
@@ -87,6 +89,7 @@
                         duration: 1000,
                         hp: 1,
                         damage: 10,
+                        density: 1,
                     }
                 },
             
@@ -103,6 +106,7 @@
                         moveSpeed: 3,
                         hp: 20,
                         damage: 2,
+                        density: 1,
                     },
                     middle: {
                         side: 4,
@@ -116,6 +120,7 @@
                         moveSpeed: 3,
                         hp: 40,
                         damage: 4,
+                        density: 1,
                     },
                     large: {
                         side: 5,
@@ -129,6 +134,7 @@
                         moveSpeed: 3,
                         hp: 80,
                         damage: 8,
+                        density: 1,
                     },
                 },
             
@@ -156,11 +162,13 @@
                                 reloadFrame: 10,
                                 shootDelayFrame: 3,
                                 disturbDeg: 15,
+                                recoil: 10000,
                             },
                         ],
                         speed: 160,
-                        hp: 100,
+                        hp: 1000,
                         damage: 10,
+                        density: 1,
                     },
                     twin: {
                         edge: {
@@ -185,6 +193,7 @@
                                 reloadFrame: 10,
                                 shootDelayFrame: 3,
                                 disturbDeg: 15,
+                                recoil: 10000,
                             },
                             {
                                 w: 12,
@@ -198,11 +207,13 @@
                                 reloadFrame: 10,
                                 shootDelayFrame: 6,
                                 disturbDeg: 15,
+                                recoil: 10000,
                             }
                         ],
                         speed: 160,
-                        hp: 200,
+                        hp: 2000,
                         damage: 10,
+                        density: 1,
                     },
                     quad: {
                         edge: {
@@ -227,6 +238,7 @@
                                 reloadFrame: 10,
                                 shootDelayFrame: 3,
                                 disturbDeg: 15,
+                                recoil: 10000,
                             },
                             {
                                 w: 16,
@@ -238,8 +250,9 @@
                                 color: 0x999999,
                                 shootOffset: 10,
                                 reloadFrame: 10,
-                                shootDelayFrame: 3,
+                                shootDelayFrame: 6,
                                 disturbDeg: 15,
+                                recoil: 10000,
                             },
                             {
                                 w: 16,
@@ -251,8 +264,9 @@
                                 color: 0x999999,
                                 shootOffset: 10,
                                 reloadFrame: 10,
-                                shootDelayFrame: 6,
+                                shootDelayFrame: 3,
                                 disturbDeg: 15,
+                                recoil: 10000,
                             },
                             {
                                 w: 16,
@@ -266,11 +280,13 @@
                                 reloadFrame: 10,
                                 shootDelayFrame: 6,
                                 disturbDeg: 15,
+                                recoil: 10000,
                             },
                         ],
                         speed: 160,
-                        hp: 200,
+                        hp: 2000,
                         damage: 10,
+                        density: 1,
                     },
                 }
             };
@@ -294,6 +310,7 @@
                 this.cfg = Config.bullets[weapon.cfg.bullet];
                 this.hp = this.cfg.hp;
                 this.damage = this.cfg.damage;
+                this.density = this.cfg.density;
                 this.motion = new Motion(this, this.cfg.speed);
                 this.motion.setMoveDirByAngle(angle);
             
@@ -371,6 +388,9 @@
                 },
                 radius: {
                     get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+                },
+                m: {
+                    get: function() { return this.radius * this.radius * this.density; }
                 },
             });
             
@@ -498,6 +518,15 @@
             
             Motion.prototype = {}
             
+            Motion.prototype.toString = function()
+            {
+                return "unit[" + this.owner.id + "] "
+                    + "move dir={" + this.moveDir.x + "," + this.moveDir.y + "} "
+                    + "iv={" + this.iv.x + "," + this.iv.y + "} "
+                    + "ev={" + this.ev.x + "," + this.ev.y + "} "
+                    + "v=" + this.v;
+            }
+            
             Motion.prototype.randomMoveDir = function()
             {
                 var angle = Math.random() * Math.PI * 2;
@@ -533,6 +562,10 @@
                 }
             
                 var elen = this.ev.length();
+                if (elen > Config.world.externalVelocityMax) {
+                    elen = Config.world.externalVelocityMax;
+                    this.ev.norm().multiply(new Victor(elen, elen));
+                }
                 if (elen > epsilon) {
                     var dec = Config.world.externalVelocityDecPerSecond * deltaMS / 1000;
                     elen = elen > dec ? (elen - dec) : 0;
@@ -557,6 +590,9 @@
                 vy: {
                     get: function() { return this.iv.y + this.ev.y; }
                 },
+                v: {
+                    get: function() { return Math.sqrt(this.vx * this.vx + this.vy * this.vy); }
+                },
             });
             
             module.exports = Motion;
@@ -578,6 +614,7 @@
                 this.hp = this.cfg.hp;
                 this.fullHp = this.cfg.hp;
                 this.damage = this.cfg.damage;
+                this.density = this.cfg.density;
             
                 // view
                 this.sprite = new PIXI.Container();
@@ -663,6 +700,9 @@
                 },
                 radius: {
                     get: function() { return this.cfg.radius + this.cfg.edge.w; }
+                },
+                m: {
+                    get: function() { return this.radius * this.radius * this.density; }
                 },
                 h: {
                     get: function() { return this.sprite.height; }
@@ -767,7 +807,7 @@
                 var player = this;
                 document.body.addEventListener('mousedown', function(e) {
                     if (player.tank != null) {
-                        player.tank.fire();
+                        player.tank.revertFireStatus();
                     }
                 }, false);
             }
@@ -791,7 +831,7 @@
             Player.prototype.update = function()
             {
                 if (!this.tank) {
-                    this.tank = new Tank(this.world, "base", {
+                    this.tank = new Tank(this.world, "quad", {
                         x: Math.random() * this.world.w,
                         y: Math.random() * this.world.h
                     }, this);
@@ -848,7 +888,7 @@
                 this.hp = this.cfg.hp;
                 this.fullHp = this.cfg.hp;
                 this.damage = this.cfg.damage;
-                this.autoFire = true;
+                this.density = this.cfg.density;
             
                 // view & weapons
                 this.sprite = new PIXI.Container();
@@ -931,6 +971,18 @@
                 }
             }
             
+            Tank.prototype.revertFireStatus = function()
+            {
+                if (this.autoFire == true) {
+                    this.autoFire = false;
+                } else {
+                    this.autoFire = true;
+                    for (var idx in this.weapons) {
+                        this.weapons[idx].resetFireDelay();
+                    }
+                }
+            }
+            
             Object.defineProperties(Tank.prototype, {
                 x: {
                     get: function() { return this.sprite.x; },
@@ -942,6 +994,9 @@
                 },
                 radius: {
                     get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+                },
+                m: {
+                    get: function() { return this.radius * this.radius * this.density; }
                 },
                 h: {
                     get: function() { return this.sprite.height; }
@@ -1002,6 +1057,11 @@
             
             Weapon.prototype = {}
             
+            Weapon.prototype.resetFireDelay = function()
+            {
+                this.fireFrame = this.world.frame + this.cfg.shootDelayFrame;
+            }
+            
             Weapon.prototype.fire = function()
             {
                 if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
@@ -1017,10 +1077,16 @@
             
                     var angle = this.owner.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
                     var disturb = this.cfg.disturbDeg * Math.PI / 180;
-                    angle += (Math.random() * disturb - disturb / 2);
+                    var bulletAngle = angle + (Math.random() * disturb - disturb / 2);
             
-                    var bullet = new Bullet(this.world, pos, angle, this);
+                    var bullet = new Bullet(this.world, pos, bulletAngle, this);
                     this.world.bullets[bullet.id] = bullet;
+            
+                    var recoil = this.cfg.recoil / this.owner.m;
+                    // console.log("frame:" + this.world.frame + ", recoil:" + recoil + ","  + this.owner.motion.toString());
+                    this.owner.motion.ev.x -= recoil * Math.cos(angle);
+                    this.owner.motion.ev.y -= recoil * Math.sin(angle);
+                    // console.log("frame:" + this.world.frame + "," + this.owner.motion.toString());
                 }
             }
             
@@ -1275,7 +1341,7 @@
                 return u1 != u2;
             }
             
-            World.prototype.collide = function(unit1, unit2)
+            World.prototype.elasticCollide = function(unit1, unit2)
             {
                 // Elastic collision
                 // m1, v10
@@ -1283,24 +1349,41 @@
                 // v1 = [(m1-m2)v10 + 2m2v20] / (m1+m2)
                 // v2 = [(m2-m1)v20 + 2m1v10] / (m1+m2)
             
-                // TODO: simple transform
-            
-                var m1 = unit1.radius * unit1.radius;
-                var m2 = unit2.radius * unit2.radius;
                 var v10 = new Victor(unit1.motion.vx, unit1.motion.vy);
                 var v20 = new Victor(unit2.motion.vx, unit2.motion.vy);
             
-                var v1x = ((m1 - m2) * v10.x + 2 * m2 * v20.x) / (m1 + m2);
-                var v1y = ((m1 - m2) * v10.y + 2 * m2 * v20.y) / (m1 + m2);
+                var v1x = ((unit1.m - unit2.m) * v10.x + 2 * unit2.m * v20.x) / (unit1.m + unit2.m);
+                var v1y = ((unit1.m - unit2.m) * v10.y + 2 * unit2.m * v20.y) / (unit1.m + unit2.m);
                 unit1.motion.ev.x += v1x;
                 unit1.motion.ev.y += v1y;
             
-                var v2x = ((m2 - m1) * v20.x + 2 * m1 * v10.x) / (m1 + m2);
-                var v2y = ((m2 - m1) * v20.y + 2 * m1 * v10.y) / (m1 + m2);
+                var v2x = ((unit2.m - unit1.m) * v20.x + 2 * unit1.m * v10.x) / (unit1.m + unit2.m);
+                var v2y = ((unit2.m - unit1.m) * v20.y + 2 * unit1.m * v10.y) / (unit1.m + unit2.m);
                 unit2.motion.ev.x += v2x;
                 unit2.motion.ev.y += v2y;
+            }
             
-                // damage each other
+            World.prototype.simpleCollide = function(unit1, unit2, distRatio)
+            {
+                var dir = new Victor(unit1.x - unit2.x, unit1.y - unit2.y);
+                dir.norm();
+                var v1 = unit1.motion.v;
+                var v2 = unit2.motion.v;
+                var spring = this.cfg.springVelocityBase + (1.0 - distRatio) * this.cfg.springVelocityAdd;
+                // console.log(unit1.motion.toString());
+                // console.log(unit2.motion.toString());
+                // console.log("spring=" + spring + ", m1=" + unit1.m + ", m2=" + unit2.m);
+                unit1.motion.ev.x += (v2 + spring) * dir.x * unit2.m / unit1.m;
+                unit1.motion.ev.y += (v2 + spring) * dir.y * unit2.m / unit1.m;
+                unit2.motion.ev.x -= (v1 + spring) * dir.x * unit1.m / unit2.m;
+                unit2.motion.ev.y -= (v1 + spring) * dir.y * unit1.m / unit2.m;
+                // console.log(unit1.motion.toString());
+                // console.log(unit2.motion.toString());
+            }
+            
+            World.prototype.collide = function(unit1, unit2, distRatio)
+            {
+                this.simpleCollide(unit1, unit2, distRatio);
                 unit1.takeDamageByUnit(unit2);
                 unit2.takeDamageByUnit(unit1);
             }
@@ -1337,10 +1420,11 @@
                                 var distX = unit.x - target.x;
                                 var distY = unit.y - target.y;
                                 var distR = unit.radius + target.radius;
-                                if (distX * distX + distY * distY < distR * distR) {
+                                var dist2 = distX * distX + distY * distY;
+                                if (dist2 < distR * distR) {
                                     unit.collideTime = this.time;
                                     target.collideTime = this.time;
-                                    this.collide(unit, target);
+                                    this.collide(unit, target, dist2 / (distR * distR));
                                 }
                             }
                             unit.collideCheckFrame = this.frame;
