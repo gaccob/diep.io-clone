@@ -1,4 +1,3 @@
-var Config = require("../modules/config");
 var Motion = require("../modules/motion");
 var Util = require("../modules/util");
 
@@ -9,10 +8,9 @@ function Bullet(world, position, angle, weapon)
     this.world = world;
     this.owner = weapon.owner;
     this.bornTime = world.time;
-    this.cfg = Config.bullets[weapon.cfg.bullet];
+    this.cfg = world.cfg.configBullets[weapon.cfg.bullet];
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
-    this.density = this.cfg.density;
     this.motion = new Motion(this, this.cfg.velocity, angle);
 
     // view
@@ -75,7 +73,8 @@ Bullet.prototype.die = function()
 
 Bullet.prototype.update = function()
 {
-    this.motion.update(Config.world.updateMS);
+    var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
+    this.motion.update(deltaMS);
 }
 
 Object.defineProperties(Bullet.prototype, {
@@ -91,7 +90,7 @@ Object.defineProperties(Bullet.prototype, {
         get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
     },
     m: {
-        get: function() { return this.radius * this.radius * this.density; }
+        get: function() { return this.radius * this.radius * this.cfg.density; }
     },
 });
 

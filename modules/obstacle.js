@@ -1,18 +1,15 @@
-var Config = require("../modules/config");
 var HpBar = require("../modules/hpbar");
 var Motion = require("../modules/motion");
 var Util = require("../modules/util");
 
-function Obstacle(world, cfg, position)
+function Obstacle(world, name, position)
 {
     this.world = world;
     this.id = Util.getId();
     this.type = Util.unitType.obstacle;
-    this.cfg = cfg;
+    this.cfg = world.cfg.configObstacles[name];
     this.hp = this.cfg.hp;
-    this.fullHp = this.cfg.hp;
     this.damage = this.cfg.damage;
-    this.density = this.cfg.density;
 
     // view
     this.sprite = new PIXI.Container();
@@ -43,7 +40,7 @@ function Obstacle(world, cfg, position)
 
     var angle = Math.random() * Math.PI * 2;
     this.motion = new Motion(this, this.cfg.velocity, angle);
-    this.hpbar = new HpBar(world, Config.hpbar, this, false);
+    this.hpbar = new HpBar(world, "base", this, false);
 }
 
 Obstacle.prototype = {}
@@ -71,19 +68,20 @@ Obstacle.prototype.update = function()
 {
     var oldX = this.x;
     var oldY = this.y;
-    this.motion.update(Config.world.updateMS);
+    var updateMS = 1000.0 / this.world.cfg.configWorld.frame;
+    this.motion.update(updateMS);
 
-    this.hpbar.update(this.hp / this.fullHp);
+    this.hpbar.update(this.hp / this.cfg.hp);
     this.hpbar.x += (this.x - oldX);
     this.hpbar.y += (this.y - oldY);
 
     if (this.x < this.world.spawnRegion.x
         || this.x > this.world.spawnRegion.x + this.world.spawnRegion.w) {
-        this.motion.reverseMoveDirX();
+        this.motion.reverseIvX();
     }
     if (this.y < this.world.spawnRegion.y
         || this.y > this.world.spawnRegion.y + this.world.spawnRegion.h) {
-        this.motion.reverseMoveDirY();
+        this.motion.reverseIvY();
     }
 }
 
@@ -100,7 +98,7 @@ Object.defineProperties(Obstacle.prototype, {
         get: function() { return this.cfg.radius + this.cfg.edge.w; }
     },
     m: {
-        get: function() { return this.radius * this.radius * this.density; }
+        get: function() { return this.radius * this.radius * this.cfg.density; }
     },
     h: {
         get: function() { return this.sprite.height; }

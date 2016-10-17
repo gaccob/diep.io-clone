@@ -1,4 +1,3 @@
-var Config = require("../modules/config");
 var HpBar = require("../modules/hpbar");
 var Motion = require("../modules/motion");
 var Weapon = require("../modules/weapon");
@@ -9,20 +8,20 @@ function Tank(world, name, position, player)
     this.world = world;
     this.id = Util.getId();
     this.type = Util.unitType.tank;
-    this.cfg = Config.tanks[name];
+    this.cfg = world.cfg.configTanks[name];
     this.player = player;
     this.hp = this.cfg.hp;
-    this.fullHp = this.cfg.hp;
     this.damage = this.cfg.damage;
-    this.density = this.cfg.density;
 
     // view & weapons
     this.sprite = new PIXI.Container();
     this.weapons = [];
     for (var idx in this.cfg.weapons) {
-        var weapon = new Weapon(world, this, this.cfg.weapons[idx]);
-        this.weapons.push(weapon);
-        this.sprite.addChild(weapon.sprite);
+        if (this.cfg.weapons[idx] != "") {
+            var weapon = new Weapon(world, this, this.cfg.weapons[idx]);
+            this.weapons.push(weapon);
+            this.sprite.addChild(weapon.sprite);
+        }
     }
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
@@ -45,7 +44,7 @@ function Tank(world, name, position, player)
     world.addUnitToGrid(this);
 
     this.motion = new Motion(this, this.cfg.velocity, 0);
-    this.hpbar = new HpBar(world, Config.hpbar, this, true);
+    this.hpbar = new HpBar(world, "base", this, true);
 }
 
 Tank.prototype = {}
@@ -79,9 +78,10 @@ Tank.prototype.update = function()
 {
     var oldX = this.x;
     var oldY = this.y;
-    this.motion.update(Config.world.updateMS);
+    var updateMS = 1000.0 / this.world.cfg.configWorld.frame;
+    this.motion.update(updateMS);
 
-    this.hpbar.update(this.hp / this.fullHp);
+    this.hpbar.update(this.hp / this.cfg.hp);
     this.hpbar.x += (this.x - oldX);
     this.hpbar.y += (this.y - oldY);
 
@@ -126,7 +126,7 @@ Object.defineProperties(Tank.prototype, {
         get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
     },
     m: {
-        get: function() { return this.radius * this.radius * this.density; }
+        get: function() { return this.radius * this.radius * this.cfg.density; }
     },
     h: {
         get: function() { return this.sprite.height; }

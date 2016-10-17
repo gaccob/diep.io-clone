@@ -1,10 +1,9 @@
-var Config = require("../modules/config");
 var Util = require("../modules/util");
 
-function HpBar(world, cfg, owner, display)
+function HpBar(world, name, owner, display)
 {
     this.world = world;
-    this.cfg = cfg;
+    this.cfg = world.cfg.configHpbar[name];
     this.owner = owner;
     this.display = display;
     this.percent = 1;

@@ -6,24 +6,24 @@ var Util = require("../modules/util");
 
 function getWorldBackground(world)
 {
-    var cfg = Config.world;
+    var cfg = world.cfg.configMap;
     var graphics = new PIXI.Graphics();
 
     // background spawn region
-    graphics.beginFill(cfg.obstacleSpawn.color);
+    graphics.beginFill(cfg.obstacleRegion.color);
     graphics.drawRect(world.spawnRegion.x, world.spawnRegion.y,
         world.spawnRegion.w, world.spawnRegion.h);
     graphics.endFill();
 
     // background grids
     graphics.lineStyle(cfg.view.grid.edge, cfg.view.grid.color);
-    for (var x = cfg.view.grid.size; x < cfg.map.w; x += cfg.view.grid.size) {
+    for (var x = cfg.view.grid.size; x < world.w; x += cfg.view.grid.size) {
         graphics.moveTo(x, 0);
-        graphics.lineTo(x, cfg.map.h);
+        graphics.lineTo(x, world.h);
     }
-    for (var y = cfg.view.grid.size; y < cfg.map.h; y += cfg.view.grid.size) {
+    for (var y = cfg.view.grid.size; y < world.h; y += cfg.view.grid.size) {
         graphics.moveTo(0, y);
-        graphics.lineTo(cfg.map.w, y);
+        graphics.lineTo(world.w, y);
     }
 
     return graphics;
@@ -32,18 +32,18 @@ function getWorldBackground(world)
 function World()
 {
     this.frame = 0;
-    this.cfg = Config.world;
+    this.cfg = new Config();
 
-    this.w = this.cfg.map.w;
-    this.h = this.cfg.map.h;
+    this.w = this.cfg.configMap.w;
+    this.h = this.cfg.configMap.h;
 
     this.spawnRegion = {}
-    this.spawnRegion.x = this.cfg.map.w * (1 - this.cfg.obstacleSpawn.wRatio) / 2;
-    this.spawnRegion.w = this.cfg.map.w * this.cfg.obstacleSpawn.wRatio;
-    this.spawnRegion.y = this.cfg.map.h * (1 - this.cfg.obstacleSpawn.hRatio) / 2;
-    this.spawnRegion.h = this.cfg.map.h * this.cfg.obstacleSpawn.hRatio;
+    this.spawnRegion.x = this.w * (1.0 - this.cfg.configMap.obstacleRegion.wRatio) / 2;
+    this.spawnRegion.w = this.w * this.cfg.configMap.obstacleRegion.wRatio;
+    this.spawnRegion.y = this.h * (1.0 - this.cfg.configMap.obstacleRegion.hRatio) / 2;
+    this.spawnRegion.h = this.h * this.cfg.configMap.obstacleRegion.hRatio;
 
-    this.gridSize = this.cfg.map.grid.size;
+    this.gridSize = this.cfg.configWorld.gridSize;
     this.gridW = Math.floor(this.w / this.gridSize) + 1;
     this.gridH = Math.floor(this.h / this.gridSize) + 1;
     this.grids = [];
@@ -65,8 +65,11 @@ function World()
     this.ui = new PIXI.Container();
     this.stage.addChild(this.ui);
 
-    this.renderer = new PIXI.CanvasRenderer(this.cfg.view.w, this.cfg.view.h, {
-            backgroundColor: this.cfg.map.color,
+    this.viewW = document.documentElement.clientWidth;
+    this.viewH = document.documentElement.clientHeight - 10;
+    this.renderer = new PIXI.CanvasRenderer(
+        this.viewW, this.viewH, {
+            backgroundColor: Number(this.cfg.configMap.color),
             antialias: true,
             autoResize: true,
         });
@@ -77,8 +80,11 @@ function World()
     this.obstacleCount = 0;
     this.tanks = {};
     var idx = 0;
-    for (var i in Config.tanks) {
-        var tank = new Tank(this, i, { x: this.w / 2 + idx * 200, y: this.h / 2 + idx * 200, });
+    for (var i in this.cfg.configTanks) {
+        var tank = new Tank(this, i, {
+            x: this.w / 2 + idx * 200,
+            y: this.h / 2 + idx * 200,
+        });
         tank.autoFire = true;
         this.tanks[tank.id] = tank;
         ++ idx;
@@ -101,8 +107,8 @@ World.prototype.updateCamera = function()
 {
     var x = this.player.x;
     var y = this.player.y;
-    var viewCenterX = this.cfg.view.w / 2;
-    var viewCenterY = this.cfg.view.h / 2;
+    var viewCenterX = this.viewW / 2;
+    var viewCenterY = this.viewH / 2;
     x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
     y = Util.clamp(y, viewCenterY, this.h - viewCenterY);
     this.view.x = viewCenterX - x;
@@ -127,14 +133,10 @@ World.prototype.updatePlayers = function()
 
 World.prototype.updateObstacles = function()
 {
-    if (this.obstacleCount < this.cfg.obstacleSpawn.maxCount) {
-        var cfgs = [
-            Config.obstacles.small,
-            Config.obstacles.middle,
-            Config.obstacles.large
-        ];
-        var cfg = cfgs[Math.floor((Math.random() * cfgs.length))];
-        var obstacle = new Obstacle(this, cfg, {
+    if (this.obstacleCount < this.cfg.configWorld.maxObstaclesCount) {
+        var names = ["triangle", "quad", "pentagon"];
+        var name = names[Math.floor((Math.random() * names.length))];
+        var obstacle = new Obstacle(this, name, {
             x: Util.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
             y: Util.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
         });
@@ -261,14 +263,14 @@ World.prototype.simpleCollide = function(unit1, unit2, distRatio)
     dir.norm();
     var v1 = unit1.motion.v;
     var v2 = unit2.motion.v;
-    var spring = this.cfg.springVelocityBase + (1.0 - distRatio) * this.cfg.springVelocityAdd;
+    var spring1 = unit2.cfg.velocity.springBase + (1.0 - distRatio) * unit2.cfg.velocity.springAdd;
+    var spring2 = unit1.cfg.velocity.springBase + (1.0 - distRatio) * unit1.cfg.velocity.springAdd;
     // console.log(unit1.motion.toString());
     // console.log(unit2.motion.toString());
-    // console.log("spring=" + spring + ", m1=" + unit1.m + ", m2=" + unit2.m);
-    unit1.motion.ev.x += (v2 + spring) * dir.x * unit2.m / unit1.m;
-    unit1.motion.ev.y += (v2 + spring) * dir.y * unit2.m / unit1.m;
-    unit2.motion.ev.x -= (v1 + spring) * dir.x * unit1.m / unit2.m;
-    unit2.motion.ev.y -= (v1 + spring) * dir.y * unit1.m / unit2.m;
+    unit1.motion.ev.x += (v2 + spring1) * dir.x * unit2.m / unit1.m;
+    unit1.motion.ev.y += (v2 + spring1) * dir.y * unit2.m / unit1.m;
+    unit2.motion.ev.x -= (v1 + spring2) * dir.x * unit1.m / unit2.m;
+    unit2.motion.ev.y -= (v1 + spring2) * dir.y * unit1.m / unit2.m;
     // console.log(unit1.motion.toString());
     // console.log(unit2.motion.toString());
 }
@@ -291,7 +293,7 @@ World.prototype.updateCollision = function()
 
                 // avoid multi-collision
                 if (unit.collideTime != null) {
-                    if (this.time - unit.collideTime < this.cfg.unitCollideCheckMS) {
+                    if (this.time - unit.collideTime < this.cfg.configWorld.unitCollideCheckMS) {
                         continue;
                     }
                 }
@@ -327,7 +329,8 @@ World.prototype.updateCollision = function()
 
 World.prototype.updateDieAnimations = function()
 {
-    var cfg = Config.dieAnimation;
+    // TODO:
+    var cfg = this.cfg.configDieAnimation.base;
     for (var i in this.dieSprites) {
         var sprite = this.dieSprites[i];
         if (sprite.alpha > cfg.alphaStart) {
@@ -351,8 +354,9 @@ World.prototype.updateLogic = function()
 {
     var dateTime = new Date();
     var ms = dateTime.getTime();
-    while (ms > this.time + this.cfg.updateMS) {
-        this.time += this.cfg.updateMS;
+    var updateMS = 1000.0 / this.cfg.configWorld.frame;
+    while (ms > this.time + updateMS) {
+        this.time += updateMS;
         this.frame ++;
         this.updatePlayers();
         this.updateTanks();

@@ -5,13 +5,13 @@ function weaponCreateView(weapon)
 {
 }
 
-function Weapon(world, tank, cfg)
+function Weapon(world, tank, name)
 {
     this.world = world;
     this.id = Util.getId();
     this.type = Util.unitType.weapon;
     this.owner = tank;
-    this.cfg = cfg;
+    this.cfg = world.cfg.configWeapons[name];
     this.angle = this.cfg.angle;
     this.offset = new Victor(0, - this.cfg.shootOffset - this.cfg.h);
     this.offset.rotateDeg(this.cfg.angle)
