@@ -2,6 +2,7 @@ var HpBar = require("../modules/hpbar");
 var Motion = require("../modules/motion");
 var Weapon = require("../modules/weapon");
 var Util = require("../modules/util");
+var View = require("../modules/view");
 
 function Tank(world, name, position, player)
 {
@@ -10,41 +11,27 @@ function Tank(world, name, position, player)
     this.type = Util.unitType.tank;
     this.cfg = world.cfg.configTanks[name];
     this.player = player;
-    this.hp = this.cfg.hp;
-    this.damage = this.cfg.damage;
 
-    // view & weapons
-    this.sprite = new PIXI.Container();
     this.weapons = [];
     for (var idx in this.cfg.weapons) {
         if (this.cfg.weapons[idx] != "") {
             var weapon = new Weapon(world, this, this.cfg.weapons[idx]);
             this.weapons.push(weapon);
-            this.sprite.addChild(weapon.sprite);
         }
     }
-    var graphics = new PIXI.Graphics();
-    graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-    if (this.player) {
-        graphics.beginFill(this.cfg.body.playerColor);
-    } else {
-        graphics.beginFill(this.cfg.body.color);
-    }
-    graphics.drawCircle(0, 0, this.cfg.body.radius);
-    graphics.endFill();
-    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-    graphics.destroy();
-    bodySprite.anchor.x = 0.5;
-    bodySprite.anchor.y = 0.5;
-    this.sprite.addChild(bodySprite);
-    world.view.addChild(this.sprite);
+
+    this.view = new View(this);
 
     this.x = position.x;
     this.y = position.y;
-    world.addUnitToGrid(this);
+    this.rotation = 0;
 
+    this.hp = this.cfg.hp;
+    this.damage = this.cfg.damage;
     this.motion = new Motion(this, this.cfg.velocity, 0);
     this.hpbar = new HpBar(world, "base", this, true);
+
+    world.addUnitToGrid(this);
 }
 
 Tank.prototype = {}
@@ -60,7 +47,7 @@ Tank.prototype.takeDamageByUnit = function(caster)
 Tank.prototype.die = function()
 {
     this.hpbar.die();
-    this.world.dieSprites.push(this.sprite);
+    this.view.onDie();
 
     delete this.world.tanks[this.id];
     this.world.removeUnitFromGrid(this);
@@ -80,10 +67,11 @@ Tank.prototype.update = function()
     var oldY = this.y;
     var updateMS = 1000.0 / this.world.cfg.configWorld.frame;
     this.motion.update(updateMS);
+    this.view.update();
 
-    this.hpbar.update(this.hp / this.cfg.hp);
     this.hpbar.x += (this.x - oldX);
     this.hpbar.y += (this.y - oldY);
+    this.hpbar.update(this.hp / this.cfg.hp);
 
     if (this.autoFire == true) {
         this.fire();
@@ -114,29 +102,11 @@ Tank.prototype.revertFireStatus = function()
 }
 
 Object.defineProperties(Tank.prototype, {
-    x: {
-        get: function() { return this.sprite.x; },
-        set: function(v) { this.sprite.x = v; }
-    },
-    y: {
-        get: function() { return this.sprite.y; },
-        set: function(v) { this.sprite.y = v; }
-    },
     radius: {
-        get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+        get: function() { return this.cfg.radius; }
     },
     m: {
         get: function() { return this.radius * this.radius * this.cfg.density; }
-    },
-    h: {
-        get: function() { return this.sprite.height; }
-    },
-    w: {
-        get: function() { return this.sprite.width; }
-    },
-    rotation: {
-        get: function() { return this.sprite.rotation; },
-        set: function(r) { this.sprite.rotation = r; }
     },
 });
 

@@ -1,14 +1,9 @@
 var configObstacles = {
 	"0": {
 		"density": 1.0,
-		"color": "0xfc7676",
 		"hp": 20.0,
 		"damage": 2.0,
 		"alias": "triangle",
-		"edge": {
-			"color": "0x555555",
-			"w": 2.5,
-		},
 		"radius": 20.0,
 		"velocity": {
 			"ivMax": 3.0,
@@ -21,18 +16,27 @@ var configObstacles = {
 			"ivInit": 3.0,
 			"evDec": 80.0,
 		},
-		"side": 3.0,
+		"view": {
+			"color": "0xfc7676",
+			"hpbar": {
+				"scaleYRatio": 0.6,
+				"scaleXRatio": 0.6,
+				"yOffsetRatio": 1.4,
+				"xOffsetRatio": 0.0,
+			},
+			"edge": {
+				"color": "0x555555",
+				"w": 2.5,
+			},
+			"radius": 20.0,
+			"side": 3.0,
+		},
 	},
 	"1": {
 		"density": 1.0,
-		"color": "0xffe869",
 		"hp": 40.0,
 		"damage": 4.0,
 		"alias": "quad",
-		"edge": {
-			"color": "0x555555",
-			"w": 2.5,
-		},
 		"radius": 20.0,
 		"velocity": {
 			"ivMax": 3.0,
@@ -45,18 +49,27 @@ var configObstacles = {
 			"ivInit": 3.0,
 			"evDec": 80.0,
 		},
-		"side": 4.0,
+		"view": {
+			"color": "0xffe869",
+			"hpbar": {
+				"scaleYRatio": 0.6,
+				"scaleXRatio": 0.6,
+				"yOffsetRatio": 1.4,
+				"xOffsetRatio": 0.0,
+			},
+			"edge": {
+				"color": "0x555555",
+				"w": 2.5,
+			},
+			"radius": 20.0,
+			"side": 4.0,
+		},
 	},
 	"2": {
 		"density": 1.0,
-		"color": "0x768dfc",
 		"hp": 80.0,
 		"damage": 8.0,
 		"alias": "pentagon",
-		"edge": {
-			"color": "0x555555",
-			"w": 2.5,
-		},
 		"radius": 24.0,
 		"velocity": {
 			"ivMax": 3.0,
@@ -69,7 +82,21 @@ var configObstacles = {
 			"ivInit": 3.0,
 			"evDec": 80.0,
 		},
-		"side": 5.0,
+		"view": {
+			"color": "0x768dfc",
+			"hpbar": {
+				"scaleYRatio": 0.6,
+				"scaleXRatio": 0.6,
+				"yOffsetRatio": 1.4,
+				"xOffsetRatio": 0.0,
+			},
+			"edge": {
+				"color": "0x555555",
+				"w": 2.5,
+			},
+			"radius": 24.0,
+			"side": 5.0,
+		},
 	},
 };
 module.exports = configObstacles;

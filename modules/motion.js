@@ -109,7 +109,7 @@ Motion.prototype.update = function(deltaMS)
     Util.clampPosition(this.owner, 0, this.owner.world.w, 0, this.owner.world.h);
 
     if (this.rotate != null && Math.abs(this.rotate) > epsilon) {
-        this.owner.sprite.rotation += this.rotate * deltaMS / 1000;
+        this.owner.rotation += this.rotate * deltaMS / 1000;
     }
 }
 

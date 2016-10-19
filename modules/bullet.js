@@ -1,5 +1,6 @@
 var Motion = require("../modules/motion");
 var Util = require("../modules/util");
+var View = require("../modules/view");
 
 function Bullet(world, position, angle, weapon)
 {
@@ -12,27 +13,10 @@ function Bullet(world, position, angle, weapon)
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
     this.motion = new Motion(this, this.cfg.velocity, angle);
-
-    // view
-    var graphics = new PIXI.Graphics();
-    graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-    if (this.world.player.tank == this.owner) {
-        graphics.beginFill(this.cfg.body.playerColor);
-    } else {
-        graphics.beginFill(this.cfg.body.color);
-    }
-    graphics.drawCircle(0, 0, this.cfg.body.radius);
-    graphics.endFill();
-    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-    graphics.destroy();
-    bodySprite.anchor.x = 0.5;
-    bodySprite.anchor.y = 0.5;
-    this.sprite = new PIXI.Container();
-    this.sprite.addChild(bodySprite);
-    world.view.addChild(this.sprite);
-
+    this.view = new View(this);
     this.x = position.x;
     this.y = position.y;
+    this.rotation = 0;
     world.addUnitToGrid(this);
 }
 
@@ -66,7 +50,7 @@ Bullet.prototype.takeDamageByUnit = function(caster)
 Bullet.prototype.die = function()
 {
     delete this.world.bullets[this.id];
-    this.world.dieSprites.push(this.sprite);
+    this.view.onDie();
     this.world.removeUnitFromGrid(this);
     this.world.removeUnits.push(this);
 }
@@ -75,19 +59,12 @@ Bullet.prototype.update = function()
 {
     var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
     this.motion.update(deltaMS);
+    this.view.update();
 }
 
 Object.defineProperties(Bullet.prototype, {
-    x: {
-        get: function() { return this.sprite.x; },
-        set: function(v) { this.sprite.x = v; }
-    },
-    y: {
-        get: function() { return this.sprite.y; },
-        set: function(v) { this.sprite.y = v; }
-    },
     radius: {
-        get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+        get: function() { return this.cfg.radius; }
     },
     m: {
         get: function() { return this.radius * this.radius * this.cfg.density; }

@@ -1,5 +1,6 @@
 var Bullet = require("../modules/bullet");
 var Util = require("../modules/util");
+var View = require("../modules/view");
 
 function weaponCreateView(weapon)
 {
@@ -12,29 +13,17 @@ function Weapon(world, tank, name)
     this.type = Util.unitType.weapon;
     this.owner = tank;
     this.cfg = world.cfg.configWeapons[name];
-    this.angle = this.cfg.angle;
-    this.offset = new Victor(0, - this.cfg.shootOffset - this.cfg.h);
+    this.fireFrame = world.frame + this.cfg.shootDelayFrame;
+    this.view = new View(this);
+
+    this.offset = new Victor(0, - this.cfg.shootOffset);
     this.offset.rotateDeg(this.cfg.angle)
                .add(new Victor(this.cfg.x, this.cfg.y));
-    this.fireFrame = world.frame + this.cfg.shootDelayFrame;
-
-    // view
-    var graphics = new PIXI.Graphics();
-    graphics.lineStyle(this.owner.cfg.edge.w, this.owner.cfg.edge.color);
-    graphics.beginFill(this.cfg.color);
-    graphics.drawRect(0, 0, this.cfg.w, this.cfg.h);
-    graphics.endFill();
-    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-    graphics.destroy();
-    bodySprite.anchor.x = 0.5;
-    bodySprite.anchor.y = 1.0;
-    this.sprite = new PIXI.Container();
-    this.sprite.addChild(bodySprite);
 
     // rotation & position
     this.rotation = this.cfg.angle * Math.PI / 180;
-    this.x += this.cfg.x;
-    this.y += this.cfg.y;
+    this.x = this.cfg.x;
+    this.y = this.cfg.y;
 
     // fire animation
     this.fireAnimFrame = null;
@@ -61,6 +50,7 @@ Weapon.prototype.update = function()
             this.y = this.originalY + Math.sin(this.rotation + Math.PI / 2) * delta;
         }
     }
+    this.view.update();
 }
 
 Weapon.prototype.fire = function()
@@ -72,7 +62,7 @@ Weapon.prototype.fire = function()
 
         var pos = this.offset.clone();
         pos.rotate(this.owner.rotation);
-        pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
+        pos.add(new Victor(this.owner.x, this.owner.y));
         if (pos.x <= 0 || pos.y <= 0 || pos.x >= this.world.w || pos.y >= this.world.h) {
             return;
         }
@@ -85,25 +75,11 @@ Weapon.prototype.fire = function()
         this.world.bullets[bullet.id] = bullet;
 
         var recoil = this.cfg.recoil / this.owner.m;
-        // console.log("frame:" + this.world.frame + ", recoil:" + recoil + ","  + this.owner.motion.toString());
         this.owner.motion.addRecoil(recoil, angle);
-        // console.log("frame:" + this.world.frame + "," + this.owner.motion.toString());
     }
 }
 
 Object.defineProperties(Weapon.prototype, {
-    x: {
-        get: function() { return this.sprite.x; },
-        set: function(v) { this.sprite.x = v; }
-    },
-    y: {
-        get: function() { return this.sprite.y; },
-        set: function(v) { this.sprite.y = v; }
-    },
-    rotation: {
-        get: function() { return this.sprite.rotation; },
-        set: function(r) { this.sprite.rotation = r; }
-    },
 });
 
 module.exports = Weapon;

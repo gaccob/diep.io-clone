@@ -19,19 +19,11 @@
         require.register("./cfg/configBullets", function(module, exports, require) {
             var configBullets = {
             	"0": {
-            		"body": {
-            			"color": "0xf14e54",
-            			"playerColor": "0x00b2e1",
-            			"radius": 7.0,
-            		},
             		"density": 1.0,
             		"hp": 1.0,
             		"damage": 10.0,
             		"alias": "normal",
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 2.0,
-            		},
+            		"radius": 8.0,
             		"duration": 900.0,
             		"velocity": {
             			"ivMax": 300.0,
@@ -43,6 +35,17 @@
             			"rotation": 0.0,
             			"ivInit": 300.0,
             			"evDec": 80.0,
+            		},
+            		"view": {
+            			"body": {
+            				"color": "0xf14e54",
+            				"playerColor": "0x00b2e1",
+            				"radius": 7.0,
+            			},
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
             		},
             	},
             };
@@ -67,20 +70,18 @@
         require.register("./cfg/configHpbar", function(module, exports, require) {
             var configHpbar = {
             	"0": {
-            		"xOffsetRatio": 0.0,
-            		"yDisplayRatio": 0.6,
-            		"color": "0x86c680",
-            		"h": 20.0,
             		"alias": "base",
-            		"xDisplayRatio": 0.6,
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 4.0,
+            		"view": {
+            			"color": "0x86c680",
+            			"h": 20.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 4.0,
+            			},
+            			"radius": 10.0,
+            			"w": 100.0,
+            			"alpha": 0.75,
             		},
-            		"radius": 10.0,
-            		"yOffsetRatio": 1.4,
-            		"w": 100.0,
-            		"alpha": 0.75,
             	},
             };
             module.exports = configHpbar;
@@ -91,14 +92,9 @@
             var configObstacles = {
             	"0": {
             		"density": 1.0,
-            		"color": "0xfc7676",
             		"hp": 20.0,
             		"damage": 2.0,
             		"alias": "triangle",
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 2.5,
-            		},
             		"radius": 20.0,
             		"velocity": {
             			"ivMax": 3.0,
@@ -111,18 +107,27 @@
             			"ivInit": 3.0,
             			"evDec": 80.0,
             		},
-            		"side": 3.0,
+            		"view": {
+            			"color": "0xfc7676",
+            			"hpbar": {
+            				"scaleYRatio": 0.6,
+            				"scaleXRatio": 0.6,
+            				"yOffsetRatio": 1.4,
+            				"xOffsetRatio": 0.0,
+            			},
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.5,
+            			},
+            			"radius": 20.0,
+            			"side": 3.0,
+            		},
             	},
             	"1": {
             		"density": 1.0,
-            		"color": "0xffe869",
             		"hp": 40.0,
             		"damage": 4.0,
             		"alias": "quad",
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 2.5,
-            		},
             		"radius": 20.0,
             		"velocity": {
             			"ivMax": 3.0,
@@ -135,18 +140,27 @@
             			"ivInit": 3.0,
             			"evDec": 80.0,
             		},
-            		"side": 4.0,
+            		"view": {
+            			"color": "0xffe869",
+            			"hpbar": {
+            				"scaleYRatio": 0.6,
+            				"scaleXRatio": 0.6,
+            				"yOffsetRatio": 1.4,
+            				"xOffsetRatio": 0.0,
+            			},
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.5,
+            			},
+            			"radius": 20.0,
+            			"side": 4.0,
+            		},
             	},
             	"2": {
             		"density": 1.0,
-            		"color": "0x768dfc",
             		"hp": 80.0,
             		"damage": 8.0,
             		"alias": "pentagon",
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 2.5,
-            		},
             		"radius": 24.0,
             		"velocity": {
             			"ivMax": 3.0,
@@ -159,7 +173,21 @@
             			"ivInit": 3.0,
             			"evDec": 80.0,
             		},
-            		"side": 5.0,
+            		"view": {
+            			"color": "0x768dfc",
+            			"hpbar": {
+            				"scaleYRatio": 0.6,
+            				"scaleXRatio": 0.6,
+            				"yOffsetRatio": 1.4,
+            				"xOffsetRatio": 0.0,
+            			},
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.5,
+            			},
+            			"radius": 24.0,
+            			"side": 5.0,
+            		},
             	},
             };
             module.exports = configObstacles;
@@ -169,11 +197,6 @@
         require.register("./cfg/configTanks", function(module, exports, require) {
             var configTanks = {
             	"0": {
-            		"body": {
-            			"color": "0xf14e54",
-            			"playerColor": "0x00b2e1",
-            			"radius": 22.0,
-            		},
             		"density": 1.0,
             		"hp": 200.0,
             		"damage": 10.0,
@@ -184,10 +207,7 @@
             			"2": "",
             		},
             		"alias": "base",
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 2.5,
-            		},
+            		"radius": 24.0,
             		"velocity": {
             			"ivMax": 160.0,
             			"evMax": 120.0,
@@ -199,13 +219,25 @@
             			"ivInit": 0.0,
             			"evDec": 80.0,
             		},
+            		"view": {
+            			"body": {
+            				"color": "0xf14e54",
+            				"playerColor": "0x00b2e1",
+            				"radius": 22.0,
+            			},
+            			"hpbar": {
+            				"scaleYRatio": 0.6,
+            				"scaleXRatio": 0.6,
+            				"yOffsetRatio": 1.4,
+            				"xOffsetRatio": 0.0,
+            			},
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.5,
+            			},
+            		},
             	},
             	"1": {
-            		"body": {
-            			"color": "0xf14e54",
-            			"playerColor": "0x00b2e1",
-            			"radius": 24.0,
-            		},
             		"density": 1.0,
             		"hp": 300.0,
             		"damage": 10.0,
@@ -216,10 +248,7 @@
             			"2": "",
             		},
             		"alias": "twin",
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 2.5,
-            		},
+            		"radius": 26.0,
             		"velocity": {
             			"ivMax": 160.0,
             			"evMax": 120.0,
@@ -231,13 +260,25 @@
             			"ivInit": 0.0,
             			"evDec": 80.0,
             		},
+            		"view": {
+            			"body": {
+            				"color": "0xf14e54",
+            				"playerColor": "0x00b2e1",
+            				"radius": 24.0,
+            			},
+            			"hpbar": {
+            				"scaleYRatio": 0.6,
+            				"scaleXRatio": 0.6,
+            				"yOffsetRatio": 1.4,
+            				"xOffsetRatio": 0.0,
+            			},
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.5,
+            			},
+            		},
             	},
             	"2": {
-            		"body": {
-            			"color": "0xf14e54",
-            			"playerColor": "0x00b2e1",
-            			"radius": 24.0,
-            		},
             		"density": 1.0,
             		"hp": 400.0,
             		"damage": 10.0,
@@ -248,10 +289,7 @@
             			"2": "quad-down",
             		},
             		"alias": "quad",
-            		"edge": {
-            			"color": "0x555555",
-            			"w": 2.5,
-            		},
+            		"radius": 26.0,
             		"velocity": {
             			"ivMax": 160.0,
             			"evMax": 120.0,
@@ -262,6 +300,23 @@
             			"rotation": 0.0,
             			"ivInit": 0.0,
             			"evDec": 80.0,
+            		},
+            		"view": {
+            			"body": {
+            				"color": "0xf14e54",
+            				"playerColor": "0x00b2e1",
+            				"radius": 24.0,
+            			},
+            			"hpbar": {
+            				"scaleYRatio": 0.6,
+            				"scaleXRatio": 0.6,
+            				"yOffsetRatio": 1.4,
+            				"xOffsetRatio": 0.0,
+            			},
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.5,
+            			},
             		},
             	},
             };
@@ -276,119 +331,161 @@
             		"fireAnimDistance": 5.0,
             		"angle": 0.0,
             		"bullet": "normal",
-            		"shootOffset": 10.0,
-            		"color": "0x999999",
-            		"h": 35.0,
+            		"shootOffset": 45.0,
             		"alias": "base",
             		"fireAnimFrame": 16.0,
             		"recoil": 10000.0,
-            		"w": 15.0,
             		"reloadFrame": 10.0,
             		"y": 0.0,
             		"x": 0.0,
             		"shootDelayFrame": 3.0,
+            		"view": {
+            			"color": "0x999999",
+            			"h": 35.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
+            			"w": 15.0,
+            		},
             	},
             	"1": {
             		"disturbDeg": 15.0,
             		"fireAnimDistance": 5.0,
             		"angle": 0.0,
             		"bullet": "normal",
-            		"shootOffset": 10.0,
-            		"color": "0x999999",
-            		"h": 40.0,
+            		"shootOffset": 50.0,
             		"alias": "twin-left",
             		"fireAnimFrame": 16.0,
             		"recoil": 8000.0,
-            		"w": 12.0,
             		"reloadFrame": 10.0,
             		"y": 0.0,
             		"x": -8.0,
             		"shootDelayFrame": 3.0,
+            		"view": {
+            			"color": "0x999999",
+            			"h": 40.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
+            			"w": 12.0,
+            		},
             	},
             	"2": {
             		"disturbDeg": 15.0,
             		"fireAnimDistance": 5.0,
             		"angle": 0.0,
             		"bullet": "normal",
-            		"shootOffset": 10.0,
-            		"color": "0x999999",
-            		"h": 40.0,
+            		"shootOffset": 50.0,
             		"alias": "twin-right",
             		"fireAnimFrame": 16.0,
             		"recoil": 8000.0,
-            		"w": 12.0,
             		"reloadFrame": 10.0,
             		"y": 0.0,
             		"x": 8.0,
             		"shootDelayFrame": 6.0,
+            		"view": {
+            			"color": "0x999999",
+            			"h": 40.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
+            			"w": 12.0,
+            		},
             	},
             	"3": {
             		"disturbDeg": 15.0,
             		"fireAnimDistance": 5.0,
             		"angle": 0.0,
             		"bullet": "normal",
-            		"shootOffset": 10.0,
-            		"color": "0x999999",
-            		"h": 38.0,
+            		"shootOffset": 48.0,
             		"alias": "quad-up",
             		"fireAnimFrame": 16.0,
             		"recoil": 10000.0,
-            		"w": 16.0,
             		"reloadFrame": 10.0,
             		"y": 0.0,
             		"x": 0.0,
             		"shootDelayFrame": 3.0,
+            		"view": {
+            			"color": "0x999999",
+            			"h": 38.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
+            			"w": 16.0,
+            		},
             	},
             	"4": {
             		"disturbDeg": 15.0,
             		"fireAnimDistance": 5.0,
             		"angle": 90.0,
             		"bullet": "normal",
-            		"shootOffset": 10.0,
-            		"color": "0x999999",
-            		"h": 38.0,
+            		"shootOffset": 48.0,
             		"alias": "quad-right",
             		"fireAnimFrame": 16.0,
             		"recoil": 10000.0,
-            		"w": 16.0,
             		"reloadFrame": 10.0,
             		"y": 0.0,
             		"x": 0.0,
             		"shootDelayFrame": 6.0,
+            		"view": {
+            			"color": "0x999999",
+            			"h": 38.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
+            			"w": 16.0,
+            		},
             	},
             	"5": {
             		"disturbDeg": 15.0,
             		"fireAnimDistance": 5.0,
             		"angle": 180.0,
             		"bullet": "normal",
-            		"shootOffset": 10.0,
-            		"color": "0x999999",
-            		"h": 38.0,
+            		"shootOffset": 48.0,
             		"alias": "quad-down",
             		"fireAnimFrame": 16.0,
             		"recoil": 10000.0,
-            		"w": 16.0,
             		"reloadFrame": 10.0,
             		"y": 0.0,
             		"x": 0.0,
             		"shootDelayFrame": 3.0,
+            		"view": {
+            			"color": "0x999999",
+            			"h": 38.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
+            			"w": 16.0,
+            		},
             	},
             	"6": {
             		"disturbDeg": 15.0,
             		"fireAnimDistance": 5.0,
             		"angle": 270.0,
             		"bullet": "normal",
-            		"shootOffset": 10.0,
-            		"color": "0x999999",
-            		"h": 38.0,
+            		"shootOffset": 48.0,
             		"alias": "quad-left",
             		"fireAnimFrame": 16.0,
             		"recoil": 10000.0,
-            		"w": 16.0,
             		"reloadFrame": 10.0,
             		"y": 0.0,
             		"x": 0.0,
             		"shootDelayFrame": 6.0,
+            		"view": {
+            			"color": "0x999999",
+            			"h": 38.0,
+            			"edge": {
+            				"color": "0x555555",
+            				"w": 2.0,
+            			},
+            			"w": 16.0,
+            		},
             	},
             };
             module.exports = configWeapons;
@@ -487,6 +584,7 @@
         require.register("./modules/bullet", function(module, exports, require) {
             var Motion = require("../modules/motion");
             var Util = require("../modules/util");
+            var View = require("../modules/view");
             
             function Bullet(world, position, angle, weapon)
             {
@@ -499,27 +597,10 @@
                 this.hp = this.cfg.hp;
                 this.damage = this.cfg.damage;
                 this.motion = new Motion(this, this.cfg.velocity, angle);
-            
-                // view
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-                if (this.world.player.tank == this.owner) {
-                    graphics.beginFill(this.cfg.body.playerColor);
-                } else {
-                    graphics.beginFill(this.cfg.body.color);
-                }
-                graphics.drawCircle(0, 0, this.cfg.body.radius);
-                graphics.endFill();
-                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-                graphics.destroy();
-                bodySprite.anchor.x = 0.5;
-                bodySprite.anchor.y = 0.5;
-                this.sprite = new PIXI.Container();
-                this.sprite.addChild(bodySprite);
-                world.view.addChild(this.sprite);
-            
+                this.view = new View(this);
                 this.x = position.x;
                 this.y = position.y;
+                this.rotation = 0;
                 world.addUnitToGrid(this);
             }
             
@@ -553,7 +634,7 @@
             Bullet.prototype.die = function()
             {
                 delete this.world.bullets[this.id];
-                this.world.dieSprites.push(this.sprite);
+                this.view.onDie();
                 this.world.removeUnitFromGrid(this);
                 this.world.removeUnits.push(this);
             }
@@ -562,19 +643,12 @@
             {
                 var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
                 this.motion.update(deltaMS);
+                this.view.update();
             }
             
             Object.defineProperties(Bullet.prototype, {
-                x: {
-                    get: function() { return this.sprite.x; },
-                    set: function(v) { this.sprite.x = v; }
-                },
-                y: {
-                    get: function() { return this.sprite.y; },
-                    set: function(v) { this.sprite.y = v; }
-                },
                 radius: {
-                    get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+                    get: function() { return this.cfg.radius; }
                 },
                 m: {
                     get: function() { return this.radius * this.radius * this.cfg.density; }
@@ -588,97 +662,47 @@
         <script>
         require.register("./modules/hpbar", function(module, exports, require) {
             var Util = require("../modules/util");
+            var View = require("../modules/view");
             
             function HpBar(world, name, owner, display)
             {
                 this.world = world;
+                this.type = Util.unitType.hpbar;
                 this.cfg = world.cfg.configHpbar[name];
                 this.owner = owner;
                 this.display = display;
                 this.percent = 1;
+                this.view = new View(this);
             
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-                graphics.beginFill(this.cfg.edge.color);
-                graphics.drawRoundedRect(0, 0, this.cfg.w, this.cfg.h, this.cfg.radius);
-                graphics.endFill();
-                this.backSprite = new PIXI.Sprite(graphics.generateTexture());
-                this.backSprite.anchor.x = 0.5;
-                this.backSprite.anchor.y = 0.5;
-            
-                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-                graphics.beginFill(this.cfg.color);
-                graphics.drawRoundedRect(0, 0, this.cfg.w, this.cfg.h, this.cfg.radius);
-                graphics.endFill();
-                this.frontSprite = new PIXI.Sprite(graphics.generateTexture());
-                this.frontSprite.anchor.x = 0.5;
-                this.frontSprite.anchor.y = 0.5;
-            
-                this.sprite = new PIXI.Container();
-                this.sprite.addChild(this.backSprite);
-                this.sprite.addChild(this.frontSprite);
-                this.sprite.alpha = this.cfg.alpha;
-            
-                this.x = this.owner.x + this.owner.radius * this.cfg.xOffsetRatio;
-                this.y = this.owner.y + this.owner.radius * this.cfg.yOffsetRatio;
-            
-                this.scale.x = this.cfg.xDisplayRatio * 2 * this.owner.radius / this.cfg.w;
-                this.scale.y = this.cfg.yDisplayRatio * 2 * this.owner.radius / this.cfg.w;
-            
-                world.view.addChild(this.sprite);
+                this.x = this.view.x;
+                this.y = this.view.y;
+                this.rotation = 0;
             }
             
             HpBar.prototype = {}
             
             HpBar.prototype.die = function()
             {
-                if (this.sprite && this.sprite.parent != null) {
-                    this.sprite.parent.removeChild(this.sprite);
-                }
-                delete this.sprite;
+                this.view.onDie();
             }
             
             HpBar.prototype.update = function(percent)
             {
                 if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
-                    this.visible = false;
+                    this.view.visible = false;
                 } else {
-                    this.visible = true;
+                    this.view.visible = true;
                 }
             
-                if (this.percent == percent) {
-                    return;
+                if (this.percent != percent) {
+                    this.view.updateHpbar(this.percent, percent);
+                    this.percent = percent;
                 }
             
-                this.frontSprite.x += this.cfg.w * (1 - this.percent) / 2;
-                this.percent = percent;
-                this.frontSprite.width = this.cfg.w * percent;
-                this.frontSprite.x -= this.cfg.w * (1 - this.percent) / 2;
+                this.view.update();
             }
             
             Object.defineProperties(HpBar.prototype, {
-                x: {
-                    get: function() { return this.sprite.x; },
-                    set: function(v) { this.sprite.x = v; }
-                },
-                y: {
-                    get: function() { return this.sprite.y; },
-                    set: function(v) { this.sprite.y = v; }
-                },
-                scale: {
-                    get: function() { return this.sprite.scale; },
-                    set: function(s) { this.sprite.scale = s; }
-                },
-                visible: {
-                    get: function() { return this.sprite.visible; },
-                    set: function(v) { this.sprite.visible = v; }
-                },
-                w: {
-                    get: function() { return this.sprite.width; }
-                },
-                h: {
-                    get: function() { return this.sprite.height; }
-                },
             });
             
             module.exports = HpBar;
@@ -798,7 +822,7 @@
                 Util.clampPosition(this.owner, 0, this.owner.world.w, 0, this.owner.world.h);
             
                 if (this.rotate != null && Math.abs(this.rotate) > epsilon) {
-                    this.owner.sprite.rotation += this.rotate * deltaMS / 1000;
+                    this.owner.rotation += this.rotate * deltaMS / 1000;
                 }
             }
             
@@ -822,6 +846,7 @@
             var HpBar = require("../modules/hpbar");
             var Motion = require("../modules/motion");
             var Util = require("../modules/util");
+            var View = require("../modules/view");
             
             function Obstacle(world, name, position)
             {
@@ -831,37 +856,15 @@
                 this.cfg = world.cfg.configObstacles[name];
                 this.hp = this.cfg.hp;
                 this.damage = this.cfg.damage;
-            
-                // view
-                this.sprite = new PIXI.Container();
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-                graphics.beginFill(this.cfg.color);
-                var from = new PIXI.Point(0, - this.cfg.radius);
-                graphics.moveTo(from.x, from.y);
-                for (var i = 1; i < this.cfg.side; ++ i) {
-                    var p = new Victor(from.x, from.y);
-                    p.rotate(Math.PI * 2 / this.cfg.side);
-                    graphics.lineTo(p.x, p.y);
-                    from.set(p.x, p.y);
-                    delete p;
-                }
-                graphics.endFill();
-                delete from;
-                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-                graphics.destroy();
-                bodySprite.pivot.x = bodySprite.width / 2;
-                bodySprite.pivot.y = this.cfg.radius + this.cfg.edge.w;
-                this.sprite.addChild(bodySprite);
-                world.view.addChild(this.sprite);
-            
+                this.view = new View(this);
                 this.x = position.x;
                 this.y = position.y;
-                world.addUnitToGrid(this);
-            
+                this.rotation = 0;
                 var angle = Math.random() * Math.PI * 2;
                 this.motion = new Motion(this, this.cfg.velocity, angle);
                 this.hpbar = new HpBar(world, "base", this, false);
+            
+                world.addUnitToGrid(this);
             }
             
             Obstacle.prototype = {}
@@ -877,7 +880,7 @@
             Obstacle.prototype.die = function()
             {
                 this.hpbar.die();
-                this.world.dieSprites.push(this.sprite);
+                this.view.onDie();
             
                 delete this.world.obstacles[this.id];
                 -- this.world.obstacleCount;
@@ -891,10 +894,11 @@
                 var oldY = this.y;
                 var updateMS = 1000.0 / this.world.cfg.configWorld.frame;
                 this.motion.update(updateMS);
+                this.view.update();
             
-                this.hpbar.update(this.hp / this.cfg.hp);
                 this.hpbar.x += (this.x - oldX);
                 this.hpbar.y += (this.y - oldY);
+                this.hpbar.update(this.hp / this.cfg.hp);
             
                 if (this.x < this.world.spawnRegion.x
                     || this.x > this.world.spawnRegion.x + this.world.spawnRegion.w) {
@@ -907,25 +911,11 @@
             }
             
             Object.defineProperties(Obstacle.prototype, {
-                x: {
-                    get: function() { return this.sprite.x; },
-                    set: function(v) { this.sprite.x = v; }
-                },
-                y: {
-                    get: function() { return this.sprite.y; },
-                    set: function(v) { this.sprite.y = v; }
-                },
                 radius: {
-                    get: function() { return this.cfg.radius + this.cfg.edge.w; }
+                    get: function() { return this.cfg.radius; }
                 },
                 m: {
                     get: function() { return this.radius * this.radius * this.cfg.density; }
-                },
-                h: {
-                    get: function() { return this.sprite.height; }
-                },
-                w: {
-                    get: function() { return this.sprite.width; }
                 },
             });
             
@@ -1083,6 +1073,7 @@
             var Motion = require("../modules/motion");
             var Weapon = require("../modules/weapon");
             var Util = require("../modules/util");
+            var View = require("../modules/view");
             
             function Tank(world, name, position, player)
             {
@@ -1091,41 +1082,27 @@
                 this.type = Util.unitType.tank;
                 this.cfg = world.cfg.configTanks[name];
                 this.player = player;
-                this.hp = this.cfg.hp;
-                this.damage = this.cfg.damage;
             
-                // view & weapons
-                this.sprite = new PIXI.Container();
                 this.weapons = [];
                 for (var idx in this.cfg.weapons) {
                     if (this.cfg.weapons[idx] != "") {
                         var weapon = new Weapon(world, this, this.cfg.weapons[idx]);
                         this.weapons.push(weapon);
-                        this.sprite.addChild(weapon.sprite);
                     }
                 }
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this.cfg.edge.w, this.cfg.edge.color);
-                if (this.player) {
-                    graphics.beginFill(this.cfg.body.playerColor);
-                } else {
-                    graphics.beginFill(this.cfg.body.color);
-                }
-                graphics.drawCircle(0, 0, this.cfg.body.radius);
-                graphics.endFill();
-                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-                graphics.destroy();
-                bodySprite.anchor.x = 0.5;
-                bodySprite.anchor.y = 0.5;
-                this.sprite.addChild(bodySprite);
-                world.view.addChild(this.sprite);
+            
+                this.view = new View(this);
             
                 this.x = position.x;
                 this.y = position.y;
-                world.addUnitToGrid(this);
+                this.rotation = 0;
             
+                this.hp = this.cfg.hp;
+                this.damage = this.cfg.damage;
                 this.motion = new Motion(this, this.cfg.velocity, 0);
                 this.hpbar = new HpBar(world, "base", this, true);
+            
+                world.addUnitToGrid(this);
             }
             
             Tank.prototype = {}
@@ -1141,7 +1118,7 @@
             Tank.prototype.die = function()
             {
                 this.hpbar.die();
-                this.world.dieSprites.push(this.sprite);
+                this.view.onDie();
             
                 delete this.world.tanks[this.id];
                 this.world.removeUnitFromGrid(this);
@@ -1161,10 +1138,11 @@
                 var oldY = this.y;
                 var updateMS = 1000.0 / this.world.cfg.configWorld.frame;
                 this.motion.update(updateMS);
+                this.view.update();
             
-                this.hpbar.update(this.hp / this.cfg.hp);
                 this.hpbar.x += (this.x - oldX);
                 this.hpbar.y += (this.y - oldY);
+                this.hpbar.update(this.hp / this.cfg.hp);
             
                 if (this.autoFire == true) {
                     this.fire();
@@ -1195,29 +1173,11 @@
             }
             
             Object.defineProperties(Tank.prototype, {
-                x: {
-                    get: function() { return this.sprite.x; },
-                    set: function(v) { this.sprite.x = v; }
-                },
-                y: {
-                    get: function() { return this.sprite.y; },
-                    set: function(v) { this.sprite.y = v; }
-                },
                 radius: {
-                    get: function() { return this.cfg.body.radius + this.cfg.edge.w; }
+                    get: function() { return this.cfg.radius; }
                 },
                 m: {
                     get: function() { return this.radius * this.radius * this.cfg.density; }
-                },
-                h: {
-                    get: function() { return this.sprite.height; }
-                },
-                w: {
-                    get: function() { return this.sprite.width; }
-                },
-                rotation: {
-                    get: function() { return this.sprite.rotation; },
-                    set: function(r) { this.sprite.rotation = r; }
                 },
             });
             
@@ -1229,6 +1189,7 @@
         require.register("./modules/weapon", function(module, exports, require) {
             var Bullet = require("../modules/bullet");
             var Util = require("../modules/util");
+            var View = require("../modules/view");
             
             function weaponCreateView(weapon)
             {
@@ -1241,29 +1202,17 @@
                 this.type = Util.unitType.weapon;
                 this.owner = tank;
                 this.cfg = world.cfg.configWeapons[name];
-                this.angle = this.cfg.angle;
-                this.offset = new Victor(0, - this.cfg.shootOffset - this.cfg.h);
+                this.fireFrame = world.frame + this.cfg.shootDelayFrame;
+                this.view = new View(this);
+            
+                this.offset = new Victor(0, - this.cfg.shootOffset);
                 this.offset.rotateDeg(this.cfg.angle)
                            .add(new Victor(this.cfg.x, this.cfg.y));
-                this.fireFrame = world.frame + this.cfg.shootDelayFrame;
-            
-                // view
-                var graphics = new PIXI.Graphics();
-                graphics.lineStyle(this.owner.cfg.edge.w, this.owner.cfg.edge.color);
-                graphics.beginFill(this.cfg.color);
-                graphics.drawRect(0, 0, this.cfg.w, this.cfg.h);
-                graphics.endFill();
-                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-                graphics.destroy();
-                bodySprite.anchor.x = 0.5;
-                bodySprite.anchor.y = 1.0;
-                this.sprite = new PIXI.Container();
-                this.sprite.addChild(bodySprite);
             
                 // rotation & position
                 this.rotation = this.cfg.angle * Math.PI / 180;
-                this.x += this.cfg.x;
-                this.y += this.cfg.y;
+                this.x = this.cfg.x;
+                this.y = this.cfg.y;
             
                 // fire animation
                 this.fireAnimFrame = null;
@@ -1290,6 +1239,7 @@
                         this.y = this.originalY + Math.sin(this.rotation + Math.PI / 2) * delta;
                     }
                 }
+                this.view.update();
             }
             
             Weapon.prototype.fire = function()
@@ -1301,7 +1251,7 @@
             
                     var pos = this.offset.clone();
                     pos.rotate(this.owner.rotation);
-                    pos.add(new Victor(this.owner.sprite.position.x, this.owner.sprite.position.y));
+                    pos.add(new Victor(this.owner.x, this.owner.y));
                     if (pos.x <= 0 || pos.y <= 0 || pos.x >= this.world.w || pos.y >= this.world.h) {
                         return;
                     }
@@ -1314,25 +1264,11 @@
                     this.world.bullets[bullet.id] = bullet;
             
                     var recoil = this.cfg.recoil / this.owner.m;
-                    // console.log("frame:" + this.world.frame + ", recoil:" + recoil + ","  + this.owner.motion.toString());
                     this.owner.motion.addRecoil(recoil, angle);
-                    // console.log("frame:" + this.world.frame + "," + this.owner.motion.toString());
                 }
             }
             
             Object.defineProperties(Weapon.prototype, {
-                x: {
-                    get: function() { return this.sprite.x; },
-                    set: function(v) { this.sprite.x = v; }
-                },
-                y: {
-                    get: function() { return this.sprite.y; },
-                    set: function(v) { this.sprite.y = v; }
-                },
-                rotation: {
-                    get: function() { return this.sprite.rotation; },
-                    set: function(r) { this.sprite.rotation = r; }
-                },
             });
             
             module.exports = Weapon;
@@ -1767,7 +1703,8 @@
                     tank: 1,
                     weapon: 2,
                     bullet: 3,
-                    obstacle: 4
+                    obstacle: 4,
+                    hpbar: 5,
                 },
             
                 clamp: function(value, min, max) {
@@ -1805,6 +1742,222 @@
             };
             
             module.exports = Util;
+        });
+        </script>
+        <script>
+        require.register("./modules/view", function(module, exports, require) {
+            var Util = require("../modules/util");
+            
+            function drawBullet(view)
+            {
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
+            
+                if (view.world.player.tank == view.owner.owner) {
+                    graphics.beginFill(view.cfg.body.playerColor);
+                } else {
+                    graphics.beginFill(view.cfg.body.color);
+                }
+                graphics.drawCircle(0, 0, view.cfg.body.radius);
+                graphics.endFill();
+            
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+                bodySprite.anchor.x = 0.5;
+                bodySprite.anchor.y = 0.5;
+                view.sprite.addChild(bodySprite);
+            
+                view.world.view.addChild(view.sprite);
+            }
+            
+            function drawObstacle(view)
+            {
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
+                graphics.beginFill(view.cfg.color);
+            
+                var from = new PIXI.Point(0, - view.cfg.radius);
+                graphics.moveTo(from.x, from.y);
+                for (var i = 1; i < view.cfg.side; ++ i) {
+                    var p = new Victor(from.x, from.y);
+                    p.rotate(Math.PI * 2 / view.cfg.side);
+                    graphics.lineTo(p.x, p.y);
+                    from.set(p.x, p.y);
+                    delete p;
+                }
+                delete from;
+                graphics.endFill();
+            
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+                bodySprite.pivot.x = bodySprite.width / 2;
+                bodySprite.pivot.y = view.cfg.radius + view.cfg.edge.w;
+                view.sprite.addChild(bodySprite);
+            
+                view.world.view.addChild(view.sprite);
+            }
+            
+            function drawWeapon(view)
+            {
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
+                graphics.beginFill(view.cfg.color);
+                graphics.drawRect(0, 0, view.cfg.w, view.cfg.h);
+                graphics.endFill();
+            
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+                bodySprite.anchor.x = 0.5;
+                bodySprite.anchor.y = 1.0;
+                view.sprite.addChild(bodySprite);
+            }
+            
+            function drawTank(view)
+            {
+                for (var idx in view.owner.weapons) {
+                    var weapon = view.owner.weapons[idx];
+                    view.sprite.addChild(weapon.view.sprite);
+                }
+            
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
+            
+                if (view.owner.player) {
+                    graphics.beginFill(view.cfg.body.playerColor);
+                } else {
+                    graphics.beginFill(view.cfg.body.color);
+                }
+                graphics.drawCircle(0, 0, view.cfg.body.radius);
+                graphics.endFill();
+            
+                var bodySprite = new PIXI.Sprite(graphics.generateTexture());
+                graphics.destroy();
+                bodySprite.anchor.x = 0.5;
+                bodySprite.anchor.y = 0.5;
+                view.sprite.addChild(bodySprite);
+            
+                view.world.view.addChild(view.sprite);
+            }
+            
+            function drawHpbar(view)
+            {
+                var graphics = new PIXI.Graphics();
+                graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
+                graphics.beginFill(view.cfg.edge.color);
+                graphics.drawRoundedRect(0, 0, view.cfg.w, view.cfg.h, view.cfg.radius);
+                graphics.endFill();
+            
+                view.backSprite = new PIXI.Sprite(graphics.generateTexture());
+                view.backSprite.anchor.x = 0.5;
+                view.backSprite.anchor.y = 0.5;
+            
+                graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
+                graphics.beginFill(view.cfg.color);
+                graphics.drawRoundedRect(0, 0, view.cfg.w, view.cfg.h, view.cfg.radius);
+                graphics.endFill();
+            
+                view.frontSprite = new PIXI.Sprite(graphics.generateTexture());
+                view.frontSprite.anchor.x = 0.5;
+                view.frontSprite.anchor.y = 0.5;
+            
+                view.sprite.addChild(view.backSprite);
+                view.sprite.addChild(view.frontSprite);
+                view.sprite.alpha = view.cfg.alpha;
+            
+                var holder = view.owner.owner;
+                var w = 2 * holder.radius;
+                var cfg = holder.cfg.view;
+                view.sprite.x = holder.x + holder.radius * cfg.hpbar.xOffsetRatio;
+                view.sprite.y = holder.y + holder.radius * cfg.hpbar.yOffsetRatio;
+                view.sprite.scale.x = cfg.hpbar.scaleXRatio * w / view.cfg.w;
+                view.sprite.scale.y = cfg.hpbar.scaleYRatio * w / view.cfg.w;
+            
+                view.world.view.addChild(view.sprite);
+            }
+            
+            function View(owner)
+            {
+                this.owner = owner;
+                this.cfg = this.owner.cfg.view;
+                this.world = this.owner.world;
+                this.sprite = new PIXI.Container();
+            
+                if (this.owner.type == Util.unitType.bullet) {
+                    drawBullet(this);
+                } else if (this.owner.type == Util.unitType.obstacle) {
+                    drawObstacle(this);
+                } else if (this.owner.type == Util.unitType.weapon) {
+                    drawWeapon(this);
+                } else if (this.owner.type == Util.unitType.tank) {
+                    drawTank(this);
+                } else if (this.owner.type == Util.unitType.hpbar) {
+                    drawHpbar(this);
+                }
+            }
+            
+            View.prototype = {}
+            
+            View.prototype.onDie = function()
+            {
+                if (this.owner.type == Util.unitType.bullet
+                    || this.owner.type == Util.unitType.obstacle
+                    || this.owner.type == Util.unitType.tank) {
+                    this.world.dieSprites.push(this.sprite);
+                }
+                if (this.owner.type == Util.unitType.hpbar) {
+                    if (this.sprite.parent) {
+                        this.sprite.parent.removeChild(this.sprite);
+                    }
+                    delete this.sprite;
+                }
+            }
+            
+            View.prototype.update = function()
+            {
+                this.x = this.owner.x;
+                this.y = this.owner.y;
+                this.rotation = this.owner.rotation;
+            }
+            
+            View.prototype.updateHpbar = function(oldPercent, newPercent)
+            {
+                if (this.owner.type == Util.unitType.hpbar) {
+                    this.frontSprite.x += this.cfg.w * (1 - oldPercent) / 2;
+                    this.frontSprite.width = this.cfg.w * newPercent;
+                    this.frontSprite.x -= this.cfg.w * (1 - newPercent) / 2;
+                }
+            }
+            
+            Object.defineProperties(View.prototype, {
+                x: {
+                    get: function() { return this.sprite.x; },
+                    set: function(v) { this.sprite.x = v; }
+                },
+                y: {
+                    get: function() { return this.sprite.y; },
+                    set: function(v) { this.sprite.y = v; }
+                },
+                h: {
+                    get: function() { return this.sprite.height; }
+                },
+                w: {
+                    get: function() { return this.sprite.width; }
+                },
+                rotation: {
+                    get: function() { return this.sprite.rotation; },
+                    set: function(r) { this.sprite.rotation = r; }
+                },
+                scale: {
+                    get: function() { return this.sprite.scale; },
+                    set: function(s) { this.sprite.scale = s; }
+                },
+                visible: {
+                    get: function() { return this.sprite.visible; },
+                    set: function(v) { this.sprite.visible = v; }
+                },
+            });
+            
+            module.exports = View;
         });
         </script>
 

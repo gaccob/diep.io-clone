@@ -1,10 +1,5 @@
 var configTanks = {
 	"0": {
-		"body": {
-			"color": "0xf14e54",
-			"playerColor": "0x00b2e1",
-			"radius": 22.0,
-		},
 		"density": 1.0,
 		"hp": 200.0,
 		"damage": 10.0,
@@ -15,10 +10,7 @@ var configTanks = {
 			"2": "",
 		},
 		"alias": "base",
-		"edge": {
-			"color": "0x555555",
-			"w": 2.5,
-		},
+		"radius": 24.0,
 		"velocity": {
 			"ivMax": 160.0,
 			"evMax": 120.0,
@@ -30,13 +22,25 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
+		"view": {
+			"body": {
+				"color": "0xf14e54",
+				"playerColor": "0x00b2e1",
+				"radius": 22.0,
+			},
+			"hpbar": {
+				"scaleYRatio": 0.6,
+				"scaleXRatio": 0.6,
+				"yOffsetRatio": 1.4,
+				"xOffsetRatio": 0.0,
+			},
+			"edge": {
+				"color": "0x555555",
+				"w": 2.5,
+			},
+		},
 	},
 	"1": {
-		"body": {
-			"color": "0xf14e54",
-			"playerColor": "0x00b2e1",
-			"radius": 24.0,
-		},
 		"density": 1.0,
 		"hp": 300.0,
 		"damage": 10.0,
@@ -47,10 +51,7 @@ var configTanks = {
 			"2": "",
 		},
 		"alias": "twin",
-		"edge": {
-			"color": "0x555555",
-			"w": 2.5,
-		},
+		"radius": 26.0,
 		"velocity": {
 			"ivMax": 160.0,
 			"evMax": 120.0,
@@ -62,13 +63,25 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
+		"view": {
+			"body": {
+				"color": "0xf14e54",
+				"playerColor": "0x00b2e1",
+				"radius": 24.0,
+			},
+			"hpbar": {
+				"scaleYRatio": 0.6,
+				"scaleXRatio": 0.6,
+				"yOffsetRatio": 1.4,
+				"xOffsetRatio": 0.0,
+			},
+			"edge": {
+				"color": "0x555555",
+				"w": 2.5,
+			},
+		},
 	},
 	"2": {
-		"body": {
-			"color": "0xf14e54",
-			"playerColor": "0x00b2e1",
-			"radius": 24.0,
-		},
 		"density": 1.0,
 		"hp": 400.0,
 		"damage": 10.0,
@@ -79,10 +92,7 @@ var configTanks = {
 			"2": "quad-down",
 		},
 		"alias": "quad",
-		"edge": {
-			"color": "0x555555",
-			"w": 2.5,
-		},
+		"radius": 26.0,
 		"velocity": {
 			"ivMax": 160.0,
 			"evMax": 120.0,
@@ -93,6 +103,23 @@ var configTanks = {
 			"rotation": 0.0,
 			"ivInit": 0.0,
 			"evDec": 80.0,
+		},
+		"view": {
+			"body": {
+				"color": "0xf14e54",
+				"playerColor": "0x00b2e1",
+				"radius": 24.0,
+			},
+			"hpbar": {
+				"scaleYRatio": 0.6,
+				"scaleXRatio": 0.6,
+				"yOffsetRatio": 1.4,
+				"xOffsetRatio": 0.0,
+			},
+			"edge": {
+				"color": "0x555555",
+				"w": 2.5,
+			},
 		},
 	},
 };

@@ -6,7 +6,8 @@ var Util = {
         tank: 1,
         weapon: 2,
         bullet: 3,
-        obstacle: 4
+        obstacle: 4,
+        hpbar: 5,
     },
 
     clamp: function(value, min, max) {
