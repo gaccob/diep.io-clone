@@ -1,0 +1,106 @@
+package Tank;
+
+message Vector {
+    optional float x = 1;
+    optional float y = 2;
+}
+
+enum UnitType {
+    UT_Tank = 1;
+    UT_Weapon = 2;
+    UT_Bullet = 3;
+    UT_Obstacle = 4;
+    UT_Hpbar = 5;
+}
+
+message Motion {
+    optional int32 id = 1;
+    optional Vector moveDir = 2;
+    optional Vector iv = 3;
+    optional Vector ev = 4;
+    optional float rotate = 5;
+    optional Vector position = 6;
+    optional float rotation = 7;
+}
+
+message Unit {
+    optional int32 id = 1;
+    optional int32 type = 2;
+    optional string name = 3;
+    optional int32 hp = 4;
+    optional Motion motion = 5;
+}
+
+message Player {
+    optional int32 connid = 1;
+    optional int32 id = 2;
+    optional string name = 3;
+    optional uint64 score = 4;
+    optional bool die = 5;
+}
+
+message SyncStartReq {
+    optional string name = 1;
+}
+message SyncStartRes {
+    optionla int32 connid = 1;
+    repeated Unit units = 2;
+    repeated Player players = 3;
+}
+
+message SyncUnits {
+    repeated Unit units = 1;
+}
+message SyncUnitDie {
+    optional int32 id = 1;
+}
+
+message SyncPlayerJoin {
+    optional Player player = 1;
+}
+message SyncPlayerQuit {
+    optional int32 connid = 1;
+}
+
+message SyncCollide {
+    optional Unit u1 = 1;
+    optional Unit u2 = 2;
+}
+
+message SyncFireReq {
+    optional bool fire = 1;
+}
+message SyncFireRes {
+    optional bool fire = 1;
+}
+
+message SyncOperDir {
+    optional float rotation = 1;
+}
+message SyncOperMove {
+    optional float angle = 1;
+}
+
+message Head {
+    optional uint64 sequence = 1;
+    optional uint64 frame = 2;
+    optional int32 cmd = 3;
+}
+message Body {
+    optional SyncStartReq syncStartReq = 1;
+    optional SyncStartRes syncStartRes = 2;
+    optional SyncUnits syncUnits = 3;
+    optional SyncUnitDie syncUnitDie = 4;
+    optional SyncPlayerJoin syncPlayerJoin = 5;
+    optional SyncPlayerQuit syncPlayerQuit = 6;
+    optional SyncCollide syncCollide = 7;
+    optional SyncFireReq syncFireReq = 8;
+    optional SyncFireRes syncFireRes = 9;
+    optional SyncOperDir syncOperDir = 10;
+    optional SyncOperMove syncOperMove = 11;
+}
+message Pkg {
+    optional Head head = 1;
+    optional Body body = 2;
+}
+

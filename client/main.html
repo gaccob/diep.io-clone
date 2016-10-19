@@ -10,13 +10,16 @@
         <meta name="format-detection" content="telephone=no">
     </head>
     <body>
-        <script src="./lib/pixi.min.js"></script>
-        <script src="./lib/victor.min.js"></script>
-        <script src="./lib/require.js"></script>
+        <script src="../lib/bytebuffer.min.js"></script>
+        <script src="../lib/long.min.js"></script>
+        <script src="../lib/pixi.min.js"></script>
+        <script src="../lib/protobuf.min.js"></script>
+        <script src="../lib/require.js"></script>
+        <script src="../lib/victor.min.js"></script>
 
         <!-- require modules -->
         <script>
-        require.register("./cfg/configBullets", function(module, exports, require) {
+        require.register("../cfg/configBullets", function(module, exports, require) {
             var configBullets = {
             	"0": {
             		"density": 1.0,
@@ -27,6 +30,7 @@
             		"duration": 900.0,
             		"velocity": {
             			"ivMax": 300.0,
+            			"ivDec": 50.0,
             			"evMax": 100.0,
             			"springBase": 30.0,
             			"springAdd": 10.0,
@@ -53,7 +57,7 @@
         });
         </script>
         <script>
-        require.register("./cfg/configDieAnimation", function(module, exports, require) {
+        require.register("../cfg/configDieAnimation", function(module, exports, require) {
             var configDieAnimation = {
             	"0": {
             		"scaleIncrease": 0.1,
@@ -67,7 +71,7 @@
         });
         </script>
         <script>
-        require.register("./cfg/configHpbar", function(module, exports, require) {
+        require.register("../cfg/configHpbar", function(module, exports, require) {
             var configHpbar = {
             	"0": {
             		"alias": "base",
@@ -88,7 +92,7 @@
         });
         </script>
         <script>
-        require.register("./cfg/configObstacles", function(module, exports, require) {
+        require.register("../cfg/configObstacles", function(module, exports, require) {
             var configObstacles = {
             	"0": {
             		"density": 1.0,
@@ -98,6 +102,7 @@
             		"radius": 20.0,
             		"velocity": {
             			"ivMax": 3.0,
+            			"ivDec": 0.0,
             			"evMax": 120.0,
             			"springBase": 30.0,
             			"springAdd": 10.0,
@@ -131,6 +136,7 @@
             		"radius": 20.0,
             		"velocity": {
             			"ivMax": 3.0,
+            			"ivDec": 0.0,
             			"evMax": 100.0,
             			"springBase": 30.0,
             			"springAdd": 10.0,
@@ -164,6 +170,7 @@
             		"radius": 24.0,
             		"velocity": {
             			"ivMax": 3.0,
+            			"ivDec": 0.0,
             			"evMax": 80.0,
             			"springBase": 30.0,
             			"springAdd": 10.0,
@@ -194,7 +201,7 @@
         });
         </script>
         <script>
-        require.register("./cfg/configTanks", function(module, exports, require) {
+        require.register("../cfg/configTanks", function(module, exports, require) {
             var configTanks = {
             	"0": {
             		"density": 1.0,
@@ -210,6 +217,7 @@
             		"radius": 24.0,
             		"velocity": {
             			"ivMax": 160.0,
+            			"ivDec": 200.0,
             			"evMax": 120.0,
             			"springBase": 30.0,
             			"springAdd": 10.0,
@@ -251,6 +259,7 @@
             		"radius": 26.0,
             		"velocity": {
             			"ivMax": 160.0,
+            			"ivDec": 200.0,
             			"evMax": 120.0,
             			"springBase": 30.0,
             			"springAdd": 10.0,
@@ -292,6 +301,7 @@
             		"radius": 26.0,
             		"velocity": {
             			"ivMax": 160.0,
+            			"ivDec": 200.0,
             			"evMax": 120.0,
             			"springBase": 30.0,
             			"springAdd": 10.0,
@@ -324,7 +334,7 @@
         });
         </script>
         <script>
-        require.register("./cfg/configWeapons", function(module, exports, require) {
+        require.register("../cfg/configWeapons", function(module, exports, require) {
             var configWeapons = {
             	"0": {
             		"disturbDeg": 15.0,
@@ -492,7 +502,7 @@
         });
         </script>
         <script>
-        require.register("./cfg/configMap", function(module, exports, require) {
+        require.register("../cfg/configMap", function(module, exports, require) {
             var configMap = {
             	"0": {
             		"color": "0x808080",
@@ -516,7 +526,7 @@
         });
         </script>
         <script>
-        require.register("./cfg/configWorld", function(module, exports, require) {
+        require.register("../cfg/configWorld", function(module, exports, require) {
             var configWorld = {
             	"0": {
             		"maxObstaclesCount": 50.0,
@@ -530,7 +540,7 @@
         </script>
 
         <script>
-        require.register("./modules/config", function(module, exports, require) {
+        require.register("../modules/config", function(module, exports, require) {
             var configBullets = require("../cfg/configBullets");
             var configDieAnimation = require("../cfg/configDieAnimation");
             var configHpbar = require("../cfg/configHpbar");
@@ -581,7 +591,7 @@
         });
         </script>
         <script>
-        require.register("./modules/bullet", function(module, exports, require) {
+        require.register("../modules/bullet", function(module, exports, require) {
             var Unit = require("../modules/unit");
             var Util = require("../modules/util");
             
@@ -614,7 +624,7 @@
         });
         </script>
         <script>
-        require.register("./modules/hpbar", function(module, exports, require) {
+        require.register("../modules/hpbar", function(module, exports, require) {
             var Util = require("../modules/util");
             var View = require("../modules/view");
             
@@ -666,7 +676,7 @@
         });
         </script>
         <script>
-        require.register("./modules/motion", function(module, exports, require) {
+        require.register("../modules/motion", function(module, exports, require) {
             var Util = require("../modules/util");
             
             var epsilon = 1e-6;
@@ -747,7 +757,7 @@
                 // internal velocity decrese
                 var ilen = this.iv.length();
                 if (ilen > this.cfg.ivMin) {
-                    var dec = (this.cfg.ivAcc / 2) * deltaMS / 1000;
+                    var dec = this.cfg.ivDec * deltaMS / 1000;
                     ilen = ilen > dec ? (ilen - dec) : 0;
                     ilen = ilen < this.cfg.ivMin ? this.cfg.ivMin : ilen;
                     this.iv.norm().multiply(new Victor(ilen, ilen));
@@ -800,7 +810,7 @@
         });
         </script>
         <script>
-        require.register("./modules/obstacle", function(module, exports, require) {
+        require.register("../modules/obstacle", function(module, exports, require) {
             var Unit = require("../modules/unit");
             var Util = require("../modules/util");
             
@@ -837,13 +847,14 @@
         });
         </script>
         <script>
-        require.register("./modules/player", function(module, exports, require) {
+        require.register("../modules/player", function(module, exports, require) {
             var Tank = require("../modules/tank");
             var Util = require("../modules/util");
             
-            function Player(world)
+            function Player(world, connid)
             {
                 this.world = world;
+                this.connid = connid;
                 this.tank = null;
                 this.control = {
                     left: 0,
@@ -994,7 +1005,7 @@
         });
         </script>
         <script>
-        require.register("./modules/tank", function(module, exports, require) {
+        require.register("../modules/tank", function(module, exports, require) {
             var Weapon = require("../modules/weapon");
             var Unit = require("../modules/unit");
             var Util = require("../modules/util");
@@ -1062,7 +1073,7 @@
         });
         </script>
         <script>
-        require.register("./modules/weapon", function(module, exports, require) {
+        require.register("../modules/weapon", function(module, exports, require) {
             var Bullet = require("../modules/bullet");
             var Util = require("../modules/util");
             var View = require("../modules/view");
@@ -1147,7 +1158,7 @@
         });
         </script>
         <script>
-        require.register("./modules/world", function(module, exports, require) {
+        require.register("../modules/world", function(module, exports, require) {
             var Config = require("../modules/config");
             var Obstacle = require("../modules/obstacle");
             var Player = require("../modules/player")
@@ -1566,7 +1577,7 @@
         });
         </script>
         <script>
-        require.register("./modules/unit", function(module, exports, require) {
+        require.register("../modules/unit", function(module, exports, require) {
             var HpBar = require("../modules/hpbar");
             var Motion = require("../modules/motion");
             var Util = require("../modules/util");
@@ -1680,7 +1691,7 @@
         });
         </script>
         <script>
-        require.register("./modules/util", function(module, exports, require) {
+        require.register("../modules/util", function(module, exports, require) {
             var Util = {
             
                 unitType: {
@@ -1725,7 +1736,7 @@
         });
         </script>
         <script>
-        require.register("./modules/view", function(module, exports, require) {
+        require.register("../modules/view", function(module, exports, require) {
             var Util = require("../modules/util");
             
             function drawBullet(view)

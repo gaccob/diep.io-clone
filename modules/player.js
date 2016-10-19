@@ -1,9 +1,10 @@
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
-function Player(world)
+function Player(world, connid)
 {
     this.world = world;
+    this.connid = connid;
     this.tank = null;
     this.control = {
         left: 0,

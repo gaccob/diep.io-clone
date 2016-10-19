@@ -13,6 +13,7 @@ var configTanks = {
 		"radius": 24.0,
 		"velocity": {
 			"ivMax": 160.0,
+			"ivDec": 200.0,
 			"evMax": 120.0,
 			"springBase": 30.0,
 			"springAdd": 10.0,
@@ -54,6 +55,7 @@ var configTanks = {
 		"radius": 26.0,
 		"velocity": {
 			"ivMax": 160.0,
+			"ivDec": 200.0,
 			"evMax": 120.0,
 			"springBase": 30.0,
 			"springAdd": 10.0,
@@ -95,6 +97,7 @@ var configTanks = {
 		"radius": 26.0,
 		"velocity": {
 			"ivMax": 160.0,
+			"ivDec": 200.0,
 			"evMax": 120.0,
 			"springBase": 30.0,
 			"springAdd": 10.0,

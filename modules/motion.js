@@ -78,7 +78,7 @@ Motion.prototype.update = function(deltaMS)
     // internal velocity decrese
     var ilen = this.iv.length();
     if (ilen > this.cfg.ivMin) {
-        var dec = (this.cfg.ivAcc / 2) * deltaMS / 1000;
+        var dec = this.cfg.ivDec * deltaMS / 1000;
         ilen = ilen > dec ? (ilen - dec) : 0;
         ilen = ilen < this.cfg.ivMin ? this.cfg.ivMin : ilen;
         this.iv.norm().multiply(new Victor(ilen, ilen));

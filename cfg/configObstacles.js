@@ -7,6 +7,7 @@ var configObstacles = {
 		"radius": 20.0,
 		"velocity": {
 			"ivMax": 3.0,
+			"ivDec": 0.0,
 			"evMax": 120.0,
 			"springBase": 30.0,
 			"springAdd": 10.0,
@@ -40,6 +41,7 @@ var configObstacles = {
 		"radius": 20.0,
 		"velocity": {
 			"ivMax": 3.0,
+			"ivDec": 0.0,
 			"evMax": 100.0,
 			"springBase": 30.0,
 			"springAdd": 10.0,
@@ -73,6 +75,7 @@ var configObstacles = {
 		"radius": 24.0,
 		"velocity": {
 			"ivMax": 3.0,
+			"ivDec": 0.0,
 			"evMax": 80.0,
 			"springBase": 30.0,
 			"springAdd": 10.0,

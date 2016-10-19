@@ -8,6 +8,7 @@ var configBullets = {
 		"duration": 900.0,
 		"velocity": {
 			"ivMax": 300.0,
+			"ivDec": 50.0,
 			"evMax": 100.0,
 			"springBase": 30.0,
 			"springAdd": 10.0,
