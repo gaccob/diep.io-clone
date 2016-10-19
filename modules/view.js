@@ -147,7 +147,9 @@ function View(owner)
     }
 }
 
-View.prototype = {}
+View.prototype = {
+    constructor: View,
+}
 
 View.prototype.onDie = function()
 {

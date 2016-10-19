@@ -582,38 +582,24 @@
         </script>
         <script>
         require.register("./modules/bullet", function(module, exports, require) {
-            var Motion = require("../modules/motion");
+            var Unit = require("../modules/unit");
             var Util = require("../modules/util");
-            var View = require("../modules/view");
             
             function Bullet(world, position, angle, weapon)
             {
-                this.id = Util.getId();
-                this.type = Util.unitType.bullet;
-                this.world = world;
+                Unit.call(this,
+                    world,
+                    Util.unitType.bullet,
+                    world.cfg.configBullets[weapon.cfg.bullet],
+                    position,
+                    angle);
+            
                 this.owner = weapon.owner;
                 this.bornTime = world.time;
-                this.cfg = world.cfg.configBullets[weapon.cfg.bullet];
-                this.hp = this.cfg.hp;
-                this.damage = this.cfg.damage;
-                this.motion = new Motion(this, this.cfg.velocity, angle);
-                this.view = new View(this);
-                this.x = position.x;
-                this.y = position.y;
-                this.rotation = 0;
-                world.addUnitToGrid(this);
             }
             
-            Bullet.prototype = {}
-            
-            Bullet.prototype.outOfBounds = function()
-            {
-                if (this.x <= 0 || this.x >= this.world.w
-                    || this.y <= 0 || this.y >= this.world.h) {
-                    return true;
-                }
-                return false;
-            }
+            Bullet.prototype = Object.create(Unit.prototype);
+            Bullet.prototype.constructor = Bullet;
             
             Bullet.prototype.outOfDate = function()
             {
@@ -622,38 +608,6 @@
                 }
                 return false;
             }
-            
-            Bullet.prototype.takeDamageByUnit = function(caster)
-            {
-                this.hp -= caster.damage;
-                if (this.hp <= 0) {
-                    this.die();
-                }
-            }
-            
-            Bullet.prototype.die = function()
-            {
-                delete this.world.bullets[this.id];
-                this.view.onDie();
-                this.world.removeUnitFromGrid(this);
-                this.world.removeUnits.push(this);
-            }
-            
-            Bullet.prototype.update = function()
-            {
-                var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
-                this.motion.update(deltaMS);
-                this.view.update();
-            }
-            
-            Object.defineProperties(Bullet.prototype, {
-                radius: {
-                    get: function() { return this.cfg.radius; }
-                },
-                m: {
-                    get: function() { return this.radius * this.radius * this.cfg.density; }
-                },
-            });
             
             module.exports = Bullet;
             
@@ -679,7 +633,9 @@
                 this.rotation = 0;
             }
             
-            HpBar.prototype = {}
+            HpBar.prototype = {
+                constructor: HpBar,
+            }
             
             HpBar.prototype.die = function()
             {
@@ -726,7 +682,9 @@
                 this.rotate = cfg.rotate;
             }
             
-            Motion.prototype = {}
+            Motion.prototype = {
+                constructor: Motion,
+            }
             
             Motion.prototype.toString = function()
             {
@@ -843,62 +801,27 @@
         </script>
         <script>
         require.register("./modules/obstacle", function(module, exports, require) {
-            var HpBar = require("../modules/hpbar");
-            var Motion = require("../modules/motion");
+            var Unit = require("../modules/unit");
             var Util = require("../modules/util");
-            var View = require("../modules/view");
             
             function Obstacle(world, name, position)
             {
-                this.world = world;
-                this.id = Util.getId();
-                this.type = Util.unitType.obstacle;
-                this.cfg = world.cfg.configObstacles[name];
-                this.hp = this.cfg.hp;
-                this.damage = this.cfg.damage;
-                this.view = new View(this);
-                this.x = position.x;
-                this.y = position.y;
-                this.rotation = 0;
-                var angle = Math.random() * Math.PI * 2;
-                this.motion = new Motion(this, this.cfg.velocity, angle);
-                this.hpbar = new HpBar(world, "base", this, false);
+                Unit.call(this,
+                    world,
+                    Util.unitType.obstacle,
+                    world.cfg.configObstacles[name],
+                    position,
+                    Math.random() * Math.PI * 2);
             
-                world.addUnitToGrid(this);
+                Unit.prototype.addHpBar.call(this, "base", false);
             }
             
-            Obstacle.prototype = {}
-            
-            Obstacle.prototype.takeDamageByUnit = function(caster)
-            {
-                this.hp -= caster.damage;
-                if (this.hp <= 0) {
-                    this.die();
-                }
-            }
-            
-            Obstacle.prototype.die = function()
-            {
-                this.hpbar.die();
-                this.view.onDie();
-            
-                delete this.world.obstacles[this.id];
-                -- this.world.obstacleCount;
-                this.world.removeUnitFromGrid(this);
-                this.world.removeUnits.push(this);
-            }
+            Obstacle.prototype = Object.create(Unit.prototype);
+            Obstacle.prototype.constructor = Obstacle;
             
             Obstacle.prototype.update = function()
             {
-                var oldX = this.x;
-                var oldY = this.y;
-                var updateMS = 1000.0 / this.world.cfg.configWorld.frame;
-                this.motion.update(updateMS);
-                this.view.update();
-            
-                this.hpbar.x += (this.x - oldX);
-                this.hpbar.y += (this.y - oldY);
-                this.hpbar.update(this.hp / this.cfg.hp);
+                Unit.prototype.update.call(this);
             
                 if (this.x < this.world.spawnRegion.x
                     || this.x > this.world.spawnRegion.x + this.world.spawnRegion.w) {
@@ -909,15 +832,6 @@
                     this.motion.reverseIvY();
                 }
             }
-            
-            Object.defineProperties(Obstacle.prototype, {
-                radius: {
-                    get: function() { return this.cfg.radius; }
-                },
-                m: {
-                    get: function() { return this.radius * this.radius * this.cfg.density; }
-                },
-            });
             
             module.exports = Obstacle;
         });
@@ -939,7 +853,9 @@
                 };
             }
             
-            Player.prototype = {}
+            Player.prototype = {
+                constructor: Player,
+            }
             
             Player.prototype.handleKeyDown = function()
             {
@@ -948,21 +864,25 @@
                     if (player.tank == null) {
                         return;
                     }
-                    switch (e.key) {
-                        case 'w':
-                        case 'W':
+                    switch (e.keyCode) {
+                        // 'w' or 'W'
+                        case 87:
+                        case 119:
                             player.control.up = 1;
                             break;
-                        case 'd':
-                        case 'D':
+                        // 'd' or 'D'
+                        case 68:
+                        case 100:
                             player.control.right = 1;
                             break;
-                        case 's':
-                        case 'S':
+                        // 's' or 'S'
+                        case 83:
+                        case 115:
                             player.control.down = 1;
                             break;
-                        case 'a':
-                        case 'A':
+                        // 'a' or 'A'
+                        case 65:
+                        case 97:
                             player.control.left = 1;
                             break;
                     }
@@ -976,21 +896,25 @@
                     if (player.tank == null) {
                         return;
                     }
-                    switch (e.key) {
-                        case 'w':
-                        case 'W':
+                    switch (e.keyCode) {
+                        // 'w' or 'W'
+                        case 87:
+                        case 119:
                             player.control.up = 0;
                             break;
-                        case 'd':
-                        case 'D':
+                        // 'd' or 'D'
+                        case 68:
+                        case 100:
                             player.control.right = 0;
                             break;
-                        case 's':
-                        case 'S':
+                        // 's' or 'S'
+                        case 83:
+                        case 115:
                             player.control.down = 0;
                             break;
-                        case 'a':
-                        case 'A':
+                        // 'a' or 'A'
+                        case 65:
+                        case 97:
                             player.control.left = 0;
                             break;
                     }
@@ -1038,9 +962,11 @@
             Player.prototype.update = function()
             {
                 if (!this.tank) {
+                    var px = (this.world.w - this.world.viewW) / 2;
+                    var py = (this.world.h - this.world.viewH) / 2;
                     this.tank = new Tank(this.world, "base", {
-                        x: Math.random() * this.world.w,
-                        y: Math.random() * this.world.h
+                        x: Math.random() * px + this.world.viewW / 2,
+                        y: Math.random() * py + this.world.viewH / 2,
                     }, this);
                     this.world.tanks[this.tank.id] = this.tank;
                     this.resetControl();
@@ -1069,80 +995,39 @@
         </script>
         <script>
         require.register("./modules/tank", function(module, exports, require) {
-            var HpBar = require("../modules/hpbar");
-            var Motion = require("../modules/motion");
             var Weapon = require("../modules/weapon");
+            var Unit = require("../modules/unit");
             var Util = require("../modules/util");
-            var View = require("../modules/view");
             
             function Tank(world, name, position, player)
             {
-                this.world = world;
-                this.id = Util.getId();
-                this.type = Util.unitType.tank;
-                this.cfg = world.cfg.configTanks[name];
                 this.player = player;
             
                 this.weapons = [];
-                for (var idx in this.cfg.weapons) {
-                    if (this.cfg.weapons[idx] != "") {
-                        var weapon = new Weapon(world, this, this.cfg.weapons[idx]);
+                var cfg = world.cfg.configTanks[name];
+                for (var idx in cfg.weapons) {
+                    if (cfg.weapons[idx] != "") {
+                        var weapon = new Weapon(world, this, cfg.weapons[idx]);
                         this.weapons.push(weapon);
                     }
                 }
             
-                this.view = new View(this);
+                Unit.call(this,
+                    world,
+                    Util.unitType.tank,
+                    cfg,
+                    position,
+                    0);
             
-                this.x = position.x;
-                this.y = position.y;
-                this.rotation = 0;
-            
-                this.hp = this.cfg.hp;
-                this.damage = this.cfg.damage;
-                this.motion = new Motion(this, this.cfg.velocity, 0);
-                this.hpbar = new HpBar(world, "base", this, true);
-            
-                world.addUnitToGrid(this);
+                Unit.prototype.addHpBar.call(this, "base", true);
             }
             
-            Tank.prototype = {}
-            
-            Tank.prototype.takeDamageByUnit = function(caster)
-            {
-                this.hp -= caster.damage;
-                if (this.hp <= 0) {
-                    this.die();
-                }
-            }
-            
-            Tank.prototype.die = function()
-            {
-                this.hpbar.die();
-                this.view.onDie();
-            
-                delete this.world.tanks[this.id];
-                this.world.removeUnitFromGrid(this);
-                this.world.removeUnits.push(this);
-            
-                if (this.world.player.tank == this) {
-                    this.world.player.tank = null;
-                    this.world.gameend = true;
-                    alert("Lose! Click To Restart!");
-                    this.world.player.update();
-                }
-            }
+            Tank.prototype = Object.create(Unit.prototype);
+            Tank.prototype.constructor = Tank;
             
             Tank.prototype.update = function()
             {
-                var oldX = this.x;
-                var oldY = this.y;
-                var updateMS = 1000.0 / this.world.cfg.configWorld.frame;
-                this.motion.update(updateMS);
-                this.view.update();
-            
-                this.hpbar.x += (this.x - oldX);
-                this.hpbar.y += (this.y - oldY);
-                this.hpbar.update(this.hp / this.cfg.hp);
+                Unit.prototype.update.call(this);
             
                 if (this.autoFire == true) {
                     this.fire();
@@ -1172,15 +1057,6 @@
                 }
             }
             
-            Object.defineProperties(Tank.prototype, {
-                radius: {
-                    get: function() { return this.cfg.radius; }
-                },
-                m: {
-                    get: function() { return this.radius * this.radius * this.cfg.density; }
-                },
-            });
-            
             module.exports = Tank;
             
         });
@@ -1191,15 +1067,11 @@
             var Util = require("../modules/util");
             var View = require("../modules/view");
             
-            function weaponCreateView(weapon)
-            {
-            }
-            
             function Weapon(world, tank, name)
             {
                 this.world = world;
-                this.id = Util.getId();
                 this.type = Util.unitType.weapon;
+            
                 this.owner = tank;
                 this.cfg = world.cfg.configWeapons[name];
                 this.fireFrame = world.frame + this.cfg.shootDelayFrame;
@@ -1220,7 +1092,9 @@
                 this.originalY = this.y;
             }
             
-            Weapon.prototype = {}
+            Weapon.prototype = {
+                constructor: Weapon,
+            }
             
             Weapon.prototype.resetFireDelay = function()
             {
@@ -1267,9 +1141,6 @@
                     this.owner.motion.addRecoil(recoil, angle);
                 }
             }
-            
-            Object.defineProperties(Weapon.prototype, {
-            });
             
             module.exports = Weapon;
             
@@ -1379,8 +1250,9 @@
                 this.gameend = false;
             }
             
-            World.prototype = {};
-            World.prototype.constructor = World;
+            World.prototype = {
+                constructor: World,
+            };
             
             World.prototype.updateCamera = function()
             {
@@ -1694,10 +1566,122 @@
         });
         </script>
         <script>
+        require.register("./modules/unit", function(module, exports, require) {
+            var HpBar = require("../modules/hpbar");
+            var Motion = require("../modules/motion");
+            var Util = require("../modules/util");
+            var View = require("../modules/view");
+            
+            var id = 0;
+            
+            function Unit(world, type, cfg, position, angle)
+            {
+                this.world = world;
+                this.id = (++ id);
+                this.type = type;
+                this.cfg = cfg;
+                this.motion = new Motion(this, this.cfg.velocity, angle);
+                this.view = new View(this);
+                this.x = position.x;
+                this.y = position.y;
+                this.rotation = 0;
+                this.hp = this.cfg.hp;
+                this.damage = this.cfg.damage;
+                world.addUnitToGrid(this);
+            }
+            
+            Unit.prototype = {
+                constructor: Unit,
+            }
+            
+            Unit.prototype.addHpBar = function(name, visible)
+            {
+                if (this.hpbar) {
+                    delete this.hpbar;
+                }
+                this.hpbar = new HpBar(this.world, name, this, visible);
+            }
+            
+            Unit.prototype.outOfBounds = function()
+            {
+                if (this.x <= 0 || this.x >= this.world.w
+                    || this.y <= 0 || this.y >= this.world.h) {
+                    return true;
+                }
+                return false;
+            }
+            
+            Unit.prototype.takeDamageByUnit = function(caster)
+            {
+                this.hp -= caster.damage;
+                if (this.hp <= 0) {
+                    this.die();
+                }
+            }
+            
+            Unit.prototype.die = function()
+            {
+                if (this.hpbar) {
+                    this.hpbar.die();
+                }
+            
+                this.view.onDie();
+                this.world.removeUnitFromGrid(this);
+                this.world.removeUnits.push(this);
+            
+                if (this.type == Util.unitType.bullet) {
+                    delete this.world.bullets[this.id];
+                }
+            
+                if (this.type == Util.unitType.obstacle) {
+                    delete this.world.obstacles[this.id];
+                    -- this.world.obstacleCount;
+                }
+            
+                if (this.type == Util.unitType.tank) {
+                    delete this.world.tanks[this.id];
+                    if (this.world.player.tank == this) {
+                        this.world.player.tank = null;
+                        this.world.gameend = true;
+                        alert("Lose! Click To Restart!");
+                        this.world.player.update();
+                    }
+                }
+            }
+            
+            Unit.prototype.update = function()
+            {
+                var oldX = this.x;
+                var oldY = this.y;
+            
+                var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
+                this.motion.update(deltaMS);
+                this.view.update();
+            
+                if (this.hpbar) {
+                    this.hpbar.x += (this.x - oldX);
+                    this.hpbar.y += (this.y - oldY);
+                    this.hpbar.update(this.hp / this.cfg.hp);
+                }
+            }
+            
+            Object.defineProperties(Unit.prototype, {
+                radius: {
+                    get: function() { return this.cfg.radius; }
+                },
+                m: {
+                    get: function() { return this.radius * this.radius * this.cfg.density; }
+                },
+            });
+            
+            module.exports = Unit;
+            
+            
+        });
+        </script>
+        <script>
         require.register("./modules/util", function(module, exports, require) {
             var Util = {
-            
-                id: 0,
             
                 unitType: {
                     tank: 1,
@@ -1734,10 +1718,6 @@
             
                 randomBetween: function(min, max) {
                     return Math.random() * (max - min) + min;
-                },
-            
-                getId: function() {
-                    return ++ this.id;
                 },
             };
             
@@ -1895,7 +1875,9 @@
                 }
             }
             
-            View.prototype = {}
+            View.prototype = {
+                constructor: View,
+            }
             
             View.prototype.onDie = function()
             {

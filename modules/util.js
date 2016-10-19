@@ -1,7 +1,5 @@
 var Util = {
 
-    id: 0,
-
     unitType: {
         tank: 1,
         weapon: 2,
@@ -37,10 +35,6 @@ var Util = {
 
     randomBetween: function(min, max) {
         return Math.random() * (max - min) + min;
-    },
-
-    getId: function() {
-        return ++ this.id;
     },
 };
 

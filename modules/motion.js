@@ -13,7 +13,9 @@ function Motion(owner, cfg, angle)
     this.rotate = cfg.rotate;
 }
 
-Motion.prototype = {}
+Motion.prototype = {
+    constructor: Motion,
+}
 
 Motion.prototype.toString = function()
 {

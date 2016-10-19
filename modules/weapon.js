@@ -2,15 +2,11 @@ var Bullet = require("../modules/bullet");
 var Util = require("../modules/util");
 var View = require("../modules/view");
 
-function weaponCreateView(weapon)
-{
-}
-
 function Weapon(world, tank, name)
 {
     this.world = world;
-    this.id = Util.getId();
     this.type = Util.unitType.weapon;
+
     this.owner = tank;
     this.cfg = world.cfg.configWeapons[name];
     this.fireFrame = world.frame + this.cfg.shootDelayFrame;
@@ -31,7 +27,9 @@ function Weapon(world, tank, name)
     this.originalY = this.y;
 }
 
-Weapon.prototype = {}
+Weapon.prototype = {
+    constructor: Weapon,
+}
 
 Weapon.prototype.resetFireDelay = function()
 {
@@ -78,9 +76,6 @@ Weapon.prototype.fire = function()
         this.owner.motion.addRecoil(recoil, angle);
     }
 }
-
-Object.defineProperties(Weapon.prototype, {
-});
 
 module.exports = Weapon;
 

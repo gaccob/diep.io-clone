@@ -13,7 +13,9 @@ function Player(world)
     };
 }
 
-Player.prototype = {}
+Player.prototype = {
+    constructor: Player,
+}
 
 Player.prototype.handleKeyDown = function()
 {
@@ -22,21 +24,25 @@ Player.prototype.handleKeyDown = function()
         if (player.tank == null) {
             return;
         }
-        switch (e.key) {
-            case 'w':
-            case 'W':
+        switch (e.keyCode) {
+            // 'w' or 'W'
+            case 87:
+            case 119:
                 player.control.up = 1;
                 break;
-            case 'd':
-            case 'D':
+            // 'd' or 'D'
+            case 68:
+            case 100:
                 player.control.right = 1;
                 break;
-            case 's':
-            case 'S':
+            // 's' or 'S'
+            case 83:
+            case 115:
                 player.control.down = 1;
                 break;
-            case 'a':
-            case 'A':
+            // 'a' or 'A'
+            case 65:
+            case 97:
                 player.control.left = 1;
                 break;
         }
@@ -50,21 +56,25 @@ Player.prototype.handleKeyUp = function()
         if (player.tank == null) {
             return;
         }
-        switch (e.key) {
-            case 'w':
-            case 'W':
+        switch (e.keyCode) {
+            // 'w' or 'W'
+            case 87:
+            case 119:
                 player.control.up = 0;
                 break;
-            case 'd':
-            case 'D':
+            // 'd' or 'D'
+            case 68:
+            case 100:
                 player.control.right = 0;
                 break;
-            case 's':
-            case 'S':
+            // 's' or 'S'
+            case 83:
+            case 115:
                 player.control.down = 0;
                 break;
-            case 'a':
-            case 'A':
+            // 'a' or 'A'
+            case 65:
+            case 97:
                 player.control.left = 0;
                 break;
         }
@@ -112,9 +122,11 @@ Player.prototype.resetControl = function()
 Player.prototype.update = function()
 {
     if (!this.tank) {
+        var px = (this.world.w - this.world.viewW) / 2;
+        var py = (this.world.h - this.world.viewH) / 2;
         this.tank = new Tank(this.world, "base", {
-            x: Math.random() * this.world.w,
-            y: Math.random() * this.world.h
+            x: Math.random() * px + this.world.viewW / 2,
+            y: Math.random() * py + this.world.viewH / 2,
         }, this);
         this.world.tanks[this.tank.id] = this.tank;
         this.resetControl();

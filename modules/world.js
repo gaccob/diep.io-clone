@@ -100,8 +100,9 @@ function World()
     this.gameend = false;
 }
 
-World.prototype = {};
-World.prototype.constructor = World;
+World.prototype = {
+    constructor: World,
+};
 
 World.prototype.updateCamera = function()
 {

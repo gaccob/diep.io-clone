@@ -16,7 +16,9 @@ function HpBar(world, name, owner, display)
     this.rotation = 0;
 }
 
-HpBar.prototype = {}
+HpBar.prototype = {
+    constructor: HpBar,
+}
 
 HpBar.prototype.die = function()
 {
