@@ -3,6 +3,9 @@ var Util = require("../modules/util");
 
 function Bullet(world, position, angle, weapon, view)
 {
+    this.owner = weapon.owner;
+    this.bornTime = world.time;
+
     Unit.call(this,
         world,
         Util.unitType.bullet,
@@ -10,9 +13,6 @@ function Bullet(world, position, angle, weapon, view)
         position,
         angle,
         view);
-
-    this.owner = weapon.owner;
-    this.bornTime = world.time;
 }
 
 Bullet.prototype = Object.create(Unit.prototype);

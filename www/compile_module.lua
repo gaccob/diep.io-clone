@@ -1,4 +1,3 @@
-
 function generate(input_file)
     if not string.match(input_file, "[.]tmpl$") then
         print("input file[" .. file .. "] does not end with .tmpl")
@@ -11,7 +10,7 @@ function generate(input_file)
     for line in io.lines(input_file) do
         local space, mod = string.match(line, "(%s*)require.register%(\"(.+)\"%)")
         if mod then
-            os.execute("uglifyjs " .. mod .. ".js -c -m > " .. mod .. ".min.js");
+            os.execute("../node_modules/uglify-js/bin/uglifyjs " .. mod .. ".js -c -m > " .. mod .. ".min.js");
             local mod_fd = io.open(mod .. ".min.js", 'r')
             if not mod_fd then
                 print("mod file[" .. mod .. ".js] not found")

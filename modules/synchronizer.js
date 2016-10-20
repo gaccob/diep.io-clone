@@ -2,12 +2,16 @@ function Synchronizer(world)
 {
     this.world = world;
     this.pb = dcodeIO.ProtoBuf;
-    this.builder = this.pb.loadJsonFile("../proto/tank.proto.json");
-    this.proto = this.builder.build("Tank");
 }
 
 Synchronizer.prototype = {
     constructor: Synchronizer,
+}
+
+Synchronizer.prototype.registProtocol = function(path)
+{
+    this.builder = this.pb.loadJsonFile(path);
+    this.proto = this.builder.build("Tank");
 }
 
 Synchronizer.prototype.syncUnit = function(unit)

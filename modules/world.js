@@ -105,6 +105,11 @@ function World(view)
     this.gameend = false;
 
     this.synchronizer = new Synchronizer(this);
+    if (view === true) {
+        this.synchronizer.registProtocol("./tank.proto.json");
+    } else {
+        this.synchronizer.registProtocol("../proto/tank.proto.json");
+    }
 }
 
 World.prototype = {
