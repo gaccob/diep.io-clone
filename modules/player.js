@@ -106,10 +106,12 @@ Player.prototype.handleMouseDown = function()
 
 Player.prototype.addControl = function()
 {
-    this.handleKeyDown();
-    this.handleKeyUp();
-    this.handleMouseMove();
-    this.handleMouseDown();
+    if (this.world.view) {
+        this.handleKeyDown();
+        this.handleKeyUp();
+        this.handleMouseMove();
+        this.handleMouseDown();
+    }
 }
 
 Player.prototype.resetControl = function()
@@ -123,12 +125,15 @@ Player.prototype.resetControl = function()
 Player.prototype.update = function()
 {
     if (!this.tank) {
-        var px = (this.world.w - this.world.viewW) / 2;
-        var py = (this.world.h - this.world.viewH) / 2;
+        // TODO: by player
+        var viewW = document.documentElement.clientWidth;
+        var viewH = document.documentElement.clientHeight - 10;
+        var px = (this.world.w - viewW) / 2;
+        var py = (this.world.h - viewH) / 2;
         this.tank = new Tank(this.world, "base", {
-            x: Math.random() * px + this.world.viewW / 2,
-            y: Math.random() * py + this.world.viewH / 2,
-        }, this);
+            x: Math.random() * px + viewW / 2,
+            y: Math.random() * py + viewH / 2,
+        }, this, this.world.view ? true : false);
         this.world.tanks[this.tank.id] = this.tank;
         this.resetControl();
     }

@@ -1,0 +1,17 @@
+{
+    "name": "ppppp",
+    "version": "0.2.0",
+    "dependencies": {
+        "pixi.js": ">=4.1.0",
+        "victor": ">=1.1.0",
+        "protobufjs": ">=5.0.1",
+        "uglify-js": ">=2.7.0"
+    },
+    "engines": {
+        "node": ">=4.6.0"
+    },
+    "scripts": {
+        "run": "node test.js"
+    },
+    "private": true
+}

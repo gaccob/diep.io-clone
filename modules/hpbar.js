@@ -27,7 +27,7 @@ HpBar.prototype.die = function()
 
 HpBar.prototype.update = function(percent)
 {
-    if (Math.abs(percent - 1) < 1e-6 && this.display == false) {
+    if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
         this.view.visible = false;
     } else {
         this.view.visible = true;

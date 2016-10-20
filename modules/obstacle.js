@@ -1,16 +1,19 @@
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Obstacle(world, name, position)
+function Obstacle(world, name, position, view)
 {
     Unit.call(this,
         world,
         Util.unitType.obstacle,
         world.cfg.configObstacles[name],
         position,
-        Math.random() * Math.PI * 2);
+        Math.random() * Math.PI * 2,
+        view);
 
-    Unit.prototype.addHpBar.call(this, "base", false);
+    if (view === true) {
+        Unit.prototype.addHpBar.call(this, "base", false);
+    }
 }
 
 Obstacle.prototype = Object.create(Unit.prototype);

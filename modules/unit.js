@@ -5,14 +5,16 @@ var View = require("../modules/view");
 
 var id = 0;
 
-function Unit(world, type, cfg, position, angle)
+function Unit(world, type, cfg, position, angle, view)
 {
     this.world = world;
     this.id = (++ id);
     this.type = type;
     this.cfg = cfg;
     this.motion = new Motion(this, this.cfg.velocity, angle);
-    this.view = new View(this);
+    if (view === true) {
+        this.view = new View(this);
+    }
     this.x = position.x;
     this.y = position.y;
     this.rotation = 0;
@@ -56,7 +58,10 @@ Unit.prototype.die = function()
         this.hpbar.die();
     }
 
-    this.view.onDie();
+    if (this.view) {
+        this.view.onDie();
+    }
+
     this.world.removeUnitFromGrid(this);
     this.world.removeUnits.push(this);
 
@@ -87,7 +92,10 @@ Unit.prototype.update = function()
 
     var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
     this.motion.update(deltaMS);
-    this.view.update();
+
+    if (this.view) {
+        this.view.update();
+    }
 
     if (this.hpbar) {
         this.hpbar.x += (this.x - oldX);

@@ -1,14 +1,15 @@
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Bullet(world, position, angle, weapon)
+function Bullet(world, position, angle, weapon, view)
 {
     Unit.call(this,
         world,
         Util.unitType.bullet,
         world.cfg.configBullets[weapon.cfg.bullet],
         position,
-        angle);
+        angle,
+        view);
 
     this.owner = weapon.owner;
     this.bornTime = world.time;

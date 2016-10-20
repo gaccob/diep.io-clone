@@ -1,0 +1,459 @@
+{
+    "package": "Tank",
+    "messages": [
+        {
+            "name": "Vector",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "x",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "y",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "Motion",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "Vector",
+                    "name": "moveDir",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "Vector",
+                    "name": "iv",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "Vector",
+                    "name": "ev",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "rv",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "Vector",
+                    "name": "position",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "rotation",
+                    "id": 6
+                }
+            ]
+        },
+        {
+            "name": "Unit",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "type",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "cfgName",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "hp",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "Motion",
+                    "name": "motion",
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "name": "Player",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "connid",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "name",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "score",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "bool",
+                    "name": "die",
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "name": "SyncStartReq",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "name",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncStartRes",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "connid",
+                    "id": 1
+                },
+                {
+                    "rule": "repeated",
+                    "type": "Unit",
+                    "name": "units",
+                    "id": 2
+                },
+                {
+                    "rule": "repeated",
+                    "type": "Player",
+                    "name": "players",
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "name": "SyncUnits",
+            "fields": [
+                {
+                    "rule": "repeated",
+                    "type": "Unit",
+                    "name": "units",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncUnitDie",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncPlayerJoin",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "Player",
+                    "name": "player",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncPlayerQuit",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "connid",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncCollision",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "Unit",
+                    "name": "u1",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "Unit",
+                    "name": "u2",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "SyncFireReq",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "bool",
+                    "name": "fire",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncFireRes",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "bool",
+                    "name": "fire",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncOperDir",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "rotation",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "SyncOperMove",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "angle",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "Head",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "sequence",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "frame",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncCmd",
+                    "name": "cmd",
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "name": "Body",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "SyncStartReq",
+                    "name": "syncStartReq",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncStartRes",
+                    "name": "syncStartRes",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncUnits",
+                    "name": "syncUnits",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncUnitDie",
+                    "name": "syncUnitDie",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncPlayerJoin",
+                    "name": "syncPlayerJoin",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncPlayerQuit",
+                    "name": "syncPlayerQuit",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncCollision",
+                    "name": "syncCollision",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncFireReq",
+                    "name": "syncFireReq",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncFireRes",
+                    "name": "syncFireRes",
+                    "id": 9
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncOperDir",
+                    "name": "syncOperDir",
+                    "id": 10
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncOperMove",
+                    "name": "syncOperMove",
+                    "id": 11
+                }
+            ]
+        },
+        {
+            "name": "Pkg",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "Head",
+                    "name": "head",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "Body",
+                    "name": "body",
+                    "id": 2
+                }
+            ]
+        }
+    ],
+    "enums": [
+        {
+            "name": "UnitType",
+            "values": [
+                {
+                    "name": "UT_Tank",
+                    "id": 1
+                },
+                {
+                    "name": "UT_Weapon",
+                    "id": 2
+                },
+                {
+                    "name": "UT_Bullet",
+                    "id": 3
+                },
+                {
+                    "name": "UT_Obstacle",
+                    "id": 4
+                },
+                {
+                    "name": "UT_Hpbar",
+                    "id": 5
+                }
+            ]
+        },
+        {
+            "name": "SyncCmd",
+            "values": [
+                {
+                    "name": "SYNC_START_REQ",
+                    "id": 1
+                },
+                {
+                    "name": "SYNC_START_RES",
+                    "id": 2
+                },
+                {
+                    "name": "SYNC_UNITS",
+                    "id": 3
+                },
+                {
+                    "name": "SYNC_UNIT_DIE",
+                    "id": 4
+                },
+                {
+                    "name": "SYNC_PLAYER_JOIN",
+                    "id": 5
+                },
+                {
+                    "name": "SYNC_PLAYER_QUIT",
+                    "id": 6
+                },
+                {
+                    "name": "SYNC_COLLISION",
+                    "id": 7
+                },
+                {
+                    "name": "SYNC_FIRE_REQ",
+                    "id": 8
+                },
+                {
+                    "name": "SYNC_FIRE_RES",
+                    "id": 9
+                },
+                {
+                    "name": "SYNC_OPER_DIR",
+                    "id": 10
+                },
+                {
+                    "name": "SYNC_OPER_MOVE",
+                    "id": 11
+                }
+            ]
+        }
+    ]
+}

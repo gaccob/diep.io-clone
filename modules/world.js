@@ -1,6 +1,7 @@
 var Config = require("../modules/config");
 var Obstacle = require("../modules/obstacle");
 var Player = require("../modules/player")
+var Synchronizer = require("../modules/synchronizer");
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
@@ -29,7 +30,7 @@ function getWorldBackground(world)
     return graphics;
 }
 
-function World()
+function World(view)
 {
     this.frame = 0;
     this.cfg = new Config();
@@ -56,24 +57,26 @@ function World()
     var dateTime = new Date();
     this.time = dateTime.getTime();
 
-    this.stage = new PIXI.Container();
+    if (view === true) {
+        this.stage = new PIXI.Container();
 
-    this.view = new PIXI.Container();
-    this.view.addChild(getWorldBackground(this));
-    this.stage.addChild(this.view);
+        this.view = new PIXI.Container();
+        this.view.addChild(getWorldBackground(this));
+        this.stage.addChild(this.view);
 
-    this.ui = new PIXI.Container();
-    this.stage.addChild(this.ui);
+        this.ui = new PIXI.Container();
+        this.stage.addChild(this.ui);
 
-    this.viewW = document.documentElement.clientWidth;
-    this.viewH = document.documentElement.clientHeight - 10;
-    this.renderer = new PIXI.CanvasRenderer(
-        this.viewW, this.viewH, {
-            backgroundColor: Number(this.cfg.configMap.color),
-            antialias: true,
-            autoResize: true,
-        });
-    document.body.appendChild(this.renderer.view);
+        this.viewW = document.documentElement.clientWidth;
+        this.viewH = document.documentElement.clientHeight - 10;
+        this.renderer = new PIXI.CanvasRenderer(
+            this.viewW, this.viewH, {
+                backgroundColor: Number(this.cfg.configMap.color),
+                antialias: true,
+                autoResize: true,
+            });
+        document.body.appendChild(this.renderer.view);
+    }
 
     this.bullets = {};
     this.obstacles = {};
@@ -84,20 +87,24 @@ function World()
         var tank = new Tank(this, i, {
             x: this.w / 2 + idx * 200,
             y: this.h / 2 + idx * 200,
-        });
+        }, null, this.view ? true : false);
         tank.autoFire = true;
         this.tanks[tank.id] = tank;
         ++ idx;
     }
 
     this.player = new Player(this);
-    this.player.addControl();
+    if (view === true) {
+        this.player.addControl();
+    }
 
     this.dieSprites = [];
 
     this.removeUnits = [];
 
     this.gameend = false;
+
+    this.synchronizer = new Synchronizer(this);
 }
 
 World.prototype = {
@@ -106,6 +113,10 @@ World.prototype = {
 
 World.prototype.updateCamera = function()
 {
+    if (this.view == null) {
+        return;
+    }
+
     var x = this.player.x;
     var y = this.player.y;
     var viewCenterX = this.viewW / 2;
@@ -140,7 +151,7 @@ World.prototype.updateObstacles = function()
         var obstacle = new Obstacle(this, name, {
             x: Util.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
             y: Util.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
-        });
+        }, this.view ? true : false);
         this.obstacles[obstacle.id] = obstacle;
         this.obstacleCount ++;
     }
@@ -306,7 +317,7 @@ World.prototype.updateCollision = function()
                     if (unit == target) {
                         continue;
                     }
-                    if (this.needCheckCollision(unit, target) == false) {
+                    if (this.needCheckCollision(unit, target) === false) {
                         continue;
                     }
                     if (target.collideCheckFrame == this.frame) {
@@ -330,7 +341,10 @@ World.prototype.updateCollision = function()
 
 World.prototype.updateDieAnimations = function()
 {
-    // TODO:
+    if (this.view == null) {
+        return;
+    }
+
     var cfg = this.cfg.configDieAnimation.base;
     for (var i in this.dieSprites) {
         var sprite = this.dieSprites[i];
@@ -407,8 +421,11 @@ World.prototype.addUnitToGrid = function(unit)
 World.prototype.update = function()
 {
     this.updateLogic();
-    this.updateCamera();
-    this.renderer.render(this.stage);
+
+    if (this.view) {
+        this.updateCamera();
+        this.renderer.render(this.stage);
+    }
 }
 
 module.exports = World;

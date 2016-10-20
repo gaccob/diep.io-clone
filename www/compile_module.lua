@@ -11,12 +11,10 @@ function generate(input_file)
     for line in io.lines(input_file) do
         local space, mod = string.match(line, "(%s*)require.register%(\"(.+)\"%)")
         if mod then
-            local mod_fd = io.open(mod, 'r')
+            os.execute("uglifyjs " .. mod .. ".js -c -m > " .. mod .. ".min.js");
+            local mod_fd = io.open(mod .. ".min.js", 'r')
             if not mod_fd then
-                mod_fd = io.open(mod .. ".js", 'r')
-            end
-            if not mod_fd then
-                print("mod file[" .. mod .. "] not found")
+                print("mod file[" .. mod .. ".js] not found")
                 return
             end
             local prefix = space or ""
@@ -28,6 +26,7 @@ function generate(input_file)
             output_fd:write(prefix .. "});\n")
             output_fd:write(prefix .. "</script>\n")
             mod_fd:close()
+            os.execute("rm " .. mod .. ".min.js");
         else
             output_fd:write(line .. "\n")
         end
@@ -38,6 +37,7 @@ end
 os.execute("find . -name \"*.tmpl\" > ._tmp")
 for line in io.lines("._tmp") do
     generate(line)
+    print("convert [" .. line .. "] success")
 end
 os.execute("rm ._tmp")
 

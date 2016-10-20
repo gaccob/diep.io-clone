@@ -10,12 +10,12 @@
         <meta name="format-detection" content="telephone=no">
     </head>
     <body>
-        <script src="../lib/bytebuffer.min.js"></script>
-        <script src="../lib/long.min.js"></script>
-        <script src="../lib/pixi.min.js"></script>
-        <script src="../lib/protobuf.min.js"></script>
-        <script src="../lib/require.js"></script>
-        <script src="../lib/victor.min.js"></script>
+        <script src="./lib/bytebuffer.min.js"></script>
+        <script src="./lib/long.min.js"></script>
+        <script src="./lib/pixi.min.js"></script>
+        <script src="./lib/protobuf-light.min.js"></script>
+        <script src="./lib/require.js"></script>
+        <script src="./lib/victor.min.js"></script>
 
         <!-- require modules -->
         require.register("../cfg/configBullets");
@@ -33,6 +33,7 @@
         require.register("../modules/motion");
         require.register("../modules/obstacle");
         require.register("../modules/player");
+        require.register("../modules/synchronizer");
         require.register("../modules/tank");
         require.register("../modules/weapon");
         require.register("../modules/world");

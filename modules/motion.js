@@ -10,7 +10,7 @@ function Motion(owner, cfg, angle)
     this.iv = new Victor(cfg.ivInit * Math.cos(angle),
         cfg.ivInit * Math.sin(angle));
     this.ev = new Victor(0, 0);
-    this.rotate = cfg.rotate;
+    this.rv = cfg.rv;
 }
 
 Motion.prototype = {
@@ -110,8 +110,8 @@ Motion.prototype.update = function(deltaMS)
     this.owner.y += (this.iv.y + this.ev.y) * deltaMS / 1000;
     Util.clampPosition(this.owner, 0, this.owner.world.w, 0, this.owner.world.h);
 
-    if (this.rotate != null && Math.abs(this.rotate) > epsilon) {
-        this.owner.rotation += this.rotate * deltaMS / 1000;
+    if (this.rv != null && Math.abs(this.rv) > epsilon) {
+        this.owner.rotation += this.rv * deltaMS / 1000;
     }
 }
 

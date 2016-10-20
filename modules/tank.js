@@ -2,7 +2,7 @@ var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Tank(world, name, position, player)
+function Tank(world, name, position, player, view)
 {
     this.player = player;
 
@@ -10,7 +10,7 @@ function Tank(world, name, position, player)
     var cfg = world.cfg.configTanks[name];
     for (var idx in cfg.weapons) {
         if (cfg.weapons[idx] != "") {
-            var weapon = new Weapon(world, this, cfg.weapons[idx]);
+            var weapon = new Weapon(world, this, cfg.weapons[idx], view);
             this.weapons.push(weapon);
         }
     }
@@ -20,9 +20,12 @@ function Tank(world, name, position, player)
         Util.unitType.tank,
         cfg,
         position,
-        0);
+        0,
+        view);
 
-    Unit.prototype.addHpBar.call(this, "base", true);
+    if (view === true) {
+        Unit.prototype.addHpBar.call(this, "base", true);
+    }
 }
 
 Tank.prototype = Object.create(Unit.prototype);
@@ -32,7 +35,7 @@ Tank.prototype.update = function()
 {
     Unit.prototype.update.call(this);
 
-    if (this.autoFire == true) {
+    if (this.autoFire === true) {
         this.fire();
     }
 
@@ -50,7 +53,7 @@ Tank.prototype.fire = function()
 
 Tank.prototype.revertFireStatus = function()
 {
-    if (this.autoFire == true) {
+    if (this.autoFire === true) {
         this.autoFire = false;
     } else {
         this.autoFire = true;
