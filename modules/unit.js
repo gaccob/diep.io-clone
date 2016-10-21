@@ -20,7 +20,7 @@ function Unit(world, type, cfg, position, angle, view)
     this.rotation = 0;
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
-    world.addUnitToGrid(this);
+    world.updateUnitGrid(this);
 }
 
 Unit.prototype = {
@@ -92,6 +92,7 @@ Unit.prototype.update = function()
 
     var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
     this.motion.update(deltaMS);
+    this.world.updateUnitGrid(this, {x: oldX, y: oldY});
 
     if (this.view) {
         this.view.update();

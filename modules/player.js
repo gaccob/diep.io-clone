@@ -1,11 +1,13 @@
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
-function Player(world, connid)
+function Player(world, viewW, viewH, connid)
 {
     this.world = world;
     this.connid = connid;
     this.tank = null;
+    this.viewW = viewW;
+    this.viewH = viewH;
     this.control = {
         left: 0,
         right: 0,
@@ -125,24 +127,22 @@ Player.prototype.resetControl = function()
 Player.prototype.update = function()
 {
     if (!this.tank) {
-        // TODO: by player
-        var viewW = document.documentElement.clientWidth;
-        var viewH = document.documentElement.clientHeight - 10;
-        var px = (this.world.w - viewW) / 2;
-        var py = (this.world.h - viewH) / 2;
+        var px = (this.world.w - this.viewW) / 2;
+        var py = (this.world.h - this.viewH) / 2;
         this.tank = new Tank(this.world, "base", {
-            x: Math.random() * px + viewW / 2,
-            y: Math.random() * py + viewH / 2,
+            x: Math.random() * px + this.viewW / 2,
+            y: Math.random() * py + this.viewH / 2,
         }, this, this.world.view ? true : false);
         this.world.tanks[this.tank.id] = this.tank;
         this.resetControl();
     }
-    // motion move direction
     else {
         this.tank.motion.setMoveDirByFlag(this.control.left,
             this.control.right,
             this.control.up,
             this.control.down);
+
+        this.tank.update();
     }
 }
 

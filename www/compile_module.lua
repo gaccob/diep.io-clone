@@ -10,8 +10,9 @@ function generate(input_file)
     for line in io.lines(input_file) do
         local space, mod = string.match(line, "(%s*)require.register%(\"(.+)\"%)")
         if mod then
-            os.execute("../node_modules/uglify-js/bin/uglifyjs " .. mod .. ".js -c -m > " .. mod .. ".min.js");
-            local mod_fd = io.open(mod .. ".min.js", 'r')
+            -- os.execute("../node_modules/uglify-js/bin/uglifyjs " .. mod .. ".js -c -m > " .. mod .. ".min.js");
+            -- local mod_fd = io.open(mod .. ".min.js", 'r')
+            local mod_fd = io.open(mod .. ".js", 'r')
             if not mod_fd then
                 print("mod file[" .. mod .. ".js] not found")
                 return
@@ -25,7 +26,7 @@ function generate(input_file)
             output_fd:write(prefix .. "});\n")
             output_fd:write(prefix .. "</script>\n")
             mod_fd:close()
-            os.execute("rm " .. mod .. ".min.js");
+            -- os.execute("rm " .. mod .. ".min.js");
         else
             output_fd:write(line .. "\n")
         end

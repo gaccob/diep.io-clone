@@ -14,6 +14,38 @@ Synchronizer.prototype.registProtocol = function(path)
     this.proto = this.builder.build("Tank");
 }
 
+Synchronizer.prototype.sendPkg = function(body, cmd)
+{
+    var pkg = new this.proto.Pkg();
+    pkg.head = new this.proto.Head();
+    pkg.head.frame = this.world.frame;
+    pkg.head.cmd = cmd;
+    pkg.body = new this.proto.Body();
+    switch (cmd) {
+        case this.proto.SyncCmd.SYNC_START_REQ:
+            pkg.body.syncStartReq = body;
+            break;
+        case this.proto.SyncCmd.SYNC_UNITS;
+            pkg.body.syncUnits = body;
+            break;
+        default:
+            console.log("invalid cmd=" + cmd);
+            return;
+            break;
+    }
+
+    var buffer = pkg.encode();
+    console.log(buffer.toArrayBuffer());
+    // TODO: send
+}
+
+Synchronizer.prototype.syncStartReq = function(name)
+{
+    var req = new this.proto.SyncStartReq();
+    req.name = name;
+    this.sendPkg(req, this.proto.SyncCmd.SYNC_START_REQ);
+}
+
 Synchronizer.prototype.syncUnit = function(unit)
 {
     var u = new this.proto.Unit();
@@ -29,18 +61,10 @@ Synchronizer.prototype.syncUnit = function(unit)
     u.motion.position = new this.proto.Vector(unit.x, unit.y);
     u.motion.rotation = unit.rotation;
 
-    var pkg = new this.proto.Pkg();
-    pkg.head = new this.proto.Head();
-    pkg.head.frame = this.world.frame;
-    pkg.head.cmd = this.proto.SyncCmd.SYNC_UNITS;
-    pkg.body = new this.proto.Body();
-    pkg.body.syncUnits = new this.proto.SyncUnits();
-    pkg.body.syncUnits.units = [];
-    pkg.body.syncUnits.units.push(u);
-
-    var buffer = pkg.encode();
-    console.log(buffer.toArrayBuffer());
-    // TODO: send
+    var syncUnits = new this.proto.SyncUnits();
+    syncUnits.units = [];
+    syncUnits.units.push(u);
+    this.sendPkg(syncUnits, this.proto.SyncCmd.SYNC_UNITS);
 }
 
 module.exports = Synchronizer;
