@@ -10,3 +10,6 @@ python ./cfg/conv2js.py --excel_file=./cfg/config.xlsx --output_path=./cfg/ --sk
 # client html template convert
 cd ./www/ && lua compile_module.lua
 
+# start
+node modules/app.js
+
