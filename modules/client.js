@@ -57,6 +57,23 @@ function ClientWorld()
 
     this.dieSprites = [];
 
+    // client socket
+    // TODO: config
+    this.socket = io("ws://tank.gaccob.com:9000");
+    this.socket.connect();
+
+    this.socket.on('connect',function() {
+        console.log('connected to the server!');
+    });
+    this.socket.on('event',function(data) {
+        console.log('received a message from the server!', data);
+    });
+    this.socket.on('disconnect',function() {
+        console.log('client disconnected!');
+    });
+
+    this.pb = dcodeIO.ProtoBuf;
+
     this.synchronizer = new Synchronizer(this);
     this.synchronizer.registProtocol("./tank.proto.json");
 }

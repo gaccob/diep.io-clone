@@ -1,7 +1,6 @@
 function Synchronizer(world)
 {
     this.world = world;
-    this.pb = dcodeIO.ProtoBuf;
 }
 
 Synchronizer.prototype = {
@@ -10,23 +9,21 @@ Synchronizer.prototype = {
 
 Synchronizer.prototype.registProtocol = function(path)
 {
-    this.builder = this.pb.loadJsonFile(path);
+    this.builder = this.world.pb.loadJsonFile(path);
     this.proto = this.builder.build("Tank");
 }
 
 Synchronizer.prototype.sendPkg = function(body, cmd)
 {
     var pkg = new this.proto.Pkg();
-    pkg.head = new this.proto.Head();
-    pkg.head.frame = this.world.frame;
-    pkg.head.cmd = cmd;
-    pkg.body = new this.proto.Body();
+    pkg.frame = this.world.frame;
+    pkg.cmd = cmd;
     switch (cmd) {
         case this.proto.SyncCmd.SYNC_START_REQ:
-            pkg.body.syncStartReq = body;
+            pkg.syncStartReq = body;
             break;
-        case this.proto.SyncCmd.SYNC_UNITS;
-            pkg.body.syncUnits = body;
+        case this.proto.SyncCmd.SYNC_UNITS:
+            pkg.syncUnits = body;
             break;
         default:
             console.log("invalid cmd=" + cmd);

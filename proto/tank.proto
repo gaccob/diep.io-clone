@@ -94,26 +94,19 @@ enum SyncCmd {
     SYNC_OPER_MOVE = 11;
 }
 
-message Head {
-    optional uint32 sequence = 1;
-    optional uint32 frame = 2;
-    optional SyncCmd cmd = 3;
-}
-message Body {
-    optional SyncStartReq syncStartReq = 1;
-    optional SyncStartRes syncStartRes = 2;
-    optional SyncUnits syncUnits = 3;
-    optional SyncUnitDie syncUnitDie = 4;
-    optional SyncPlayerJoin syncPlayerJoin = 5;
-    optional SyncPlayerQuit syncPlayerQuit = 6;
-    optional SyncCollision syncCollision = 7;
-    optional SyncFireReq syncFireReq = 8;
-    optional SyncFireRes syncFireRes = 9;
-    optional SyncOperDir syncOperDir = 10;
-    optional SyncOperMove syncOperMove = 11;
-}
 message Pkg {
-    optional Head head = 1;
-    optional Body body = 2;
+    optional uint32 frame = 1;
+    optional SyncCmd cmd = 2;
+    optional SyncStartReq syncStartReq = 11;
+    optional SyncStartRes syncStartRes = 12;
+    optional SyncUnits syncUnits = 13;
+    optional SyncUnitDie syncUnitDie = 14;
+    optional SyncPlayerJoin syncPlayerJoin = 15;
+    optional SyncPlayerQuit syncPlayerQuit = 16;
+    optional SyncCollision syncCollision = 17;
+    optional SyncFireReq syncFireReq = 18;
+    optional SyncFireRes syncFireRes = 19;
+    optional SyncOperDir syncOperDir = 20;
+    optional SyncOperMove syncOperMove = 21;
 }
 

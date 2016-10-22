@@ -20,11 +20,12 @@ Version 0.2
 - import node.js
 - uglify client js
 - dependecies:
-    - node.js & npm & nrm
+    - node.js & npm & cnpm
     - UglifyJS 2 v2.7.3 (https://github.com/mishoo/UglifyJS2), BSD-2-Clause
     - long.js v3.2.0 (https://github.com/dcodeIO/long.js), Apache-2.0
     - bytebuffer.js v5.0.1 (https://github.com/dcodeIO/bytebuffer.js), Apache-2.0
     - protobuf.js v5.0.1 (https://github.com/dcodeIO/protobuf.js), Apache-2.0
+    - socket.io v1.5.0 (https://github.com/socketio/socket.io), MIT
 
 
 Ver 0.3: touch input & Audio

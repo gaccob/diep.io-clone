@@ -15,6 +15,7 @@
         <script src="./lib/pixi.min.js"></script>
         <script src="./lib/protobuf-light.min.js"></script>
         <script src="./lib/require.min.js"></script>
+        <script src="./lib/socket.io.min.js"></script>
         <script src="./lib/victor.min.js"></script>
 
         <!-- require modules -->
@@ -540,6 +541,51 @@
         </script>
 
         <script>
+        require.register("../modules/app", function(module, exports, require) {
+            var fs = require("fs");
+            var http = require("http");
+            var path = require("path");
+            var url = require("url");
+            
+            var server = http.createServer(function (request, response) {
+                var pathname = url.parse(request.url).pathname;
+                if (pathname.slice(-1) === "/") {
+                    pathname = pathname + "main.html";
+                }
+                var realPath = path.join("www", path.normalize(pathname.replace(/\.\./g, "")));
+            
+                fs.exists(realPath, function (exists) {
+                    if (!exists) {
+                        response.writeHead(404, {
+                            'Content-Type': 'text/plain'
+                        });
+                        response.write("404 not found");
+                        response.end();
+                        return;
+                    }
+                    fs.readFile(realPath, "binary", function (err, file) {
+                        if (err) {
+                            response.writeHead(500, {
+                                'Content-Type': 'text/plain'
+                            });
+                            response.end(JSON.stringify(err));
+                        } else {
+                            response.writeHead(200, {
+                                'Content-Type': 'text/html'
+                            });
+                            response.write(file, "binary");
+                            response.end();
+                        }
+                    });
+                });
+            });
+            
+            server.listen(9000);
+            console.log("server start port=9000");
+            
+        });
+        </script>
+        <script>
         require.register("../modules/config", function(module, exports, require) {
             var configBullets = require("../cfg/configBullets");
             var configDieAnimation = require("../cfg/configDieAnimation");
@@ -1018,7 +1064,6 @@
             function Synchronizer(world)
             {
                 this.world = world;
-                this.pb = dcodeIO.ProtoBuf;
             }
             
             Synchronizer.prototype = {
@@ -1027,8 +1072,38 @@
             
             Synchronizer.prototype.registProtocol = function(path)
             {
-                this.builder = this.pb.loadJsonFile(path);
+                this.builder = this.world.pb.loadJsonFile(path);
                 this.proto = this.builder.build("Tank");
+            }
+            
+            Synchronizer.prototype.sendPkg = function(body, cmd)
+            {
+                var pkg = new this.proto.Pkg();
+                pkg.frame = this.world.frame;
+                pkg.cmd = cmd;
+                switch (cmd) {
+                    case this.proto.SyncCmd.SYNC_START_REQ:
+                        pkg.syncStartReq = body;
+                        break;
+                    case this.proto.SyncCmd.SYNC_UNITS:
+                        pkg.syncUnits = body;
+                        break;
+                    default:
+                        console.log("invalid cmd=" + cmd);
+                        return;
+                        break;
+                }
+            
+                var buffer = pkg.encode();
+                console.log(buffer.toArrayBuffer());
+                // TODO: send
+            }
+            
+            Synchronizer.prototype.syncStartReq = function(name)
+            {
+                var req = new this.proto.SyncStartReq();
+                req.name = name;
+                this.sendPkg(req, this.proto.SyncCmd.SYNC_START_REQ);
             }
             
             Synchronizer.prototype.syncUnit = function(unit)
@@ -1046,18 +1121,10 @@
                 u.motion.position = new this.proto.Vector(unit.x, unit.y);
                 u.motion.rotation = unit.rotation;
             
-                var pkg = new this.proto.Pkg();
-                pkg.head = new this.proto.Head();
-                pkg.head.frame = this.world.frame;
-                pkg.head.cmd = this.proto.SyncCmd.SYNC_UNITS;
-                pkg.body = new this.proto.Body();
-                pkg.body.syncUnits = new this.proto.SyncUnits();
-                pkg.body.syncUnits.units = [];
-                pkg.body.syncUnits.units.push(u);
-            
-                var buffer = pkg.encode();
-                console.log(buffer.toArrayBuffer());
-                // TODO: send
+                var syncUnits = new this.proto.SyncUnits();
+                syncUnits.units = [];
+                syncUnits.units.push(u);
+                this.sendPkg(syncUnits, this.proto.SyncCmd.SYNC_UNITS);
             }
             
             module.exports = Synchronizer;
@@ -1980,6 +2047,23 @@
                 this.player.addControl();
             
                 this.dieSprites = [];
+            
+                // client socket
+                // TODO: config
+                this.socket = io("ws://tank.gaccob.com:9000");
+                this.socket.connect();
+            
+                this.socket.on('connect',function() {
+                    console.log('connected to the server!');
+                });
+                this.socket.on('event',function(data) {
+                    console.log('received a message from the server!', data);
+                });
+                this.socket.on('disconnect',function() {
+                    console.log('client disconnected!');
+                });
+            
+                this.pb = dcodeIO.ProtoBuf;
             
                 this.synchronizer = new Synchronizer(this);
                 this.synchronizer.registProtocol("./tank.proto.json");

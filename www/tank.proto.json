@@ -269,113 +269,85 @@
             ]
         },
         {
-            "name": "Head",
+            "name": "Pkg",
             "fields": [
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "sequence",
-                    "id": 1
-                },
-                {
-                    "rule": "optional",
-                    "type": "uint32",
                     "name": "frame",
-                    "id": 2
+                    "id": 1
                 },
                 {
                     "rule": "optional",
                     "type": "SyncCmd",
                     "name": "cmd",
-                    "id": 3
-                }
-            ]
-        },
-        {
-            "name": "Body",
-            "fields": [
+                    "id": 2
+                },
                 {
                     "rule": "optional",
                     "type": "SyncStartReq",
                     "name": "syncStartReq",
-                    "id": 1
+                    "id": 11
                 },
                 {
                     "rule": "optional",
                     "type": "SyncStartRes",
                     "name": "syncStartRes",
-                    "id": 2
+                    "id": 12
                 },
                 {
                     "rule": "optional",
                     "type": "SyncUnits",
                     "name": "syncUnits",
-                    "id": 3
+                    "id": 13
                 },
                 {
                     "rule": "optional",
                     "type": "SyncUnitDie",
                     "name": "syncUnitDie",
-                    "id": 4
+                    "id": 14
                 },
                 {
                     "rule": "optional",
                     "type": "SyncPlayerJoin",
                     "name": "syncPlayerJoin",
-                    "id": 5
+                    "id": 15
                 },
                 {
                     "rule": "optional",
                     "type": "SyncPlayerQuit",
                     "name": "syncPlayerQuit",
-                    "id": 6
+                    "id": 16
                 },
                 {
                     "rule": "optional",
                     "type": "SyncCollision",
                     "name": "syncCollision",
-                    "id": 7
+                    "id": 17
                 },
                 {
                     "rule": "optional",
                     "type": "SyncFireReq",
                     "name": "syncFireReq",
-                    "id": 8
+                    "id": 18
                 },
                 {
                     "rule": "optional",
                     "type": "SyncFireRes",
                     "name": "syncFireRes",
-                    "id": 9
+                    "id": 19
                 },
                 {
                     "rule": "optional",
                     "type": "SyncOperDir",
                     "name": "syncOperDir",
-                    "id": 10
+                    "id": 20
                 },
                 {
                     "rule": "optional",
                     "type": "SyncOperMove",
                     "name": "syncOperMove",
-                    "id": 11
-                }
-            ]
-        },
-        {
-            "name": "Pkg",
-            "fields": [
-                {
-                    "rule": "optional",
-                    "type": "Head",
-                    "name": "head",
-                    "id": 1
-                },
-                {
-                    "rule": "optional",
-                    "type": "Body",
-                    "name": "body",
-                    "id": 2
+                    "id": 21
                 }
             ]
         }
