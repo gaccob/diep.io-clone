@@ -72,10 +72,12 @@ function ClientWorld()
         console.log('client disconnected!');
     });
 
-    this.pb = dcodeIO.ProtoBuf;
+    var builder = dcodeIO.ProtoBuf.loadJsonFile("./tank.proto.json");
+    this.proto = builder.build("Tank");
 
     this.synchronizer = new Synchronizer(this);
-    this.synchronizer.registProtocol("./tank.proto.json");
+
+    this.synchronizer.syncStartReq(this.socket, "test");
 }
 
 ClientWorld.prototype = Object.create(World.prototype);

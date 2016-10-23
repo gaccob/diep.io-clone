@@ -7,22 +7,16 @@ Synchronizer.prototype = {
     constructor: Synchronizer,
 }
 
-Synchronizer.prototype.registProtocol = function(path)
+Synchronizer.prototype.sendPkg = function(socket, body, cmd, broadcast)
 {
-    this.builder = this.world.pb.loadJsonFile(path);
-    this.proto = this.builder.build("Tank");
-}
-
-Synchronizer.prototype.sendPkg = function(body, cmd)
-{
-    var pkg = new this.proto.Pkg();
+    var pkg = new this.world.proto.Pkg();
     pkg.frame = this.world.frame;
     pkg.cmd = cmd;
     switch (cmd) {
-        case this.proto.SyncCmd.SYNC_START_REQ:
+        case this.world.proto.SyncCmd.SYNC_START_REQ:
             pkg.syncStartReq = body;
             break;
-        case this.proto.SyncCmd.SYNC_UNITS:
+        case this.world.proto.SyncCmd.SYNC_UNITS:
             pkg.syncUnits = body;
             break;
         default:
@@ -30,38 +24,39 @@ Synchronizer.prototype.sendPkg = function(body, cmd)
             return;
             break;
     }
-
-    var buffer = pkg.encode();
-    console.log(buffer.toArrayBuffer());
-    // TODO: send
+    if (broadcast === true) {
+        socket.broadcast.emit('pkg', pkg.encode().toArrayBuffer());
+    } else {
+        socket.emit('pkg', pkg.encode().toArrayBuffer());
+    }
 }
 
-Synchronizer.prototype.syncStartReq = function(name)
+Synchronizer.prototype.syncStartReq = function(socket, name)
 {
-    var req = new this.proto.SyncStartReq();
+    var req = new this.world.proto.SyncStartReq();
     req.name = name;
-    this.sendPkg(req, this.proto.SyncCmd.SYNC_START_REQ);
+    this.sendPkg(socket, req, this.world.proto.SyncCmd.SYNC_START_REQ);
 }
 
-Synchronizer.prototype.syncUnit = function(unit)
+Synchronizer.prototype.syncUnit = function(socket, unit)
 {
-    var u = new this.proto.Unit();
+    var u = new this.world.proto.Unit();
     u.id = unit.id;
     u.type = unit.type;
     u.cfgName = unit.cfg.alias;
     u.hp = unit.hp;
-    u.motion = new this.proto.Motion();
-    u.motion.moveDir = new this.proto.Vector(unit.motion.moveDir.x, unit.motion.moveDir.y);
-    u.motion.iv = new this.proto.Vector(unit.motion.iv.x, unit.motion.iv.y);
-    u.motion.ev = new this.proto.Vector(unit.motion.ev.x, unit.motion.ev.y);
+    u.motion = new this.world.proto.Motion();
+    u.motion.moveDir = new this.world.proto.Vector(unit.motion.moveDir.x, unit.motion.moveDir.y);
+    u.motion.iv = new this.world.proto.Vector(unit.motion.iv.x, unit.motion.iv.y);
+    u.motion.ev = new this.world.proto.Vector(unit.motion.ev.x, unit.motion.ev.y);
     u.motion.rv = unit.motion.rv;
-    u.motion.position = new this.proto.Vector(unit.x, unit.y);
+    u.motion.position = new this.world.proto.Vector(unit.x, unit.y);
     u.motion.rotation = unit.rotation;
 
-    var syncUnits = new this.proto.SyncUnits();
+    var syncUnits = new this.world.proto.SyncUnits();
     syncUnits.units = [];
     syncUnits.units.push(u);
-    this.sendPkg(syncUnits, this.proto.SyncCmd.SYNC_UNITS);
+    this.broadcastPkg(socket, syncUnits, this.world.proto.SyncCmd.SYNC_UNITS, true);
 }
 
 module.exports = Synchronizer;

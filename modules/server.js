@@ -5,6 +5,7 @@ var Path = require("path");
 var Url = require("url");
 var Protobuf = require("protobufjs");
 
+var Dispatcher = require("../modules/dispatcher");
 var Synchronizer = require("../modules/synchronizer");
 var World = require("../modules/world");
 
@@ -50,22 +51,24 @@ function ServerWorld()
     this.server.listen(9000);
     console.log("server start port=9000");
 
+    var builder = Protobuf.loadJsonFile("./proto/tank.proto.json");
+    this.proto = builder.build("Tank");
+
+    this.synchronizer = new Synchronizer(this);
+
+    this.dispatcher = new Dispatcher(this);
+
     this.socket = IO.listen(this.server);
     this.socket.on('connection', function(client){
-        console.log(client.id);
-        client.on('message',function(event){
-            console.log('message from client!', event);
+        console.log("new connection=" + client.id);
+        client.on('pkg', function(data){
+            world.dispatcher.onMessage(data);
         });
-        client.on('disconnect',function(){
+        client.on('disconnect', function(){
             console.log('client disconnected');
         });
     });
     console.log("server socket listened");
-
-    this.pb = Protobuf;
-
-    this.synchronizer = new Synchronizer(this);
-    this.synchronizer.registProtocol("./proto/tank.proto.json");
 }
 
 ServerWorld.prototype = Object.create(World.prototype);
