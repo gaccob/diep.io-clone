@@ -21,6 +21,7 @@ Version 0.2
 - uglify client js
 - dependecies:
     - node.js & npm & cnpm
+    - browserify v13.1.1(http://browserify.org/), MIT
     - UglifyJS 2 v2.7.3 (https://github.com/mishoo/UglifyJS2), BSD-2-Clause
     - long.js v3.2.0 (https://github.com/dcodeIO/long.js), Apache-2.0
     - bytebuffer.js v5.0.1 (https://github.com/dcodeIO/bytebuffer.js), Apache-2.0

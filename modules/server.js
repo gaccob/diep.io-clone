@@ -5,8 +5,10 @@ var Path = require("path");
 var Url = require("url");
 var Protobuf = require("protobufjs");
 
-var Dispatcher = require("../modules/dispatcher");
+var Obstacle = require("../modules/obstacle");
+var SDispatcher = require("../modules/sdispatcher");
 var Synchronizer = require("../modules/synchronizer");
+var Util = require("../modules/util");
 var World = require("../modules/world");
 
 function handleHttp(request, response)
@@ -48,30 +50,55 @@ function ServerWorld()
     World.call(this, false);
 
     this.server = Http.createServer(handleHttp);
-    this.server.listen(9000);
-    console.log("server start port=9000");
+    this.server.listen(this.cfg.configApp.port);
 
-    var builder = Protobuf.loadJsonFile("./proto/tank.proto.json");
+    var builder = Protobuf.loadJsonFile("./www/" + this.cfg.configApp.proto);
     this.proto = builder.build("Tank");
 
     this.synchronizer = new Synchronizer(this);
 
-    this.dispatcher = new Dispatcher(this);
-
-    this.socket = IO.listen(this.server);
-    this.socket.on('connection', function(client){
-        console.log("new connection=" + client.id);
-        client.on('pkg', function(data){
-            world.dispatcher.onMessage(data);
-        });
-        client.on('disconnect', function(){
-            console.log('client disconnected');
-        });
-    });
-    console.log("server socket listened");
+    this.dispatcher = new SDispatcher(this);
 }
 
 ServerWorld.prototype = Object.create(World.prototype);
 ServerWorld.prototype.constructor = ServerWorld;
 
+ServerWorld.prototype.start = function()
+{
+    this.socket = IO.listen(this.server);
+    console.log("server listened port=" + this.cfg.configApp.port);
+
+    this.socket.on('connection', function(client){
+        world.dispatcher.onConnected(client);
+
+        client.on('pkg', function(data){
+            world.dispatcher.onMessage(client, data);
+        });
+
+        client.on('disconnect', function(){
+            world.dispatcher.onDisconnected(client);
+        });
+    });
+}
+
+ServerWorld.prototype.updateObstacles = function()
+{
+    World.prototype.updateObstacles.call(this);
+
+    if (this.obstacleCount < this.cfg.configWorld.maxObstaclesCount) {
+        var names = ["triangle", "quad", "pentagon"];
+        var name = names[Math.floor((Math.random() * names.length))];
+        var obstacle = new Obstacle(this, name, {
+            x: Util.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
+            y: Util.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
+        }, this.view ? true : false);
+        this.addUnits.push(obstacle);
+    }
+}
+
 var world = new ServerWorld();
+world.start();
+setInterval(function() {
+    world.update();
+}, 1);
+

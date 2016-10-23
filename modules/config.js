@@ -41,6 +41,13 @@ function Config()
 
     this.configMap = configMap[0];
     this.configWorld = configWorld[0];
+
+    this.configApp = {
+        domain: "tank.gaccob.com",
+        port: 9000,
+        proto: "tank.proto.json",
+        maxOnline: 30,
+    };
 }
 
 module.exports = Config;

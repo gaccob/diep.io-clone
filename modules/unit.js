@@ -20,7 +20,6 @@ function Unit(world, type, cfg, position, angle, view)
     this.rotation = 0;
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
-    world.updateUnitGrid(this);
 }
 
 Unit.prototype = {
@@ -62,27 +61,7 @@ Unit.prototype.die = function()
         this.view.onDie();
     }
 
-    this.world.removeUnitFromGrid(this);
     this.world.removeUnits.push(this);
-
-    if (this.type == Util.unitType.bullet) {
-        delete this.world.bullets[this.id];
-    }
-
-    if (this.type == Util.unitType.obstacle) {
-        delete this.world.obstacles[this.id];
-        -- this.world.obstacleCount;
-    }
-
-    if (this.type == Util.unitType.tank) {
-        delete this.world.tanks[this.id];
-        if (this.world.player.tank == this) {
-            this.world.player.tank = null;
-            this.world.gameend = true;
-            alert("Lose! Click To Restart!");
-            this.world.player.update();
-        }
-    }
 }
 
 Unit.prototype.update = function()
@@ -103,6 +82,23 @@ Unit.prototype.update = function()
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.cfg.hp);
     }
+}
+
+Unit.prototype.dump = function()
+{
+    var u = new this.world.proto.Unit();
+    u.id = this.id;
+    u.type = this.type;
+    u.cfgName = this.cfg.alias;
+    u.hp = this.hp;
+    u.motion = new this.world.proto.Motion();
+    u.motion.moveDir = new this.world.proto.Vector(this.motion.moveDir.x, this.motion.moveDir.y);
+    u.motion.iv = new this.world.proto.Vector(this.motion.iv.x, this.motion.iv.y);
+    u.motion.ev = new this.world.proto.Vector(this.motion.ev.x, this.motion.ev.y);
+    u.motion.rv = this.motion.rv;
+    u.motion.position = new this.world.proto.Vector(this.x, this.y);
+    u.motion.rotation = this.rotation;
+    return u;
 }
 
 Object.defineProperties(Unit.prototype, {

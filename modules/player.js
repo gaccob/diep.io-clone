@@ -1,11 +1,14 @@
+var Victor = require("victor");
+
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
-function Player(world, viewW, viewH, connid)
+function Player(world, connid, name, viewW, viewH)
 {
     this.world = world;
-    this.connid = connid;
+    this.name = name;
     this.tank = null;
+    this.connid = connid;
     this.viewW = viewW;
     this.viewH = viewH;
     this.control = {
@@ -124,26 +127,42 @@ Player.prototype.resetControl = function()
     this.control.down = 0;
 }
 
+Player.prototype.createTank = function()
+{
+    var px = (this.world.w - this.viewW) / 2;
+    var py = (this.world.h - this.viewH) / 2;
+    this.tank = new Tank(this.world, "base", {
+        x: Math.random() * px + this.viewW / 2,
+        y: Math.random() * py + this.viewH / 2,
+    }, this, this.world.view ? true : false);
+    this.resetControl();
+    this.world.addUnits.push(this.tank);
+}
+
 Player.prototype.update = function()
 {
     if (!this.tank) {
-        var px = (this.world.w - this.viewW) / 2;
-        var py = (this.world.h - this.viewH) / 2;
-        this.tank = new Tank(this.world, "base", {
-            x: Math.random() * px + this.viewW / 2,
-            y: Math.random() * py + this.viewH / 2,
-        }, this, this.world.view ? true : false);
-        this.world.tanks[this.tank.id] = this.tank;
-        this.resetControl();
-    }
-    else {
+        this.createTank();
+    } else {
         this.tank.motion.setMoveDirByFlag(this.control.left,
             this.control.right,
             this.control.up,
             this.control.down);
-
-        this.tank.update();
     }
+}
+
+Player.prototype.dump = function()
+{
+    var p = new this.world.proto.Player();
+    p.connid = this.connid;
+    p.name = this.name;
+    if (p.tank) {
+        p.id = p.tank.id;
+        p.die = false;
+    } else {
+        p.die = true;
+    }
+    return p;
 }
 
 Object.defineProperties(Player.prototype, {

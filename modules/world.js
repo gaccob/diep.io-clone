@@ -1,5 +1,8 @@
+var Victor = require("victor");
+
 var Config = require("../modules/config");
 var Obstacle = require("../modules/obstacle");
+var Player = require("../modules/player");
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
@@ -33,16 +36,120 @@ function World(view)
     this.bullets = {};
     this.obstacles = {};
     this.obstacleCount = 0;
+    this.tanks = {};
+
+    // connection id <--> player
     this.players = {};
+    this.playerCount = 0;
 
+    // frame cache
+    this.addUnits = [];
     this.removeUnits = [];
-
-    this.gameend = false;
 }
 
 World.prototype = {
     constructor: World,
 };
+
+World.prototype.addPlayer = function(connid, name, viewW, viewH)
+{
+    var player = new Player(this, connid, name, viewW, viewH);
+    player.createTank();
+    this.players[connid] = player;
+    this.playerCount ++;
+    console.log("add player:" + connid + " tank:" + player.tank.id);
+}
+
+World.prototype.removePlayer = function(connid)
+{
+    var player = this.players[connid];
+    if (player) {
+        delete this.players[connid];
+        -- this.playerCount;
+        console.log("remove player:" + connid);
+
+        if (player.tank) {
+            player.tank.player = null;
+            player.tank.die();
+        }
+    }
+}
+
+World.prototype.dumpPlayers = function(players)
+{
+    for (var i in this.players) {
+        players.push(this.players[i].dump());
+    }
+}
+
+World.prototype.checkAddUnits = function()
+{
+    for (var i in this.addUnits) {
+        var unit = this.addUnits[i];
+        this.updateUnitGrid(unit);
+
+        if (unit.type == Util.unitType.bullet) {
+            this.bullets[unit.id] = unit;
+            console.log("add bullet:" + unit.id);
+        }
+
+        if (unit.type == Util.unitType.obstacle) {
+            this.obstacles[unit.id] = unit;
+            this.obstacleCount ++;
+            console.log("add obstacle:" + unit.id);
+        }
+
+        if (unit.type == Util.unitType.tank) {
+            this.tanks[unit.id] = unit;
+            console.log("add tank:" + unit.id);
+        }
+    }
+    this.addUnits = [];
+}
+
+World.prototype.checkRemoveUnits = function()
+{
+    for (var i in this.removeUnits) {
+        var unit = this.removeUnits[i];
+        this.removeUnitFromGrid(unit);
+
+        if (unit.type == Util.unitType.bullet) {
+            delete this.bullets[unit.id];
+            console.log("remove bullet:" + unit.id);
+        }
+
+        if (unit.type == Util.unitType.obstacle) {
+            delete this.obstacles[unit.id];
+            -- this.obstacleCount;
+            console.log("remove obstacle:" + unit.id);
+        }
+
+        if (unit.type == Util.unitType.tank) {
+            delete this.tanks[unit.id];
+            console.log("remove tank:" + unit.id);
+            if (unit.player) {
+                unit.player.tank = null;
+            }
+        }
+    }
+    this.removeUnits = [];
+}
+
+World.prototype.dumpUnits = function(units)
+{
+    for (var i in this.bullets) {
+        units.push(this.bullets[i].dump());
+    }
+    for (var i in this.obstacles) {
+        units.push(this.obstacles[i].dump());
+    }
+    for (var i in this.tanks) {
+        units.push(this.tanks[i].dump());
+    }
+    for (var i in this.addUnits) {
+        units.push(this.addUnits[i].dump());
+    }
+}
 
 World.prototype.updatePlayers = function()
 {
@@ -52,19 +159,16 @@ World.prototype.updatePlayers = function()
     }
 }
 
+World.prototype.updateTanks = function()
+{
+    for (var i in this.tanks) {
+        var tank = this.tanks[i];
+        tank.update();
+    }
+}
+
 World.prototype.updateObstacles = function()
 {
-    if (this.obstacleCount < this.cfg.configWorld.maxObstaclesCount) {
-        var names = ["triangle", "quad", "pentagon"];
-        var name = names[Math.floor((Math.random() * names.length))];
-        var obstacle = new Obstacle(this, name, {
-            x: Util.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
-            y: Util.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
-        }, this.view ? true : false);
-        this.obstacles[obstacle.id] = obstacle;
-        this.obstacleCount ++;
-    }
-
     for (var i in this.obstacles) {
         var obstacle = this.obstacles[i];
         var oldx = obstacle.x;
@@ -199,6 +303,7 @@ World.prototype.simpleCollide = function(unit1, unit2, distRatio)
 World.prototype.collide = function(unit1, unit2, distRatio)
 {
     this.simpleCollide(unit1, unit2, distRatio);
+    // console.log("unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
     unit1.takeDamageByUnit(unit2);
     unit2.takeDamageByUnit(unit1);
 }
@@ -281,7 +386,10 @@ World.prototype.removeUnitFromGrid = function(unit)
 
 World.prototype.updateLogic = function()
 {
+    this.checkRemoveUnits();
+    this.checkAddUnits();
     this.updatePlayers();
+    this.updateTanks();
     this.updateObstacles();
     this.updateBullets();
     this.updateCollision();

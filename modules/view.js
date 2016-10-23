@@ -1,3 +1,4 @@
+var Victor = require("victor");
 var Util = require("../modules/util");
 
 function drawBullet(view)

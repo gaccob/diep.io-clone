@@ -1,3 +1,7 @@
+var IO = require('socket.io-client');
+var Protobuf = require("protobufjs");
+
+var CDispatcher = require("../modules/cdispatcher");
 var Player = require("../modules/player");
 var View = require("../modules/view");
 var Synchronizer = require("../modules/synchronizer");
@@ -57,27 +61,12 @@ function ClientWorld()
 
     this.dieSprites = [];
 
-    // client socket
-    // TODO: config
-    this.socket = io("ws://tank.gaccob.com:9000");
-    this.socket.connect();
-
-    this.socket.on('connect',function() {
-        console.log('connected to the server!');
-    });
-    this.socket.on('event',function(data) {
-        console.log('received a message from the server!', data);
-    });
-    this.socket.on('disconnect',function() {
-        console.log('client disconnected!');
-    });
-
-    var builder = dcodeIO.ProtoBuf.loadJsonFile("./tank.proto.json");
+    var builder = Protobuf.loadJsonFile(this.cfg.configApp.proto);
     this.proto = builder.build("Tank");
 
     this.synchronizer = new Synchronizer(this);
 
-    this.synchronizer.syncStartReq(this.socket, "test");
+    this.dispatcher = new CDispatcher(this);
 }
 
 ClientWorld.prototype = Object.create(World.prototype);
@@ -120,17 +109,42 @@ ClientWorld.prototype.updateDieAnimations = function()
 ClientWorld.prototype.updateLogic = function()
 {
     World.prototype.updateLogic.call(this);
-
     this.updateDieAnimations();
+}
+
+ClientWorld.prototype.start = function()
+{
+    console.log("world start");
+
+    this.socket = IO("ws://" + this.cfg.configApp.domain + ":" + this.cfg.configApp.port);
+
+    this.socket.on('connect', function() {
+        console.log('connected to the server!');
+    });
+
+    this.socket.on('pkg', function(data) {
+        world.dispatcher.onMessage(data);
+    });
+
+    this.socket.on('disconnect', function() {
+        console.log('client disconnected!');
+    });
+
+    this.synchronizer.syncStartReq(this.socket, "test", this.viewW, this.viewH);
 }
 
 ClientWorld.prototype.update = function()
 {
     World.prototype.update.call(this);
-
     this.updateCamera();
     this.renderer.render(this.stage);
 }
 
-module.exports = ClientWorld;
+var world = new ClientWorld();
+world.start();
+function update() {
+    world.update();
+    requestAnimationFrame(update);
+}
+update();
 

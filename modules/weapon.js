@@ -1,3 +1,4 @@
+var Victor = require("victor");
 var Bullet = require("../modules/bullet");
 var Util = require("../modules/util");
 var View = require("../modules/view");
@@ -77,7 +78,7 @@ Weapon.prototype.fire = function()
         var bulletAngle = angle + (Math.random() * disturb - disturb / 2);
 
         var bullet = new Bullet(this.world, pos, bulletAngle, this, (this.view ? true : false));
-        this.world.bullets[bullet.id] = bullet;
+        this.world.addUnits.push(bullet);
 
         var recoil = this.cfg.recoil / this.owner.m;
         this.owner.motion.addRecoil(recoil, angle);

@@ -31,7 +31,7 @@ message Unit {
 }
 
 message Player {
-    optional uint32 connid = 1;
+    optional string connid = 1;
     optional uint32 id = 2;
     optional string name = 3;
     optional uint64 score = 4;
@@ -40,9 +40,11 @@ message Player {
 
 message SyncStartReq {
     optional string name = 1;
+    optional uint32 viewW = 2;
+    optional uint32 viewH = 3;
 }
 message SyncStartRes {
-    optional uint32 connid = 1;
+    optional string connid = 1;
     repeated Unit units = 2;
     repeated Player players = 3;
 }
@@ -58,7 +60,7 @@ message SyncPlayerJoin {
     optional Player player = 1;
 }
 message SyncPlayerQuit {
-    optional uint32 connid = 1;
+    optional string connid = 1;
 }
 
 message SyncCollision {
@@ -94,9 +96,16 @@ enum SyncCmd {
     SYNC_OPER_MOVE = 11;
 }
 
+enum ErrCode {
+    EC_SUCCESS = 0;
+    EC_FULL = -100;
+    EC_EXISTED = -101;
+}
+
 message Pkg {
     optional uint32 frame = 1;
     optional SyncCmd cmd = 2;
+    optional ErrCode result = 3;
     optional SyncStartReq syncStartReq = 11;
     optional SyncStartRes syncStartRes = 12;
     optional SyncUnits syncUnits = 13;

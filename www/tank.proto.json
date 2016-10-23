@@ -99,7 +99,7 @@
             "fields": [
                 {
                     "rule": "optional",
-                    "type": "uint32",
+                    "type": "string",
                     "name": "connid",
                     "id": 1
                 },
@@ -137,6 +137,18 @@
                     "type": "string",
                     "name": "name",
                     "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "viewW",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "viewH",
+                    "id": 3
                 }
             ]
         },
@@ -145,7 +157,7 @@
             "fields": [
                 {
                     "rule": "optional",
-                    "type": "uint32",
+                    "type": "string",
                     "name": "connid",
                     "id": 1
                 },
@@ -201,7 +213,7 @@
             "fields": [
                 {
                     "rule": "optional",
-                    "type": "uint32",
+                    "type": "string",
                     "name": "connid",
                     "id": 1
                 }
@@ -282,6 +294,12 @@
                     "type": "SyncCmd",
                     "name": "cmd",
                     "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "ErrCode",
+                    "name": "result",
+                    "id": 3
                 },
                 {
                     "rule": "optional",
@@ -424,6 +442,23 @@
                 {
                     "name": "SYNC_OPER_MOVE",
                     "id": 11
+                }
+            ]
+        },
+        {
+            "name": "ErrCode",
+            "values": [
+                {
+                    "name": "EC_SUCCESS",
+                    "id": 0
+                },
+                {
+                    "name": "EC_FULL",
+                    "id": -100
+                },
+                {
+                    "name": "EC_EXISTED",
+                    "id": -101
                 }
             ]
         }
