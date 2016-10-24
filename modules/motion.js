@@ -34,6 +34,12 @@ Motion.prototype.randomMoveDir = function()
     this.moveDir.y = Math.sin(angle);
 }
 
+Motion.prototype.setMoveDir = function(x, y)
+{
+    this.moveDir.x = x;
+    this.moveDir.y = y;
+}
+
 Motion.prototype.setMoveDirByAngle = function(angle)
 {
     this.moveDir.x = Math.cos(angle);

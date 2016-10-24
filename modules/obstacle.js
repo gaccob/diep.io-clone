@@ -4,12 +4,12 @@ var Util = require("../modules/util");
 function Obstacle(world, name, position, view)
 {
     Unit.call(this,
-        world,
-        Util.unitType.obstacle,
-        world.cfg.configObstacles[name],
-        position,
-        Math.random() * Math.PI * 2,
-        view);
+              world,
+              Util.unitType.obstacle,
+              world.cfg.configObstacles[name],
+              position,
+              Math.random() * Math.PI * 2,
+              view);
 
     if (view === true) {
         Unit.prototype.addHpBar.call(this, "base", false);

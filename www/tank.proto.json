@@ -41,21 +41,9 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "float",
-                    "name": "rv",
-                    "id": 4
-                },
-                {
-                    "rule": "optional",
                     "type": "Vector",
                     "name": "position",
-                    "id": 5
-                },
-                {
-                    "rule": "optional",
-                    "type": "float",
-                    "name": "rotation",
-                    "id": 6
+                    "id": 4
                 }
             ]
         },
@@ -91,6 +79,30 @@
                     "type": "Motion",
                     "name": "motion",
                     "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "rotation",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "ownerid",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "bornTime",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "weaponName",
+                    "id": 9
                 }
             ]
         },
@@ -126,6 +138,18 @@
                     "type": "bool",
                     "name": "die",
                     "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "vw",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "vh",
+                    "id": 7
                 }
             ]
         },
@@ -237,46 +261,37 @@
             ]
         },
         {
-            "name": "SyncFireReq",
+            "name": "SyncOperation",
             "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "connid",
+                    "id": 1
+                },
                 {
                     "rule": "optional",
                     "type": "bool",
                     "name": "fire",
-                    "id": 1
-                }
-            ]
-        },
-        {
-            "name": "SyncFireRes",
-            "fields": [
-                {
-                    "rule": "optional",
-                    "type": "bool",
-                    "name": "fire",
-                    "id": 1
-                }
-            ]
-        },
-        {
-            "name": "SyncOperDir",
-            "fields": [
+                    "id": 2
+                },
                 {
                     "rule": "optional",
                     "type": "float",
                     "name": "rotation",
-                    "id": 1
-                }
-            ]
-        },
-        {
-            "name": "SyncOperMove",
-            "fields": [
+                    "id": 3
+                },
                 {
                     "rule": "optional",
                     "type": "float",
-                    "name": "angle",
-                    "id": 1
+                    "name": "moveDirX",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "moveDirY",
+                    "id": 5
                 }
             ]
         },
@@ -345,57 +360,14 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "SyncFireReq",
-                    "name": "syncFireReq",
+                    "type": "SyncOperation",
+                    "name": "syncOperation",
                     "id": 18
-                },
-                {
-                    "rule": "optional",
-                    "type": "SyncFireRes",
-                    "name": "syncFireRes",
-                    "id": 19
-                },
-                {
-                    "rule": "optional",
-                    "type": "SyncOperDir",
-                    "name": "syncOperDir",
-                    "id": 20
-                },
-                {
-                    "rule": "optional",
-                    "type": "SyncOperMove",
-                    "name": "syncOperMove",
-                    "id": 21
                 }
             ]
         }
     ],
     "enums": [
-        {
-            "name": "UnitType",
-            "values": [
-                {
-                    "name": "UT_Tank",
-                    "id": 1
-                },
-                {
-                    "name": "UT_Weapon",
-                    "id": 2
-                },
-                {
-                    "name": "UT_Bullet",
-                    "id": 3
-                },
-                {
-                    "name": "UT_Obstacle",
-                    "id": 4
-                },
-                {
-                    "name": "UT_Hpbar",
-                    "id": 5
-                }
-            ]
-        },
         {
             "name": "SyncCmd",
             "values": [
@@ -428,20 +400,8 @@
                     "id": 7
                 },
                 {
-                    "name": "SYNC_FIRE_REQ",
+                    "name": "SYNC_OPERATION",
                     "id": 8
-                },
-                {
-                    "name": "SYNC_FIRE_RES",
-                    "id": 9
-                },
-                {
-                    "name": "SYNC_OPER_DIR",
-                    "id": 10
-                },
-                {
-                    "name": "SYNC_OPER_MOVE",
-                    "id": 11
                 }
             ]
         },

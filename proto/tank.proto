@@ -5,21 +5,11 @@ message Vector {
     optional float y = 2;
 }
 
-enum UnitType {
-    UT_Tank = 1;
-    UT_Weapon = 2;
-    UT_Bullet = 3;
-    UT_Obstacle = 4;
-    UT_Hpbar = 5;
-}
-
 message Motion {
     optional Vector moveDir = 1;
     optional Vector iv = 2;
     optional Vector ev = 3;
-    optional float rv = 4;
-    optional Vector position = 5;
-    optional float rotation = 6;
+    optional Vector position = 4;
 }
 
 message Unit {
@@ -28,6 +18,10 @@ message Unit {
     optional string cfgName = 3;
     optional int32 hp = 4;
     optional Motion motion = 5;
+    optional float rotation = 6;
+    optional uint32 ownerid = 7;    // only bullets
+    optional uint32 bornTime = 8;   // only bullets
+    optional string weaponName = 9;   // only bullets
 }
 
 message Player {
@@ -36,6 +30,8 @@ message Player {
     optional string name = 3;
     optional uint64 score = 4;
     optional bool die = 5;
+    optional int32 vw = 6;
+    optional int32 vh = 7;
 }
 
 message SyncStartReq {
@@ -68,18 +64,12 @@ message SyncCollision {
     optional Unit u2 = 2;
 }
 
-message SyncFireReq {
-    optional bool fire = 1;
-}
-message SyncFireRes {
-    optional bool fire = 1;
-}
-
-message SyncOperDir {
-    optional float rotation = 1;
-}
-message SyncOperMove {
-    optional float angle = 1;
+message SyncOperation {
+    optional string connid = 1;
+    optional bool fire = 2;
+    optional float rotation = 3;
+    optional float moveDirX = 4;
+    optional float moveDirY = 5;
 }
 
 enum SyncCmd {
@@ -90,10 +80,7 @@ enum SyncCmd {
     SYNC_PLAYER_JOIN = 5;
     SYNC_PLAYER_QUIT = 6;
     SYNC_COLLISION = 7;
-    SYNC_FIRE_REQ = 8;
-    SYNC_FIRE_RES = 9;
-    SYNC_OPER_DIR = 10;
-    SYNC_OPER_MOVE = 11;
+    SYNC_OPERATION = 8;
 }
 
 enum ErrCode {
@@ -113,9 +100,6 @@ message Pkg {
     optional SyncPlayerJoin syncPlayerJoin = 15;
     optional SyncPlayerQuit syncPlayerQuit = 16;
     optional SyncCollision syncCollision = 17;
-    optional SyncFireReq syncFireReq = 18;
-    optional SyncFireRes syncFireRes = 19;
-    optional SyncOperDir syncOperDir = 20;
-    optional SyncOperMove syncOperMove = 21;
+    optional SyncOperation syncOperation = 18;
 }
 

@@ -2,12 +2,13 @@ var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Tank(world, name, position, player, view)
+function Tank(world, cfgName, position, player, view)
 {
     this.player = player;
+    this.autoFire = true;
 
     this.weapons = [];
-    var cfg = world.cfg.configTanks[name];
+    var cfg = world.cfg.configTanks[cfgName];
     for (var idx in cfg.weapons) {
         if (cfg.weapons[idx] != "") {
             var weapon = new Weapon(world, this, cfg.weapons[idx], view);
@@ -15,13 +16,7 @@ function Tank(world, name, position, player, view)
         }
     }
 
-    Unit.call(this,
-        world,
-        Util.unitType.tank,
-        cfg,
-        position,
-        0,
-        view);
+    Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view);
 
     if (view === true) {
         Unit.prototype.addHpBar.call(this, "base", true);
@@ -35,13 +30,18 @@ Tank.prototype.update = function()
 {
     Unit.prototype.update.call(this);
 
-    if (this.autoFire === true) {
+    if (this.world.isLocal === false && this.autoFire === true) {
         this.fire();
     }
 
     for (var idx in this.weapons) {
         this.weapons[idx].update();
     }
+}
+
+Tank.prototype.getWeapon = function(idx)
+{
+    return this.weapons[idx];
 }
 
 Tank.prototype.fire = function()

@@ -19,7 +19,8 @@ SDispatcher.prototype.onDisconnected = function(client)
     console.log("remove connection:" + client.id);
     this.world.removePlayer(client.id);
 
-    // TODO: notify player quit
+    var sync = this.world.synchronizer;
+    sync.syncPlayerQuit(client.id);
 }
 
 SDispatcher.prototype.onStart = function(client, msg)
@@ -38,24 +39,48 @@ SDispatcher.prototype.onStart = function(client, msg)
     }
 
     var req = msg.syncStartReq;
-    this.world.addPlayer(client.id, req.name, req.viewW, req.viewH);
+    var player = this.world.addPlayer(client.id, req.name, req.viewW, req.viewH);
+    player.createTank();
     sync.syncStartRes(client, err.SUCCESS, client.id);
 
-    // TODO: notify player join
+    sync.syncPlayerJoin(player);
+}
+
+SDispatcher.prototype.onOperation = function(client, msg)
+{
+    var player = this.world.players[client.id];
+    if (!player) {
+        console.log("player[" + client.id + "] not found");
+        return;
+    }
+
+    var sync = msg.syncOperation;
+    if (player.tank) {
+        player.tank.autoFire = sync.fire;
+        player.tank.rotation = sync.rotation;
+        player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+    }
+
+    this.world.synchronizer.syncOperation(player);
 }
 
 SDispatcher.prototype.onMessage = function(client, buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-
-    console.log("recv message:");
-    console.log(message);
+    console.log("recv message cmd=" + message.cmd);
+    // console.log(message);
 
     var cmd = this.world.proto.SyncCmd;
     switch (message.cmd) {
+
         case cmd.SYNC_START_REQ:
             this.onStart(client, message);
             break;
+
+        case cmd.SYNC_OPERATION:
+            this.onOperation(client, message);
+            break;
+
         default:
             console.log("invalid cmd=" + message.cmd);
             break;

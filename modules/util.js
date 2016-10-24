@@ -36,6 +36,12 @@ var Util = {
     randomBetween: function(min, max) {
         return Math.random() * (max - min) + min;
     },
+
+    assert: function(condition, message) {
+        if (!condition) {
+            throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
+        }
+    },
 };
 
 module.exports = Util;

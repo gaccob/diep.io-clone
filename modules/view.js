@@ -6,7 +6,8 @@ function drawBullet(view)
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
 
-    if (view.world.player.tank == view.owner.owner) {
+    var player = view.world.getSelf();
+    if (player.tank == view.owner.owner) {
         graphics.beginFill(view.cfg.body.playerColor);
     } else {
         graphics.beginFill(view.cfg.body.color);
@@ -75,7 +76,8 @@ function drawTank(view)
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
 
-    if (view.owner.player) {
+    var player = view.world.getSelf();
+    if (player == view.owner) {
         graphics.beginFill(view.cfg.body.playerColor);
     } else {
         graphics.beginFill(view.cfg.body.color);

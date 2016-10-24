@@ -6,6 +6,7 @@ var View = require("../modules/view");
 function Weapon(world, tank, name, view)
 {
     this.world = world;
+    this.name = name;
     this.type = Util.unitType.weapon;
 
     this.owner = tank;
@@ -59,6 +60,14 @@ Weapon.prototype.update = function()
     }
 }
 
+// for client
+Weapon.prototype.fireBullet = function(bullet)
+{
+    this.fireFrame = this.world.frame;
+    this.fireAnimFrame = this.world.frame;
+}
+
+// for server
 Weapon.prototype.fire = function()
 {
     if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
@@ -77,8 +86,14 @@ Weapon.prototype.fire = function()
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
         var bulletAngle = angle + (Math.random() * disturb - disturb / 2);
 
-        var bullet = new Bullet(this.world, pos, bulletAngle, this, (this.view ? true : false));
-        this.world.addUnits.push(bullet);
+        var bullet = new Bullet(this.world,
+                                this.cfg.bullet,
+                                pos,
+                                bulletAngle,
+                                this.owner,
+                                this.name,
+                                (this.view ? true : false));
+        this.world.addUnit(bullet);
 
         var recoil = this.cfg.recoil / this.owner.m;
         this.owner.motion.addRecoil(recoil, angle);

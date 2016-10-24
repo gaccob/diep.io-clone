@@ -506,18 +506,19 @@ module.exports = configWorld;
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Bullet(world, position, angle, weapon, view)
+function Bullet(world, cfgName, position, angle, owner, weaponName, view)
 {
-    this.owner = weapon.owner;
+    this.owner = owner;
+    this.weaponName = weaponName;
     this.bornTime = world.time;
 
     Unit.call(this,
-        world,
-        Util.unitType.bullet,
-        world.cfg.configBullets[weapon.cfg.bullet],
-        position,
-        angle,
-        view);
+              world,
+              Util.unitType.bullet,
+              world.cfg.configBullets[cfgName],
+              position,
+              angle,
+              view);
 }
 
 Bullet.prototype = Object.create(Unit.prototype);
@@ -535,6 +536,11 @@ module.exports = Bullet;
 
 
 },{"../modules/unit":19,"../modules/util":20}],10:[function(require,module,exports){
+var Bullet = require("../modules/bullet");
+var Obstacle = require("../modules/obstacle");
+var Tank = require("../modules/tank");
+var Util = require("../modules/util");
+
 function CDispatcher(world)
 {
     this.world = world;
@@ -544,18 +550,216 @@ CDispatcher.prototype = {
     constructor: CDispatcher,
 }
 
+CDispatcher.prototype.createUnit = function(u)
+{
+    var unit = null;
+    switch (u.type) {
+
+        case Util.unitType.tank:
+            unit = new Tank(this.world,
+                            u.cfgName,
+                            u.motion.position,
+                            null,
+                            true);
+            break;
+
+        case Util.unitType.bullet:
+            unit = new Bullet(this.world,
+                              u.cfgName,
+                              u.motion.position,
+                              0,
+                              this.world.findUnit(u.ownerid),
+                              u.weaponName,
+                              true);
+            unit.bornTime = u.bornTime;
+            if (unit.owner) {
+                var weapon = unit.owner.getWeapon(u.weaponIdx);
+                if (weapon) {
+                    weapon.fireBullet(unit);
+                }
+            }
+            break;
+
+        case Util.unitType.obstacle:
+            unit = new Obstacle(this.world,
+                                u.cfgName,
+                                u.motion.position,
+                                true);
+            break;
+
+        default:
+            console.log("ignore unit type=" + u.type);
+            break;
+    }
+    if (unit) {
+        unit.id = u.id;
+        unit.motion.ev.x = u.motion.ev.x;
+        unit.motion.ev.y = u.motion.ev.y;
+        unit.motion.iv.x = u.motion.iv.x;
+        unit.motion.iv.y = u.motion.iv.y;
+        unit.motion.moveDir.x = u.motion.moveDir.x;
+        unit.motion.moveDir.y = u.motion.moveDir.y;
+        unit.rotation = u.rotation;
+        unit.hp = u.hp;
+        this.world.addUnit(unit);
+    }
+    return unit;
+}
+
+CDispatcher.prototype.createPlayer = function(p)
+{
+    var player = this.world.addPlayer(p.connid, p.name, p.vw, p.vh);
+    if (p.die === false) {
+        var tank = this.world.findUnit(p.id);
+        if (!tank) {
+            console.log("player[" + p.connid + "] tank[" + p.id + "] not found");
+        } else {
+            player.bindTank(tank);
+        }
+    }
+
+    // self
+    if (p.connid === this.world.connid) {
+        console.log("player connid=" + p.connid);
+        player.addControl();
+    }
+
+    return player;
+}
+
+CDispatcher.prototype.onStartRes = function(message)
+{
+    var err = this.world.proto.ErrCode;
+    if (message.result != err.SUCCESS) {
+        alert("start fail:" + message.result);
+        return;
+    }
+
+    var res = message.syncStartRes;
+    this.world.connid = res.connid;
+    for (var i in res.units) {
+        var u = res.units[i];
+        var unit = this.world.findUnit(u.id);
+        if (unit) {
+            unit.load(u);
+        } else {
+            this.createUnit(u);
+        }
+    }
+    for (var i in res.players) {
+        this.createPlayer(res.players[i]);
+    }
+}
+
+CDispatcher.prototype.onOperation = function(msg)
+{
+    var sync = msg.syncOperation;
+
+    // self ignore
+    if (sync.connid == this.world.connid) {
+        return;
+    }
+
+    var player = this.world.players[sync.connid];
+    if (!player) {
+        console.log("player[" + client.id + "] not found");
+        return;
+    }
+
+    if (player.tank) {
+        player.tank.autoFire = sync.fire;
+        player.tank.rotation = sync.rotation;
+        player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+    }
+}
+
+CDispatcher.prototype.onSyncUnits = function(msg)
+{
+    for (var i in msg.syncUnits.units) {
+        var u = msg.syncUnits.units[i];
+        var unit = this.world.findUnit(u.id);
+        if (unit) {
+            unit.load(u);
+        } else {
+            this.createUnit(u);
+        }
+    }
+}
+
+CDispatcher.prototype.onSyncUnitDie = function(msg)
+{
+    var unit = this.world.findUnit(msg.syncUnitDie.id);
+    if (unit) {
+        unit.die();
+    }
+}
+
+CDispatcher.prototype.onSyncPlayerJoin = function(msg)
+{
+    this.createPlayer(msg.syncPlayerJoin.player);
+}
+
+CDispatcher.prototype.onSyncPlayerQuit = function(msg)
+{
+    this.world.removePlayer(msg.syncPlayerQuit.connid);
+}
+
+CDispatcher.prototype.onSyncCollision = function(msg)
+{
+    var sync = msg.syncCollision;
+
+    var unit1 = this.world.findUnit(sync.u1.id);
+    if (!unit1) {
+        console.log("unit[" + sync.u1.id + "] not found");
+    } else {
+        unit1.load(sync.u1);
+    }
+
+    var unit2 = this.world.findUnit(sync.u2.id);
+    if (!unit2) {
+        console.log("unit[" + sync.u2.id + "] not found");
+    } else {
+        unit2.load(sync.u2);
+    }
+}
+
 CDispatcher.prototype.onMessage = function(buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-
-    console.log("recv message:");
-    console.log(message);
+    console.log("recv message cmd=" + message.cmd);
+    // console.log(message);
 
     var cmd = this.world.proto.SyncCmd;
     switch (message.cmd) {
+
         case cmd.SYNC_START_RES:
-            console.log(message);
+            this.onStartRes(message);
             break;
+
+        case cmd.SYNC_OPERATION:
+            this.onOperation(message);
+            break;
+
+        case cmd.SYNC_UNITS:
+            this.onSyncUnits(message);
+            break;
+
+        case cmd.SYNC_UNIT_DIE:
+            this.onSyncUnitDie(message);
+            break;
+
+        case cmd.SYNC_PLAYER_JOIN:
+            this.onSyncPlayerJoin(message);
+            break;
+
+        case cmd.SYNC_PLAYER_QUIT:
+            this.onSyncPlayerQuit(message);
+            break;
+
+        case cmd.SYNC_COLLISION:
+            this.onSyncCollision(message);
+            break;
+
         default:
             console.log("invalid cmd=" + message.cmd);
             break;
@@ -565,7 +769,7 @@ CDispatcher.prototype.onMessage = function(buffer)
 module.exports = CDispatcher;
 
 
-},{}],11:[function(require,module,exports){
+},{"../modules/bullet":9,"../modules/obstacle":15,"../modules/tank":18,"../modules/util":20}],11:[function(require,module,exports){
 var IO = require('socket.io-client');
 var Protobuf = require("protobufjs");
 
@@ -605,6 +809,8 @@ function ClientWorld()
 {
     World.call(this, true);
 
+    this.isLocal = true;
+
     this.stage = new PIXI.Container();
 
     this.view = new PIXI.Container();
@@ -624,9 +830,6 @@ function ClientWorld()
         });
     document.body.appendChild(this.renderer.view);
 
-    this.player = new Player(this, this.viewW, this.viewH);
-    this.player.addControl();
-
     this.dieSprites = [];
 
     var builder = Protobuf.loadJsonFile(this.cfg.configApp.proto);
@@ -635,15 +838,28 @@ function ClientWorld()
     this.synchronizer = new Synchronizer(this);
 
     this.dispatcher = new CDispatcher(this);
+
+    // self
+    this.connid = null;
 }
 
 ClientWorld.prototype = Object.create(World.prototype);
 ClientWorld.prototype.constructor = ClientWorld;
 
+ClientWorld.prototype.getSelf = function()
+{
+    return this.connid ?  this.players[this.connid] : null;
+}
+
 ClientWorld.prototype.updateCamera = function()
 {
-    var x = this.player.x;
-    var y = this.player.y;
+    var player = this.getSelf();
+    if (!player) {
+        return;
+    }
+
+    var x = player.x;
+    var y = player.y;
     var viewCenterX = this.viewW / 2;
     var viewCenterY = this.viewH / 2;
     x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
@@ -698,7 +914,7 @@ ClientWorld.prototype.start = function()
         console.log('client disconnected!');
     });
 
-    this.synchronizer.syncStartReq(this.socket, "test", this.viewW, this.viewH);
+    this.synchronizer.syncStartReq("test", this.viewW, this.viewH);
 }
 
 ClientWorld.prototype.update = function()
@@ -785,6 +1001,7 @@ function HpBar(world, name, owner, display)
     this.owner = owner;
     this.display = display;
     this.percent = 1;
+    this.isDead = false;
     this.view = new View(this);
 
     this.x = this.view.x;
@@ -799,19 +1016,23 @@ HpBar.prototype = {
 HpBar.prototype.die = function()
 {
     this.view.onDie();
+    this.isDead = true;
 }
 
 HpBar.prototype.update = function(percent)
 {
-    if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
-        this.view.visible = false;
-    } else {
-        this.view.visible = true;
-    }
+    if (this.isDead === false) {
 
-    if (this.percent != percent) {
-        this.view.updateHpbar(this.percent, percent);
-        this.percent = percent;
+        if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
+            this.view.visible = false;
+        } else {
+            this.view.visible = true;
+        }
+
+        if (this.percent != percent) {
+            this.view.updateHpbar(this.percent, percent);
+            this.percent = percent;
+        }
     }
 
     this.view.update();
@@ -858,6 +1079,12 @@ Motion.prototype.randomMoveDir = function()
     var angle = Math.random() * Math.PI * 2;
     this.moveDir.x = Math.cos(angle);
     this.moveDir.y = Math.sin(angle);
+}
+
+Motion.prototype.setMoveDir = function(x, y)
+{
+    this.moveDir.x = x;
+    this.moveDir.y = y;
 }
 
 Motion.prototype.setMoveDirByAngle = function(angle)
@@ -963,12 +1190,12 @@ var Util = require("../modules/util");
 function Obstacle(world, name, position, view)
 {
     Unit.call(this,
-        world,
-        Util.unitType.obstacle,
-        world.cfg.configObstacles[name],
-        position,
-        Math.random() * Math.PI * 2,
-        view);
+              world,
+              Util.unitType.obstacle,
+              world.cfg.configObstacles[name],
+              position,
+              Math.random() * Math.PI * 2,
+              view);
 
     if (view === true) {
         Unit.prototype.addHpBar.call(this, "base", false);
@@ -1014,6 +1241,7 @@ function Player(world, connid, name, viewW, viewH)
         up: 0,
         down: 0,
     };
+    this.needSync = false;
 }
 
 Player.prototype = {
@@ -1092,6 +1320,8 @@ Player.prototype.handleMouseMove = function()
         if (player.tank != null) {
             var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
             player.tank.rotation = dir.angle() + Math.PI / 2;
+            // TODO: threshold
+            this.needSync = true;
         }
     }, false);
 }
@@ -1102,6 +1332,7 @@ Player.prototype.handleMouseDown = function()
     document.body.addEventListener('mousedown', function(e) {
         if (player.tank != null) {
             player.tank.revertFireStatus();
+            this.needSync = true;
         }
     }, false);
 }
@@ -1132,19 +1363,34 @@ Player.prototype.createTank = function()
         x: Math.random() * px + this.viewW / 2,
         y: Math.random() * py + this.viewH / 2,
     }, this, this.world.view ? true : false);
+    this.tank.player = this;
     this.resetControl();
-    this.world.addUnits.push(this.tank);
+    this.world.addUnit(this.tank);
+}
+
+Player.prototype.bindTank = function(tank)
+{
+    this.tank = tank;
+    tank.player = this;
+    this.resetControl();
 }
 
 Player.prototype.update = function()
 {
-    if (!this.tank) {
-        this.createTank();
-    } else {
+    if (this.tank) {
+        var dir = this.tank.motion.moveDir.clone();
         this.tank.motion.setMoveDirByFlag(this.control.left,
             this.control.right,
             this.control.up,
             this.control.down);
+        if (dir.x != this.tank.motion.moveDir.x || dir.y != this.tank.motion.moveDir.y) {
+            this.needSync = true;
+        }
+    }
+
+    if (this.needSync === true) {
+        this.world.synchronizer.syncOperation(this);
+        this.needSync = false;
     }
 }
 
@@ -1153,8 +1399,10 @@ Player.prototype.dump = function()
     var p = new this.world.proto.Player();
     p.connid = this.connid;
     p.name = this.name;
-    if (p.tank) {
-        p.id = p.tank.id;
+    p.vw = this.viewW;
+    p.vh = this.viewH;
+    if (this.tank) {
+        p.id = this.tank.id;
         p.die = false;
     } else {
         p.die = true;
@@ -1186,7 +1434,7 @@ Synchronizer.prototype = {
     constructor: Synchronizer,
 }
 
-Synchronizer.prototype.sendPkg = function(socket, body, cmd, result, broadcast)
+Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
 {
     var pkg = new this.world.proto.Pkg();
     pkg.frame = this.world.frame;
@@ -1194,6 +1442,7 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result, broadcast)
     if (result) {
         pkg.result = result;
     }
+
     switch (cmd) {
         case this.cmd.SYNC_START_REQ:
             pkg.syncStartReq = body;
@@ -1204,29 +1453,35 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result, broadcast)
         case this.cmd.SYNC_UNITS:
             pkg.syncUnits = body;
             break;
+        case this.cmd.SYNC_UNIT_DIE:
+            pkg.syncUnitDie = body;
+            break;
+        case this.cmd.SYNC_PLAYER_JOIN:
+            pkg.syncPlayerJoin = body;
+            break;
+        case this.cmd.SYNC_PLAYER_QUIT:
+            pkg.syncPlayerQuit = body;
+            break;
+        case this.cmd.SYNC_COLLISION:
+            pkg.syncCollision = body;
+            break;
         default:
             console.log("invalid cmd=" + cmd);
             return;
-            break;
     }
 
-    console.log("send message:");
-    console.log(pkg);
-
-    if (broadcast === true) {
-        socket.broadcast.emit('pkg', pkg.encode().toArrayBuffer());
-    } else {
-        socket.emit('pkg', pkg.encode().toArrayBuffer());
-    }
+    socket.emit('pkg', pkg.encode().toArrayBuffer());
+    console.log("send message cmd=" + pkg.cmd);
+    // console.log(pkg);
 }
 
-Synchronizer.prototype.syncStartReq = function(socket, name, viewW, viewH)
+Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
 {
     var req = new this.world.proto.SyncStartReq();
     req.name = name;
     req.viewH = viewH;
     req.viewW = viewW;
-    this.sendPkg(socket, req, this.cmd.SYNC_START_REQ);
+    this.sendPkg(this.world.socket, req, this.cmd.SYNC_START_REQ);
 }
 
 Synchronizer.prototype.syncStartRes = function(socket, result, connid)
@@ -1242,12 +1497,54 @@ Synchronizer.prototype.syncStartRes = function(socket, result, connid)
     this.sendPkg(socket, res, this.cmd.SYNC_START_RES, result);
 }
 
-Synchronizer.prototype.syncUnit = function(socket, unit)
+Synchronizer.prototype.syncUnit = function(unit)
 {
-    var syncUnits = new this.world.proto.SyncUnits();
-    syncUnits.units = [];
-    syncUnits.units.push(unit.dump());
-    this.broadcastPkg(socket, syncUnits, this.cmd.SYNC_UNITS, true);
+    var sync = new this.world.proto.SyncUnits();
+    sync.units = [];
+    sync.units.push(unit.dump());
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_UNITS);
+}
+
+Synchronizer.prototype.syncUnitDie = function(unit)
+{
+    var sync = new this.world.proto.SyncUnitDie();
+    sync.id = unit.id;
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_UNIT_DIE);
+}
+
+Synchronizer.prototype.syncPlayerJoin = function(player)
+{
+    var sync = new this.world.proto.SyncPlayerJoin();
+    sync.player = player.dump();
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER_JOIN);
+}
+
+Synchronizer.prototype.syncPlayerQuit = function(connid)
+{
+    var sync = new this.world.proto.SyncPlayerQuit();
+    sync.connid = connid;
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER_QUIT);
+}
+
+Synchronizer.prototype.syncCollision = function(unit1, unit2)
+{
+    var sync = new this.world.proto.SyncCollision();
+    sync.u1 = unit1.dump();
+    sync.u2 = unit2.dump();
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_COLLISION);
+}
+
+Synchronizer.prototype.syncOperation = function(player)
+{
+    var sync = new this.world.proto.SyncOperation();
+    sync.connid = player.connid;
+    if (player.tank) {
+        sync.fire = player.tank.autoFire;
+        sync.rotation = player.tank.rotation;
+        sync.moveDirX = player.tank.motion.moveDir.x;
+        sync.moveDirY = player.tank.motion.moveDir.y;
+    }
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_OPERATION);
 }
 
 module.exports = Synchronizer;
@@ -1258,12 +1555,13 @@ var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Tank(world, name, position, player, view)
+function Tank(world, cfgName, position, player, view)
 {
     this.player = player;
+    this.autoFire = true;
 
     this.weapons = [];
-    var cfg = world.cfg.configTanks[name];
+    var cfg = world.cfg.configTanks[cfgName];
     for (var idx in cfg.weapons) {
         if (cfg.weapons[idx] != "") {
             var weapon = new Weapon(world, this, cfg.weapons[idx], view);
@@ -1271,13 +1569,7 @@ function Tank(world, name, position, player, view)
         }
     }
 
-    Unit.call(this,
-        world,
-        Util.unitType.tank,
-        cfg,
-        position,
-        0,
-        view);
+    Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view);
 
     if (view === true) {
         Unit.prototype.addHpBar.call(this, "base", true);
@@ -1291,13 +1583,18 @@ Tank.prototype.update = function()
 {
     Unit.prototype.update.call(this);
 
-    if (this.autoFire === true) {
+    if (this.world.isLocal === false && this.autoFire === true) {
         this.fire();
     }
 
     for (var idx in this.weapons) {
         this.weapons[idx].update();
     }
+}
+
+Tank.prototype.getWeapon = function(idx)
+{
+    return this.weapons[idx];
 }
 
 Tank.prototype.fire = function()
@@ -1333,7 +1630,9 @@ var id = 0;
 function Unit(world, type, cfg, position, angle, view)
 {
     this.world = world;
-    this.id = (++ id);
+    if (this.world.isLocal == false) {
+        this.id = (++ id);
+    }
     this.type = type;
     this.cfg = cfg;
     this.motion = new Motion(this, this.cfg.velocity, angle);
@@ -1386,7 +1685,7 @@ Unit.prototype.die = function()
         this.view.onDie();
     }
 
-    this.world.removeUnits.push(this);
+    this.world.removeUnit(this);
 }
 
 Unit.prototype.update = function()
@@ -1416,14 +1715,41 @@ Unit.prototype.dump = function()
     u.type = this.type;
     u.cfgName = this.cfg.alias;
     u.hp = this.hp;
+    u.ownerid = this.owner ? this.owner.id : 0;
+    u.bornTime = this.bornTime ? Math.floor(this.bornTime) : 0;
+    u.weaponName = this.weaponName ? this.weaponName : "";
+    u.rotation = this.rotation;
     u.motion = new this.world.proto.Motion();
     u.motion.moveDir = new this.world.proto.Vector(this.motion.moveDir.x, this.motion.moveDir.y);
     u.motion.iv = new this.world.proto.Vector(this.motion.iv.x, this.motion.iv.y);
     u.motion.ev = new this.world.proto.Vector(this.motion.ev.x, this.motion.ev.y);
-    u.motion.rv = this.motion.rv;
     u.motion.position = new this.world.proto.Vector(this.x, this.y);
-    u.motion.rotation = this.rotation;
     return u;
+}
+
+Unit.prototype.load = function(u)
+{
+    Util.assert(this.id === u.id);
+    Util.assert(this.type === u.type);
+
+    this.hp = u.hp;
+    this.rotation = u.rotation;
+    this.motion.iv.x = u.motion.iv.x;
+    this.motion.iv.y = u.motion.iv.y;
+    this.motion.ev.x = u.motion.ev.x;
+    this.motion.ev.y = u.motion.ev.y;
+    this.motion.moveDir.x = u.motion.moveDir.x;
+    this.motion.moveDir.y = u.motion.moveDir.y;
+
+    var oldX = this.x;
+    var oldY = this.y;
+    this.x = u.motion.position.x;
+    this.y = u.motion.position.y;
+    if (this.hpbar) {
+        this.hpbar.x += (this.x - oldX);
+        this.hpbar.y += (this.y - oldY);
+        this.hpbar.update(this.hp / this.cfg.hp);
+    }
 }
 
 Object.defineProperties(Unit.prototype, {
@@ -1478,6 +1804,12 @@ var Util = {
     randomBetween: function(min, max) {
         return Math.random() * (max - min) + min;
     },
+
+    assert: function(condition, message) {
+        if (!condition) {
+            throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
+        }
+    },
 };
 
 module.exports = Util;
@@ -1491,7 +1823,8 @@ function drawBullet(view)
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
 
-    if (view.world.player.tank == view.owner.owner) {
+    var player = view.world.getSelf();
+    if (player.tank == view.owner.owner) {
         graphics.beginFill(view.cfg.body.playerColor);
     } else {
         graphics.beginFill(view.cfg.body.color);
@@ -1560,7 +1893,8 @@ function drawTank(view)
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
 
-    if (view.owner.player) {
+    var player = view.world.getSelf();
+    if (player == view.owner) {
         graphics.beginFill(view.cfg.body.playerColor);
     } else {
         graphics.beginFill(view.cfg.body.color);
@@ -1708,6 +2042,7 @@ var View = require("../modules/view");
 function Weapon(world, tank, name, view)
 {
     this.world = world;
+    this.name = name;
     this.type = Util.unitType.weapon;
 
     this.owner = tank;
@@ -1761,6 +2096,14 @@ Weapon.prototype.update = function()
     }
 }
 
+// for client
+Weapon.prototype.fireBullet = function(bullet)
+{
+    this.fireFrame = this.world.frame;
+    this.fireAnimFrame = this.world.frame;
+}
+
+// for server
 Weapon.prototype.fire = function()
 {
     if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
@@ -1779,8 +2122,14 @@ Weapon.prototype.fire = function()
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
         var bulletAngle = angle + (Math.random() * disturb - disturb / 2);
 
-        var bullet = new Bullet(this.world, pos, bulletAngle, this, (this.view ? true : false));
-        this.world.addUnits.push(bullet);
+        var bullet = new Bullet(this.world,
+                                this.cfg.bullet,
+                                pos,
+                                bulletAngle,
+                                this.owner,
+                                this.name,
+                                (this.view ? true : false));
+        this.world.addUnit(bullet);
 
         var recoil = this.cfg.recoil / this.owner.m;
         this.owner.motion.addRecoil(recoil, angle);
@@ -1836,8 +2185,8 @@ function World(view)
     this.playerCount = 0;
 
     // frame cache
-    this.addUnits = [];
-    this.removeUnits = [];
+    this.unitsToAdd = [];
+    this.unitsToRemove = [];
 }
 
 World.prototype = {
@@ -1847,10 +2196,10 @@ World.prototype = {
 World.prototype.addPlayer = function(connid, name, viewW, viewH)
 {
     var player = new Player(this, connid, name, viewW, viewH);
-    player.createTank();
     this.players[connid] = player;
     this.playerCount ++;
-    console.log("add player:" + connid + " tank:" + player.tank.id);
+    console.log("add player:" + connid);
+    return player;
 }
 
 World.prototype.removePlayer = function(connid)
@@ -1875,10 +2224,38 @@ World.prototype.dumpPlayers = function(players)
     }
 }
 
+World.prototype.addUnit = function(unit)
+{
+    this.unitsToAdd.push(unit);
+}
+
+World.prototype.removeUnit = function(unit)
+{
+    this.unitsToRemove.push(unit);
+}
+
+World.prototype.findUnit = function(id)
+{
+    if (this.bullets[id]) {
+        return this.bullets[id];
+    } else if (this.obstacles[id]) {
+        return this.obstacles[id];
+    } else if (this.tanks[id]) {
+        return this.tanks[id];
+    } else {
+        for (var i in this.unitsToAdd) {
+            if (this.unitsToAdd[i].id == id) {
+                return this.unitsToAdd[i];
+            }
+        }
+    }
+    return null;
+}
+
 World.prototype.checkAddUnits = function()
 {
-    for (var i in this.addUnits) {
-        var unit = this.addUnits[i];
+    for (var i in this.unitsToAdd) {
+        var unit = this.unitsToAdd[i];
         this.updateUnitGrid(unit);
 
         if (unit.type == Util.unitType.bullet) {
@@ -1897,13 +2274,13 @@ World.prototype.checkAddUnits = function()
             console.log("add tank:" + unit.id);
         }
     }
-    this.addUnits = [];
+    this.unitsToAdd = [];
 }
 
 World.prototype.checkRemoveUnits = function()
 {
-    for (var i in this.removeUnits) {
-        var unit = this.removeUnits[i];
+    for (var i in this.unitsToRemove) {
+        var unit = this.unitsToRemove[i];
         this.removeUnitFromGrid(unit);
 
         if (unit.type == Util.unitType.bullet) {
@@ -1925,7 +2302,7 @@ World.prototype.checkRemoveUnits = function()
             }
         }
     }
-    this.removeUnits = [];
+    this.unitsToRemove = [];
 }
 
 World.prototype.dumpUnits = function(units)
@@ -1939,8 +2316,8 @@ World.prototype.dumpUnits = function(units)
     for (var i in this.tanks) {
         units.push(this.tanks[i].dump());
     }
-    for (var i in this.addUnits) {
-        units.push(this.addUnits[i].dump());
+    for (var i in this.unitsToAdd) {
+        units.push(this.unitsToAdd[i].dump());
     }
 }
 
@@ -1975,174 +2352,10 @@ World.prototype.updateBullets = function()
 {
     for (var i in this.bullets) {
         var bullet = this.bullets[i];
-        if (bullet.outOfDate() || bullet.outOfBounds()) {
-            bullet.die();
-        } else {
-            var oldx = bullet.x;
-            var oldy = bullet.y;
-            bullet.update();
-            this.updateUnitGrid(bullet, { x: oldx, y: oldy });
-        }
-    }
-}
-
-World.prototype.getUnitsIn9Grids = function(x, y)
-{
-    var targets = [];
-    var idxs = [
-        (y - 1) * this.gridW + x - 1,
-        (y - 1) * this.gridW + x,
-        (y - 1) * this.gridW + x + 1,
-        y * this.gridW + x - 1,
-        y * this.gridW + x,
-        y * this.gridW + x + 1,
-        (y + 1) * this.gridW + x - 1,
-        (y + 1) * this.gridW + x,
-        (y + 1) * this.gridW + x + 1,
-    ];
-
-    var x1 = (x >= 1);
-    var x2 = (x < this.gridW - 1);
-
-    var y1 = (y >= 1);
-    var y2 = (y < this.gridH - 1);
-
-    if (y1 && x1) {
-        var g = this.grids[idxs[0]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    if (y1) {
-        var g = this.grids[idxs[1]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    if (y1 && x2) {
-        var g = this.grids[idxs[2]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    if (x1) {
-        var g = this.grids[idxs[3]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    {
-        var g = this.grids[idxs[4]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    if (x2) {
-        var g = this.grids[idxs[5]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    if (y2 && x1) {
-        var g = this.grids[idxs[6]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    if (y2) {
-        var g = this.grids[idxs[7]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    if (y2 && x2) {
-        var g = this.grids[idxs[8]];
-        for (var i in g) { targets.push(g[i]); }
-    }
-    return targets;
-}
-
-World.prototype.needCheckCollision = function(unit, target)
-{
-    var u1 = (unit.owner == null ? unit : unit.owner);
-    var u2 = (target.owner == null ? target : target.owner);
-    return u1 != u2;
-}
-
-World.prototype.elasticCollide = function(unit1, unit2)
-{
-    // Elastic collision
-    // m1, v10
-    // m2, v20
-    // v1 = [(m1-m2)v10 + 2m2v20] / (m1+m2)
-    // v2 = [(m2-m1)v20 + 2m1v10] / (m1+m2)
-
-    var v10 = new Victor(unit1.motion.vx, unit1.motion.vy);
-    var v20 = new Victor(unit2.motion.vx, unit2.motion.vy);
-
-    var v1x = ((unit1.m - unit2.m) * v10.x + 2 * unit2.m * v20.x) / (unit1.m + unit2.m);
-    var v1y = ((unit1.m - unit2.m) * v10.y + 2 * unit2.m * v20.y) / (unit1.m + unit2.m);
-    unit1.motion.ev.x += v1x;
-    unit1.motion.ev.y += v1y;
-
-    var v2x = ((unit2.m - unit1.m) * v20.x + 2 * unit1.m * v10.x) / (unit1.m + unit2.m);
-    var v2y = ((unit2.m - unit1.m) * v20.y + 2 * unit1.m * v10.y) / (unit1.m + unit2.m);
-    unit2.motion.ev.x += v2x;
-    unit2.motion.ev.y += v2y;
-}
-
-World.prototype.simpleCollide = function(unit1, unit2, distRatio)
-{
-    var dir = new Victor(unit1.x - unit2.x, unit1.y - unit2.y);
-    dir.norm();
-    var v1 = unit1.motion.v;
-    var v2 = unit2.motion.v;
-    var spring1 = unit2.cfg.velocity.springBase + (1.0 - distRatio) * unit2.cfg.velocity.springAdd;
-    var spring2 = unit1.cfg.velocity.springBase + (1.0 - distRatio) * unit1.cfg.velocity.springAdd;
-    // console.log(unit1.motion.toString());
-    // console.log(unit2.motion.toString());
-    unit1.motion.ev.x += (v2 + spring1) * dir.x * unit2.m / unit1.m;
-    unit1.motion.ev.y += (v2 + spring1) * dir.y * unit2.m / unit1.m;
-    unit2.motion.ev.x -= (v1 + spring2) * dir.x * unit1.m / unit2.m;
-    unit2.motion.ev.y -= (v1 + spring2) * dir.y * unit1.m / unit2.m;
-    // console.log(unit1.motion.toString());
-    // console.log(unit2.motion.toString());
-}
-
-World.prototype.collide = function(unit1, unit2, distRatio)
-{
-    this.simpleCollide(unit1, unit2, distRatio);
-    // console.log("unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
-    unit1.takeDamageByUnit(unit2);
-    unit2.takeDamageByUnit(unit1);
-}
-
-World.prototype.updateCollision = function()
-{
-    for (var x = 0; x < this.gridW; ++ x) {
-        for (var y = 0; y < this.gridH; ++ y) {
-
-            var idx = y * this.gridW + x;
-            for (var i in this.grids[idx]) {
-                var unit = this.grids[idx][i];
-
-                // avoid multi-collision
-                if (unit.collideTime != null) {
-                    if (this.time - unit.collideTime < this.cfg.configWorld.unitCollideCheckMS) {
-                        continue;
-                    }
-                }
-
-                // check collision with targets
-                var targets = this.getUnitsIn9Grids(x, y);
-                for (var j in targets) {
-                    var target = targets[j];
-                    if (unit == target) {
-                        continue;
-                    }
-                    if (this.needCheckCollision(unit, target) === false) {
-                        continue;
-                    }
-                    if (target.collideCheckFrame == this.frame) {
-                        continue;
-                    }
-                    var distX = unit.x - target.x;
-                    var distY = unit.y - target.y;
-                    var distR = unit.radius + target.radius;
-                    var dist2 = distX * distX + distY * distY;
-                    if (dist2 < distR * distR) {
-                        unit.collideTime = this.time;
-                        target.collideTime = this.time;
-                        this.collide(unit, target, dist2 / (distR * distR));
-                    }
-                }
-                unit.collideCheckFrame = this.frame;
-            }
-        }
+        var oldx = bullet.x;
+        var oldy = bullet.y;
+        bullet.update();
+        this.updateUnitGrid(bullet, { x: oldx, y: oldy });
     }
 }
 
@@ -2185,7 +2398,6 @@ World.prototype.updateLogic = function()
     this.updateTanks();
     this.updateObstacles();
     this.updateBullets();
-    this.updateCollision();
 }
 
 World.prototype.update = function()

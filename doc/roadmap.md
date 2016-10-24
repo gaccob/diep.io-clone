@@ -18,7 +18,8 @@ Version 0.2
 ===========
 - use protobuf as protocol
 - import node.js
-- uglify client js
+- use browserify & uglify
+- CS communication and simple logic
 - dependecies:
     - node.js & npm & cnpm
     - browserify v13.1.1(http://browserify.org/), MIT

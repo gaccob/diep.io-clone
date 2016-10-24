@@ -9,6 +9,7 @@ function HpBar(world, name, owner, display)
     this.owner = owner;
     this.display = display;
     this.percent = 1;
+    this.isDead = false;
     this.view = new View(this);
 
     this.x = this.view.x;
@@ -23,19 +24,23 @@ HpBar.prototype = {
 HpBar.prototype.die = function()
 {
     this.view.onDie();
+    this.isDead = true;
 }
 
 HpBar.prototype.update = function(percent)
 {
-    if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
-        this.view.visible = false;
-    } else {
-        this.view.visible = true;
-    }
+    if (this.isDead === false) {
 
-    if (this.percent != percent) {
-        this.view.updateHpbar(this.percent, percent);
-        this.percent = percent;
+        if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
+            this.view.visible = false;
+        } else {
+            this.view.visible = true;
+        }
+
+        if (this.percent != percent) {
+            this.view.updateHpbar(this.percent, percent);
+            this.percent = percent;
+        }
     }
 
     this.view.update();

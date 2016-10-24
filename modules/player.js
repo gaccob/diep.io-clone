@@ -17,6 +17,7 @@ function Player(world, connid, name, viewW, viewH)
         up: 0,
         down: 0,
     };
+    this.needSync = false;
 }
 
 Player.prototype = {
@@ -95,6 +96,8 @@ Player.prototype.handleMouseMove = function()
         if (player.tank != null) {
             var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
             player.tank.rotation = dir.angle() + Math.PI / 2;
+            // TODO: threshold
+            this.needSync = true;
         }
     }, false);
 }
@@ -105,6 +108,7 @@ Player.prototype.handleMouseDown = function()
     document.body.addEventListener('mousedown', function(e) {
         if (player.tank != null) {
             player.tank.revertFireStatus();
+            this.needSync = true;
         }
     }, false);
 }
@@ -135,19 +139,34 @@ Player.prototype.createTank = function()
         x: Math.random() * px + this.viewW / 2,
         y: Math.random() * py + this.viewH / 2,
     }, this, this.world.view ? true : false);
+    this.tank.player = this;
     this.resetControl();
-    this.world.addUnits.push(this.tank);
+    this.world.addUnit(this.tank);
+}
+
+Player.prototype.bindTank = function(tank)
+{
+    this.tank = tank;
+    tank.player = this;
+    this.resetControl();
 }
 
 Player.prototype.update = function()
 {
-    if (!this.tank) {
-        this.createTank();
-    } else {
+    if (this.tank) {
+        var dir = this.tank.motion.moveDir.clone();
         this.tank.motion.setMoveDirByFlag(this.control.left,
             this.control.right,
             this.control.up,
             this.control.down);
+        if (dir.x != this.tank.motion.moveDir.x || dir.y != this.tank.motion.moveDir.y) {
+            this.needSync = true;
+        }
+    }
+
+    if (this.needSync === true) {
+        this.world.synchronizer.syncOperation(this);
+        this.needSync = false;
     }
 }
 
@@ -156,8 +175,10 @@ Player.prototype.dump = function()
     var p = new this.world.proto.Player();
     p.connid = this.connid;
     p.name = this.name;
-    if (p.tank) {
-        p.id = p.tank.id;
+    p.vw = this.viewW;
+    p.vh = this.viewH;
+    if (this.tank) {
+        p.id = this.tank.id;
         p.die = false;
     } else {
         p.die = true;

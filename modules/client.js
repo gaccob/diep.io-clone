@@ -37,6 +37,8 @@ function ClientWorld()
 {
     World.call(this, true);
 
+    this.isLocal = true;
+
     this.stage = new PIXI.Container();
 
     this.view = new PIXI.Container();
@@ -56,9 +58,6 @@ function ClientWorld()
         });
     document.body.appendChild(this.renderer.view);
 
-    this.player = new Player(this, this.viewW, this.viewH);
-    this.player.addControl();
-
     this.dieSprites = [];
 
     var builder = Protobuf.loadJsonFile(this.cfg.configApp.proto);
@@ -67,15 +66,28 @@ function ClientWorld()
     this.synchronizer = new Synchronizer(this);
 
     this.dispatcher = new CDispatcher(this);
+
+    // self
+    this.connid = null;
 }
 
 ClientWorld.prototype = Object.create(World.prototype);
 ClientWorld.prototype.constructor = ClientWorld;
 
+ClientWorld.prototype.getSelf = function()
+{
+    return this.connid ?  this.players[this.connid] : null;
+}
+
 ClientWorld.prototype.updateCamera = function()
 {
-    var x = this.player.x;
-    var y = this.player.y;
+    var player = this.getSelf();
+    if (!player) {
+        return;
+    }
+
+    var x = player.x;
+    var y = player.y;
     var viewCenterX = this.viewW / 2;
     var viewCenterY = this.viewH / 2;
     x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
@@ -130,7 +142,7 @@ ClientWorld.prototype.start = function()
         console.log('client disconnected!');
     });
 
-    this.synchronizer.syncStartReq(this.socket, "test", this.viewW, this.viewH);
+    this.synchronizer.syncStartReq("test", this.viewW, this.viewH);
 }
 
 ClientWorld.prototype.update = function()
