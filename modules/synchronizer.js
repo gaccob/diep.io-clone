@@ -40,13 +40,16 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
         case this.cmd.SYNC_COLLISION:
             pkg.syncCollision = body;
             break;
+        case this.cmd.SYNC_OPERATION:
+            pkg.syncOperation = body;
+            break;
         default:
             console.log("invalid cmd=" + cmd);
             return;
     }
 
     socket.emit('pkg', pkg.encode().toArrayBuffer());
-    console.log("send message cmd=" + pkg.cmd);
+    // console.log("send message cmd=" + pkg.cmd);
     // console.log(pkg);
 }
 
@@ -59,10 +62,11 @@ Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
     this.sendPkg(this.world.socket, req, this.cmd.SYNC_START_REQ);
 }
 
-Synchronizer.prototype.syncStartRes = function(socket, result, connid)
+Synchronizer.prototype.syncStartRes = function(socket, result, connid, id)
 {
     var res = new this.world.proto.SyncStartRes();
     res.connid = connid;
+    res.id = id ? id : 0;
     if (result == this.err.SUCCESS) {
         res.units = [];
         this.world.dumpUnits(res.units);
@@ -109,15 +113,20 @@ Synchronizer.prototype.syncCollision = function(unit1, unit2)
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_COLLISION);
 }
 
-Synchronizer.prototype.syncOperation = function(player)
+Synchronizer.prototype.syncOperation = function(player, moveDir)
 {
     var sync = new this.world.proto.SyncOperation();
     sync.connid = player.connid;
     if (player.tank) {
         sync.fire = player.tank.autoFire;
         sync.rotation = player.tank.rotation;
-        sync.moveDirX = player.tank.motion.moveDir.x;
-        sync.moveDirY = player.tank.motion.moveDir.y;
+        if (moveDir) {
+            sync.moveDirX = moveDir.x;
+            sync.moveDirY = moveDir.y;
+        } else {
+            sync.moveDirX = player.tank.motion.moveDir.x;
+            sync.moveDirY = player.tank.motion.moveDir.y;
+        }
     }
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_OPERATION);
 }

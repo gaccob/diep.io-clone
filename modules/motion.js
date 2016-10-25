@@ -46,24 +46,6 @@ Motion.prototype.setMoveDirByAngle = function(angle)
     this.moveDir.y = Math.sin(angle);
 }
 
-Motion.prototype.setMoveDirByFlag = function(left, right, up, down)
-{
-    this.moveDir.x = 0;
-    this.moveDir.y = 0;
-    if (left == 1) {
-        this.moveDir.x -= 1;
-    }
-    if (right == 1) {
-        this.moveDir.x += 1;
-    }
-    if (up == 1) {
-        this.moveDir.y -= 1;
-    }
-    if (down == 1) {
-        this.moveDir.y += 1;
-    }
-}
-
 Motion.prototype.reverseIvX = function()
 {
     this.iv.x = -this.iv.x;

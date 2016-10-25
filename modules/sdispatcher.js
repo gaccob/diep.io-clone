@@ -41,7 +41,7 @@ SDispatcher.prototype.onStart = function(client, msg)
     var req = msg.syncStartReq;
     var player = this.world.addPlayer(client.id, req.name, req.viewW, req.viewH);
     player.createTank();
-    sync.syncStartRes(client, err.SUCCESS, client.id);
+    sync.syncStartRes(client, err.SUCCESS, client.id, player.tank.id);
 
     sync.syncPlayerJoin(player);
 }
@@ -56,18 +56,19 @@ SDispatcher.prototype.onOperation = function(client, msg)
 
     var sync = msg.syncOperation;
     if (player.tank) {
-        player.tank.autoFire = sync.fire;
+        if (player.tank.autoFire != sync.fire) {
+            player.tank.revertFireStatus();
+        }
         player.tank.rotation = sync.rotation;
         player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+        this.world.synchronizer.syncOperation(player);
     }
-
-    this.world.synchronizer.syncOperation(player);
 }
 
 SDispatcher.prototype.onMessage = function(client, buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-    console.log("recv message cmd=" + message.cmd);
+    // console.log("recv message cmd=" + message.cmd);
     // console.log(message);
 
     var cmd = this.world.proto.SyncCmd;

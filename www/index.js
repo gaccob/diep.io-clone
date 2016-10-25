@@ -550,7 +550,7 @@ CDispatcher.prototype = {
     constructor: CDispatcher,
 }
 
-CDispatcher.prototype.createUnit = function(u)
+CDispatcher.prototype.createUnit = function(u, slf)
 {
     var unit = null;
     switch (u.type) {
@@ -560,7 +560,8 @@ CDispatcher.prototype.createUnit = function(u)
                             u.cfgName,
                             u.motion.position,
                             null,
-                            true);
+                            true,
+                            slf);
             break;
 
         case Util.unitType.bullet:
@@ -573,7 +574,7 @@ CDispatcher.prototype.createUnit = function(u)
                               true);
             unit.bornTime = u.bornTime;
             if (unit.owner) {
-                var weapon = unit.owner.getWeapon(u.weaponIdx);
+                var weapon = unit.owner.getWeaponByName(u.weaponName);
                 if (weapon) {
                     weapon.fireBullet(unit);
                 }
@@ -591,6 +592,7 @@ CDispatcher.prototype.createUnit = function(u)
             console.log("ignore unit type=" + u.type);
             break;
     }
+
     if (unit) {
         unit.id = u.id;
         unit.motion.ev.x = u.motion.ev.x;
@@ -637,15 +639,17 @@ CDispatcher.prototype.onStartRes = function(message)
 
     var res = message.syncStartRes;
     this.world.connid = res.connid;
+
     for (var i in res.units) {
         var u = res.units[i];
         var unit = this.world.findUnit(u.id);
         if (unit) {
             unit.load(u);
         } else {
-            this.createUnit(u);
+            this.createUnit(u, u.id === res.id);
         }
     }
+
     for (var i in res.players) {
         this.createPlayer(res.players[i]);
     }
@@ -655,11 +659,6 @@ CDispatcher.prototype.onOperation = function(msg)
 {
     var sync = msg.syncOperation;
 
-    // self ignore
-    if (sync.connid == this.world.connid) {
-        return;
-    }
-
     var player = this.world.players[sync.connid];
     if (!player) {
         console.log("player[" + client.id + "] not found");
@@ -667,9 +666,16 @@ CDispatcher.prototype.onOperation = function(msg)
     }
 
     if (player.tank) {
-        player.tank.autoFire = sync.fire;
-        player.tank.rotation = sync.rotation;
-        player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+        // self only sync move dir
+        if (sync.connid == this.world.connid) {
+            player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+        }
+        // other player sync all
+        else {
+            player.tank.autoFire = sync.fire;
+            player.tank.rotation = sync.rotation;
+            player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+        }
     }
 }
 
@@ -696,7 +702,9 @@ CDispatcher.prototype.onSyncUnitDie = function(msg)
 
 CDispatcher.prototype.onSyncPlayerJoin = function(msg)
 {
-    this.createPlayer(msg.syncPlayerJoin.player);
+    if (msg.syncPlayerJoin.player.connid !== this.world.connid) {
+        this.createPlayer(msg.syncPlayerJoin.player);
+    }
 }
 
 CDispatcher.prototype.onSyncPlayerQuit = function(msg)
@@ -709,16 +717,12 @@ CDispatcher.prototype.onSyncCollision = function(msg)
     var sync = msg.syncCollision;
 
     var unit1 = this.world.findUnit(sync.u1.id);
-    if (!unit1) {
-        console.log("unit[" + sync.u1.id + "] not found");
-    } else {
+    if (unit1 && unit1.isDead === false) {
         unit1.load(sync.u1);
     }
 
     var unit2 = this.world.findUnit(sync.u2.id);
-    if (!unit2) {
-        console.log("unit[" + sync.u2.id + "] not found");
-    } else {
+    if (unit2 && unit2.isDead === false) {
         unit2.load(sync.u2);
     }
 }
@@ -726,10 +730,17 @@ CDispatcher.prototype.onSyncCollision = function(msg)
 CDispatcher.prototype.onMessage = function(buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-    console.log("recv message cmd=" + message.cmd);
+    // console.log("recv message cmd=" + message.cmd);
     // console.log(message);
 
     var cmd = this.world.proto.SyncCmd;
+
+    // not start ignpre
+    if (this.world.connid == null && message.cmd != cmd.SYNC_START_RES) {
+        return;
+    }
+
+    // dispatcher
     switch (message.cmd) {
 
         case cmd.SYNC_START_RES:
@@ -1093,24 +1104,6 @@ Motion.prototype.setMoveDirByAngle = function(angle)
     this.moveDir.y = Math.sin(angle);
 }
 
-Motion.prototype.setMoveDirByFlag = function(left, right, up, down)
-{
-    this.moveDir.x = 0;
-    this.moveDir.y = 0;
-    if (left == 1) {
-        this.moveDir.x -= 1;
-    }
-    if (right == 1) {
-        this.moveDir.x += 1;
-    }
-    if (up == 1) {
-        this.moveDir.y -= 1;
-    }
-    if (down == 1) {
-        this.moveDir.y += 1;
-    }
-}
-
 Motion.prototype.reverseIvX = function()
 {
     this.iv.x = -this.iv.x;
@@ -1235,7 +1228,9 @@ function Player(world, connid, name, viewW, viewH)
     this.connid = connid;
     this.viewW = viewW;
     this.viewH = viewH;
-    this.control = {
+
+    this.control = false;
+    this.controlDir = {
         left: 0,
         right: 0,
         up: 0,
@@ -1259,22 +1254,34 @@ Player.prototype.handleKeyDown = function()
             // 'w' or 'W'
             case 87:
             case 119:
-                player.control.up = 1;
+                if (player.controlDir.up != 1) {
+                    player.controlDir.up = 1;
+                    player.needSync = true;
+                }
                 break;
             // 'd' or 'D'
             case 68:
             case 100:
-                player.control.right = 1;
+                if (player.controlDir.right != 1) {
+                    player.controlDir.right = 1;
+                    player.needSync = true;
+                }
                 break;
             // 's' or 'S'
             case 83:
             case 115:
-                player.control.down = 1;
+                if (player.controlDir.down != 1) {
+                    player.controlDir.down = 1;
+                    player.needSync = true;
+                }
                 break;
             // 'a' or 'A'
             case 65:
             case 97:
-                player.control.left = 1;
+                if (player.controlDir.left != 1) {
+                    player.controlDir.left = 1;
+                    player.needSync = true;
+                }
                 break;
         }
     }, false);
@@ -1291,22 +1298,34 @@ Player.prototype.handleKeyUp = function()
             // 'w' or 'W'
             case 87:
             case 119:
-                player.control.up = 0;
+                if (player.controlDir.up != 0) {
+                    player.controlDir.up = 0;
+                    player.needSync = true;
+                }
                 break;
             // 'd' or 'D'
             case 68:
             case 100:
-                player.control.right = 0;
+                if (player.controlDir.right != 0) {
+                    player.controlDir.right = 0;
+                    player.needSync = true;
+                }
                 break;
             // 's' or 'S'
             case 83:
             case 115:
-                player.control.down = 0;
+                if (player.controlDir.down != 0) {
+                    player.controlDir.down = 0;
+                    player.needSync = true;
+                }
                 break;
             // 'a' or 'A'
             case 65:
             case 97:
-                player.control.left = 0;
+                if (player.controlDir.left != 0) {
+                    player.controlDir.left = 0;
+                    player.needSync = true;
+                }
                 break;
         }
     }, false);
@@ -1321,7 +1340,7 @@ Player.prototype.handleMouseMove = function()
             var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
             player.tank.rotation = dir.angle() + Math.PI / 2;
             // TODO: threshold
-            this.needSync = true;
+            player.needSync = true;
         }
     }, false);
 }
@@ -1332,27 +1351,27 @@ Player.prototype.handleMouseDown = function()
     document.body.addEventListener('mousedown', function(e) {
         if (player.tank != null) {
             player.tank.revertFireStatus();
-            this.needSync = true;
+            player.needSync = true;
         }
     }, false);
 }
 
 Player.prototype.addControl = function()
 {
-    if (this.world.view) {
-        this.handleKeyDown();
-        this.handleKeyUp();
-        this.handleMouseMove();
-        this.handleMouseDown();
-    }
+    this.control = true;
+    this.handleKeyDown();
+    this.handleKeyUp();
+    this.handleMouseMove();
+    this.handleMouseDown();
 }
 
 Player.prototype.resetControl = function()
 {
-    this.control.left = 0;
-    this.control.right = 0;
-    this.control.up = 0;
-    this.control.down = 0;
+    this.control = false;
+    this.controlDir.left = 0;
+    this.controlDir.right = 0;
+    this.controlDir.up = 0;
+    this.controlDir.down = 0;
 }
 
 Player.prototype.createTank = function()
@@ -1377,19 +1396,13 @@ Player.prototype.bindTank = function(tank)
 
 Player.prototype.update = function()
 {
-    if (this.tank) {
-        var dir = this.tank.motion.moveDir.clone();
-        this.tank.motion.setMoveDirByFlag(this.control.left,
-            this.control.right,
-            this.control.up,
-            this.control.down);
-        if (dir.x != this.tank.motion.moveDir.x || dir.y != this.tank.motion.moveDir.y) {
-            this.needSync = true;
-        }
-    }
-
     if (this.needSync === true) {
-        this.world.synchronizer.syncOperation(this);
+        if (this.control == true) {
+            var dir = Util.getVectorByControlDir(this.controlDir);
+            this.world.synchronizer.syncOperation(this, dir);
+        } else {
+            this.world.synchronizer.syncOperation(this);
+        }
         this.needSync = false;
     }
 }
@@ -1465,13 +1478,16 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
         case this.cmd.SYNC_COLLISION:
             pkg.syncCollision = body;
             break;
+        case this.cmd.SYNC_OPERATION:
+            pkg.syncOperation = body;
+            break;
         default:
             console.log("invalid cmd=" + cmd);
             return;
     }
 
     socket.emit('pkg', pkg.encode().toArrayBuffer());
-    console.log("send message cmd=" + pkg.cmd);
+    // console.log("send message cmd=" + pkg.cmd);
     // console.log(pkg);
 }
 
@@ -1484,10 +1500,11 @@ Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
     this.sendPkg(this.world.socket, req, this.cmd.SYNC_START_REQ);
 }
 
-Synchronizer.prototype.syncStartRes = function(socket, result, connid)
+Synchronizer.prototype.syncStartRes = function(socket, result, connid, id)
 {
     var res = new this.world.proto.SyncStartRes();
     res.connid = connid;
+    res.id = id ? id : 0;
     if (result == this.err.SUCCESS) {
         res.units = [];
         this.world.dumpUnits(res.units);
@@ -1534,15 +1551,20 @@ Synchronizer.prototype.syncCollision = function(unit1, unit2)
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_COLLISION);
 }
 
-Synchronizer.prototype.syncOperation = function(player)
+Synchronizer.prototype.syncOperation = function(player, moveDir)
 {
     var sync = new this.world.proto.SyncOperation();
     sync.connid = player.connid;
     if (player.tank) {
         sync.fire = player.tank.autoFire;
         sync.rotation = player.tank.rotation;
-        sync.moveDirX = player.tank.motion.moveDir.x;
-        sync.moveDirY = player.tank.motion.moveDir.y;
+        if (moveDir) {
+            sync.moveDirX = moveDir.x;
+            sync.moveDirY = moveDir.y;
+        } else {
+            sync.moveDirX = player.tank.motion.moveDir.x;
+            sync.moveDirY = player.tank.motion.moveDir.y;
+        }
     }
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_OPERATION);
 }
@@ -1555,7 +1577,7 @@ var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Tank(world, cfgName, position, player, view)
+function Tank(world, cfgName, position, player, view, slf)
 {
     this.player = player;
     this.autoFire = true;
@@ -1569,7 +1591,7 @@ function Tank(world, cfgName, position, player, view)
         }
     }
 
-    Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view);
+    Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view, slf);
 
     if (view === true) {
         Unit.prototype.addHpBar.call(this, "base", true);
@@ -1592,9 +1614,14 @@ Tank.prototype.update = function()
     }
 }
 
-Tank.prototype.getWeapon = function(idx)
+Tank.prototype.getWeaponByName = function(name)
 {
-    return this.weapons[idx];
+    for (var idx in this.weapons) {
+        if (this.weapons[idx].name === name) {
+            return this.weapons[idx];
+        }
+    }
+    return null;
 }
 
 Tank.prototype.fire = function()
@@ -1627,7 +1654,7 @@ var View = require("../modules/view");
 
 var id = 0;
 
-function Unit(world, type, cfg, position, angle, view)
+function Unit(world, type, cfg, position, angle, view, slf)
 {
     this.world = world;
     if (this.world.isLocal == false) {
@@ -1637,13 +1664,14 @@ function Unit(world, type, cfg, position, angle, view)
     this.cfg = cfg;
     this.motion = new Motion(this, this.cfg.velocity, angle);
     if (view === true) {
-        this.view = new View(this);
+        this.view = new View(this, slf);
     }
     this.x = position.x;
     this.y = position.y;
     this.rotation = 0;
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
+    this.isDead = false;
 }
 
 Unit.prototype = {
@@ -1677,6 +1705,8 @@ Unit.prototype.takeDamageByUnit = function(caster)
 
 Unit.prototype.die = function()
 {
+    this.isDead = true;
+
     if (this.hpbar) {
         this.hpbar.die();
     }
@@ -1701,7 +1731,7 @@ Unit.prototype.update = function()
         this.view.update();
     }
 
-    if (this.hpbar) {
+    if (this.isDead === false && this.hpbar) {
         this.hpbar.x += (this.x - oldX);
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.cfg.hp);
@@ -1810,6 +1840,23 @@ var Util = {
             throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
         }
     },
+
+    getVectorByControlDir: function(controlDir) {
+        var x = 0, y = 0;
+        if (controlDir.left == 1) {
+            x -= 1;
+        }
+        if (controlDir.right == 1) {
+            x += 1;
+        }
+        if (controlDir.up == 1) {
+            y -= 1;
+        }
+        if (controlDir.down == 1) {
+            y += 1;
+        }
+        return {x: x, y: y};
+    },
 };
 
 module.exports = Util;
@@ -1883,7 +1930,7 @@ function drawWeapon(view)
     view.sprite.addChild(bodySprite);
 }
 
-function drawTank(view)
+function drawTank(view, slf)
 {
     for (var idx in view.owner.weapons) {
         var weapon = view.owner.weapons[idx];
@@ -1893,8 +1940,7 @@ function drawTank(view)
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
 
-    var player = view.world.getSelf();
-    if (player == view.owner) {
+    if (slf === true) {
         graphics.beginFill(view.cfg.body.playerColor);
     } else {
         graphics.beginFill(view.cfg.body.color);
@@ -1947,7 +1993,7 @@ function drawHpbar(view)
     view.world.view.addChild(view.sprite);
 }
 
-function View(owner)
+function View(owner, slf)
 {
     this.owner = owner;
     this.cfg = this.owner.cfg.view;
@@ -1961,7 +2007,7 @@ function View(owner)
     } else if (this.owner.type == Util.unitType.weapon) {
         drawWeapon(this);
     } else if (this.owner.type == Util.unitType.tank) {
-        drawTank(this);
+        drawTank(this, slf);
     } else if (this.owner.type == Util.unitType.hpbar) {
         drawHpbar(this);
     }

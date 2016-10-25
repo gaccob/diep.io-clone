@@ -12,7 +12,7 @@ CDispatcher.prototype = {
     constructor: CDispatcher,
 }
 
-CDispatcher.prototype.createUnit = function(u)
+CDispatcher.prototype.createUnit = function(u, slf)
 {
     var unit = null;
     switch (u.type) {
@@ -22,7 +22,8 @@ CDispatcher.prototype.createUnit = function(u)
                             u.cfgName,
                             u.motion.position,
                             null,
-                            true);
+                            true,
+                            slf);
             break;
 
         case Util.unitType.bullet:
@@ -35,7 +36,7 @@ CDispatcher.prototype.createUnit = function(u)
                               true);
             unit.bornTime = u.bornTime;
             if (unit.owner) {
-                var weapon = unit.owner.getWeapon(u.weaponIdx);
+                var weapon = unit.owner.getWeaponByName(u.weaponName);
                 if (weapon) {
                     weapon.fireBullet(unit);
                 }
@@ -53,6 +54,7 @@ CDispatcher.prototype.createUnit = function(u)
             console.log("ignore unit type=" + u.type);
             break;
     }
+
     if (unit) {
         unit.id = u.id;
         unit.motion.ev.x = u.motion.ev.x;
@@ -99,15 +101,17 @@ CDispatcher.prototype.onStartRes = function(message)
 
     var res = message.syncStartRes;
     this.world.connid = res.connid;
+
     for (var i in res.units) {
         var u = res.units[i];
         var unit = this.world.findUnit(u.id);
         if (unit) {
             unit.load(u);
         } else {
-            this.createUnit(u);
+            this.createUnit(u, u.id === res.id);
         }
     }
+
     for (var i in res.players) {
         this.createPlayer(res.players[i]);
     }
@@ -117,11 +121,6 @@ CDispatcher.prototype.onOperation = function(msg)
 {
     var sync = msg.syncOperation;
 
-    // self ignore
-    if (sync.connid == this.world.connid) {
-        return;
-    }
-
     var player = this.world.players[sync.connid];
     if (!player) {
         console.log("player[" + client.id + "] not found");
@@ -129,9 +128,16 @@ CDispatcher.prototype.onOperation = function(msg)
     }
 
     if (player.tank) {
-        player.tank.autoFire = sync.fire;
-        player.tank.rotation = sync.rotation;
-        player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+        // self only sync move dir
+        if (sync.connid == this.world.connid) {
+            player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+        }
+        // other player sync all
+        else {
+            player.tank.autoFire = sync.fire;
+            player.tank.rotation = sync.rotation;
+            player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
+        }
     }
 }
 
@@ -158,7 +164,9 @@ CDispatcher.prototype.onSyncUnitDie = function(msg)
 
 CDispatcher.prototype.onSyncPlayerJoin = function(msg)
 {
-    this.createPlayer(msg.syncPlayerJoin.player);
+    if (msg.syncPlayerJoin.player.connid !== this.world.connid) {
+        this.createPlayer(msg.syncPlayerJoin.player);
+    }
 }
 
 CDispatcher.prototype.onSyncPlayerQuit = function(msg)
@@ -171,16 +179,12 @@ CDispatcher.prototype.onSyncCollision = function(msg)
     var sync = msg.syncCollision;
 
     var unit1 = this.world.findUnit(sync.u1.id);
-    if (!unit1) {
-        console.log("unit[" + sync.u1.id + "] not found");
-    } else {
+    if (unit1 && unit1.isDead === false) {
         unit1.load(sync.u1);
     }
 
     var unit2 = this.world.findUnit(sync.u2.id);
-    if (!unit2) {
-        console.log("unit[" + sync.u2.id + "] not found");
-    } else {
+    if (unit2 && unit2.isDead === false) {
         unit2.load(sync.u2);
     }
 }
@@ -188,10 +192,17 @@ CDispatcher.prototype.onSyncCollision = function(msg)
 CDispatcher.prototype.onMessage = function(buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-    console.log("recv message cmd=" + message.cmd);
+    // console.log("recv message cmd=" + message.cmd);
     // console.log(message);
 
     var cmd = this.world.proto.SyncCmd;
+
+    // not start ignpre
+    if (this.world.connid == null && message.cmd != cmd.SYNC_START_RES) {
+        return;
+    }
+
+    // dispatcher
     switch (message.cmd) {
 
         case cmd.SYNC_START_RES:

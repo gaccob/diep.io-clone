@@ -186,16 +186,22 @@
                     "id": 1
                 },
                 {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 2
+                },
+                {
                     "rule": "repeated",
                     "type": "Unit",
                     "name": "units",
-                    "id": 2
+                    "id": 3
                 },
                 {
                     "rule": "repeated",
                     "type": "Player",
                     "name": "players",
-                    "id": 3
+                    "id": 4
                 }
             ]
         },

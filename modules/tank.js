@@ -2,7 +2,7 @@ var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Tank(world, cfgName, position, player, view)
+function Tank(world, cfgName, position, player, view, slf)
 {
     this.player = player;
     this.autoFire = true;
@@ -16,7 +16,7 @@ function Tank(world, cfgName, position, player, view)
         }
     }
 
-    Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view);
+    Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view, slf);
 
     if (view === true) {
         Unit.prototype.addHpBar.call(this, "base", true);
@@ -39,9 +39,14 @@ Tank.prototype.update = function()
     }
 }
 
-Tank.prototype.getWeapon = function(idx)
+Tank.prototype.getWeaponByName = function(name)
 {
-    return this.weapons[idx];
+    for (var idx in this.weapons) {
+        if (this.weapons[idx].name === name) {
+            return this.weapons[idx];
+        }
+    }
+    return null;
 }
 
 Tank.prototype.fire = function()

@@ -41,8 +41,9 @@ message SyncStartReq {
 }
 message SyncStartRes {
     optional string connid = 1;
-    repeated Unit units = 2;
-    repeated Player players = 3;
+    optional uint32 id = 2;
+    repeated Unit units = 3;
+    repeated Player players = 4;
 }
 
 message SyncUnits {

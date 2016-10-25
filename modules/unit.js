@@ -5,7 +5,7 @@ var View = require("../modules/view");
 
 var id = 0;
 
-function Unit(world, type, cfg, position, angle, view)
+function Unit(world, type, cfg, position, angle, view, slf)
 {
     this.world = world;
     if (this.world.isLocal == false) {
@@ -15,13 +15,14 @@ function Unit(world, type, cfg, position, angle, view)
     this.cfg = cfg;
     this.motion = new Motion(this, this.cfg.velocity, angle);
     if (view === true) {
-        this.view = new View(this);
+        this.view = new View(this, slf);
     }
     this.x = position.x;
     this.y = position.y;
     this.rotation = 0;
     this.hp = this.cfg.hp;
     this.damage = this.cfg.damage;
+    this.isDead = false;
 }
 
 Unit.prototype = {
@@ -55,6 +56,8 @@ Unit.prototype.takeDamageByUnit = function(caster)
 
 Unit.prototype.die = function()
 {
+    this.isDead = true;
+
     if (this.hpbar) {
         this.hpbar.die();
     }
@@ -79,7 +82,7 @@ Unit.prototype.update = function()
         this.view.update();
     }
 
-    if (this.hpbar) {
+    if (this.isDead === false && this.hpbar) {
         this.hpbar.x += (this.x - oldX);
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.cfg.hp);

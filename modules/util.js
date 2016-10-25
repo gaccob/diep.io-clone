@@ -42,6 +42,23 @@ var Util = {
             throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
         }
     },
+
+    getVectorByControlDir: function(controlDir) {
+        var x = 0, y = 0;
+        if (controlDir.left == 1) {
+            x -= 1;
+        }
+        if (controlDir.right == 1) {
+            x += 1;
+        }
+        if (controlDir.up == 1) {
+            y -= 1;
+        }
+        if (controlDir.down == 1) {
+            y += 1;
+        }
+        return {x: x, y: y};
+    },
 };
 
 module.exports = Util;

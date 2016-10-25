@@ -11,7 +11,9 @@ function Player(world, connid, name, viewW, viewH)
     this.connid = connid;
     this.viewW = viewW;
     this.viewH = viewH;
-    this.control = {
+
+    this.control = false;
+    this.controlDir = {
         left: 0,
         right: 0,
         up: 0,
@@ -35,22 +37,34 @@ Player.prototype.handleKeyDown = function()
             // 'w' or 'W'
             case 87:
             case 119:
-                player.control.up = 1;
+                if (player.controlDir.up != 1) {
+                    player.controlDir.up = 1;
+                    player.needSync = true;
+                }
                 break;
             // 'd' or 'D'
             case 68:
             case 100:
-                player.control.right = 1;
+                if (player.controlDir.right != 1) {
+                    player.controlDir.right = 1;
+                    player.needSync = true;
+                }
                 break;
             // 's' or 'S'
             case 83:
             case 115:
-                player.control.down = 1;
+                if (player.controlDir.down != 1) {
+                    player.controlDir.down = 1;
+                    player.needSync = true;
+                }
                 break;
             // 'a' or 'A'
             case 65:
             case 97:
-                player.control.left = 1;
+                if (player.controlDir.left != 1) {
+                    player.controlDir.left = 1;
+                    player.needSync = true;
+                }
                 break;
         }
     }, false);
@@ -67,22 +81,34 @@ Player.prototype.handleKeyUp = function()
             // 'w' or 'W'
             case 87:
             case 119:
-                player.control.up = 0;
+                if (player.controlDir.up != 0) {
+                    player.controlDir.up = 0;
+                    player.needSync = true;
+                }
                 break;
             // 'd' or 'D'
             case 68:
             case 100:
-                player.control.right = 0;
+                if (player.controlDir.right != 0) {
+                    player.controlDir.right = 0;
+                    player.needSync = true;
+                }
                 break;
             // 's' or 'S'
             case 83:
             case 115:
-                player.control.down = 0;
+                if (player.controlDir.down != 0) {
+                    player.controlDir.down = 0;
+                    player.needSync = true;
+                }
                 break;
             // 'a' or 'A'
             case 65:
             case 97:
-                player.control.left = 0;
+                if (player.controlDir.left != 0) {
+                    player.controlDir.left = 0;
+                    player.needSync = true;
+                }
                 break;
         }
     }, false);
@@ -97,7 +123,7 @@ Player.prototype.handleMouseMove = function()
             var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
             player.tank.rotation = dir.angle() + Math.PI / 2;
             // TODO: threshold
-            this.needSync = true;
+            player.needSync = true;
         }
     }, false);
 }
@@ -108,27 +134,27 @@ Player.prototype.handleMouseDown = function()
     document.body.addEventListener('mousedown', function(e) {
         if (player.tank != null) {
             player.tank.revertFireStatus();
-            this.needSync = true;
+            player.needSync = true;
         }
     }, false);
 }
 
 Player.prototype.addControl = function()
 {
-    if (this.world.view) {
-        this.handleKeyDown();
-        this.handleKeyUp();
-        this.handleMouseMove();
-        this.handleMouseDown();
-    }
+    this.control = true;
+    this.handleKeyDown();
+    this.handleKeyUp();
+    this.handleMouseMove();
+    this.handleMouseDown();
 }
 
 Player.prototype.resetControl = function()
 {
-    this.control.left = 0;
-    this.control.right = 0;
-    this.control.up = 0;
-    this.control.down = 0;
+    this.control = false;
+    this.controlDir.left = 0;
+    this.controlDir.right = 0;
+    this.controlDir.up = 0;
+    this.controlDir.down = 0;
 }
 
 Player.prototype.createTank = function()
@@ -153,19 +179,13 @@ Player.prototype.bindTank = function(tank)
 
 Player.prototype.update = function()
 {
-    if (this.tank) {
-        var dir = this.tank.motion.moveDir.clone();
-        this.tank.motion.setMoveDirByFlag(this.control.left,
-            this.control.right,
-            this.control.up,
-            this.control.down);
-        if (dir.x != this.tank.motion.moveDir.x || dir.y != this.tank.motion.moveDir.y) {
-            this.needSync = true;
-        }
-    }
-
     if (this.needSync === true) {
-        this.world.synchronizer.syncOperation(this);
+        if (this.control == true) {
+            var dir = Util.getVectorByControlDir(this.controlDir);
+            this.world.synchronizer.syncOperation(this, dir);
+        } else {
+            this.world.synchronizer.syncOperation(this);
+        }
         this.needSync = false;
     }
 }
