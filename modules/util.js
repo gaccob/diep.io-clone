@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Util = {
 
     unitType: {
@@ -62,3 +64,5 @@ var Util = {
 };
 
 module.exports = Util;
+
+})();

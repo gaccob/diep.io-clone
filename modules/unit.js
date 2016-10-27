@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var HpBar = require("../modules/hpbar");
 var Motion = require("../modules/motion");
 var Util = require("../modules/util");
@@ -8,7 +10,7 @@ var id = 0;
 function Unit(world, type, cfg, position, angle, view, slf)
 {
     this.world = world;
-    if (this.world.isLocal == false) {
+    if (this.world.isLocal === false) {
         this.id = (++ id);
     }
     this.type = type;
@@ -27,7 +29,7 @@ function Unit(world, type, cfg, position, angle, view, slf)
 
 Unit.prototype = {
     constructor: Unit,
-}
+};
 
 Unit.prototype.addHpBar = function(name, visible)
 {
@@ -35,7 +37,7 @@ Unit.prototype.addHpBar = function(name, visible)
         delete this.hpbar;
     }
     this.hpbar = new HpBar(this.world, name, this, visible);
-}
+};
 
 Unit.prototype.outOfBounds = function()
 {
@@ -44,7 +46,7 @@ Unit.prototype.outOfBounds = function()
         return true;
     }
     return false;
-}
+};
 
 Unit.prototype.takeDamageByUnit = function(caster)
 {
@@ -52,7 +54,7 @@ Unit.prototype.takeDamageByUnit = function(caster)
     if (this.hp <= 0) {
         this.die();
     }
-}
+};
 
 Unit.prototype.die = function()
 {
@@ -67,7 +69,7 @@ Unit.prototype.die = function()
     }
 
     this.world.removeUnit(this);
-}
+};
 
 Unit.prototype.update = function()
 {
@@ -87,7 +89,7 @@ Unit.prototype.update = function()
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.cfg.hp);
     }
-}
+};
 
 Unit.prototype.dump = function()
 {
@@ -106,7 +108,7 @@ Unit.prototype.dump = function()
     u.motion.ev = new this.world.proto.Vector(this.motion.ev.x, this.motion.ev.y);
     u.motion.position = new this.world.proto.Vector(this.x, this.y);
     return u;
-}
+};
 
 Unit.prototype.load = function(u)
 {
@@ -131,7 +133,7 @@ Unit.prototype.load = function(u)
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.cfg.hp);
     }
-}
+};
 
 Object.defineProperties(Unit.prototype, {
     radius: {
@@ -144,4 +146,4 @@ Object.defineProperties(Unit.prototype, {
 
 module.exports = Unit;
 
-
+})();

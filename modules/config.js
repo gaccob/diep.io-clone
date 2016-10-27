@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var configBullets = require("../cfg/configBullets");
 var configDieAnimation = require("../cfg/configDieAnimation");
 var configHpbar = require("../cfg/configHpbar");
@@ -9,33 +11,35 @@ var configWorld = require("../cfg/configWorld");
 
 function Config()
 {
+    var idx;
+
     this.configBullets = {};
-    for (var idx in configBullets) {
+    for (idx in configBullets) {
         this.configBullets[configBullets[idx].alias] = configBullets[idx];
     }
 
     this.configDieAnimation = {};
-    for (var idx in configDieAnimation) {
+    for (idx in configDieAnimation) {
         this.configDieAnimation[configDieAnimation[idx].alias] = configDieAnimation[idx];
     }
 
     this.configHpbar = {};
-    for (var idx in configHpbar) {
+    for (idx in configHpbar) {
         this.configHpbar[configHpbar[idx].alias] = configHpbar[idx];
     }
 
     this.configObstacles = {};
-    for (var idx in configObstacles) {
+    for (idx in configObstacles) {
         this.configObstacles[configObstacles[idx].alias] = configObstacles[idx];
     }
 
     this.configTanks = {};
-    for (var idx in configTanks) {
+    for (idx in configTanks) {
         this.configTanks[configTanks[idx].alias] = configTanks[idx];
     }
 
     this.configWeapons = {};
-    for (var idx in configWeapons) {
+    for (idx in configWeapons) {
         this.configWeapons[configWeapons[idx].alias] = configWeapons[idx];
     }
 
@@ -52,3 +56,4 @@ function Config()
 
 module.exports = Config;
 
+})();

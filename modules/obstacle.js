@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
@@ -31,6 +33,8 @@ Obstacle.prototype.update = function()
         || this.y > this.world.spawnRegion.y + this.world.spawnRegion.h) {
         this.motion.reverseIvY();
     }
-}
+};
 
 module.exports = Obstacle;
+
+})();

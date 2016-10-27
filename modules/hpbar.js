@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Util = require("../modules/util");
 var View = require("../modules/view");
 
@@ -19,13 +21,13 @@ function HpBar(world, name, owner, display)
 
 HpBar.prototype = {
     constructor: HpBar,
-}
+};
 
 HpBar.prototype.die = function()
 {
     this.view.onDie();
     this.isDead = true;
-}
+};
 
 HpBar.prototype.update = function(percent)
 {
@@ -44,10 +46,11 @@ HpBar.prototype.update = function(percent)
     }
 
     this.view.update();
-}
+};
 
 Object.defineProperties(HpBar.prototype, {
 });
 
 module.exports = HpBar;
 
+})();

@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
@@ -10,7 +12,7 @@ function Tank(world, cfgName, position, player, view, slf)
     this.weapons = [];
     var cfg = world.cfg.configTanks[cfgName];
     for (var idx in cfg.weapons) {
-        if (cfg.weapons[idx] != "") {
+        if (cfg.weapons[idx] !== "") {
             var weapon = new Weapon(world, this, cfg.weapons[idx], view);
             this.weapons.push(weapon);
         }
@@ -37,7 +39,7 @@ Tank.prototype.update = function()
     for (var idx in this.weapons) {
         this.weapons[idx].update();
     }
-}
+};
 
 Tank.prototype.getWeaponByName = function(name)
 {
@@ -47,14 +49,14 @@ Tank.prototype.getWeaponByName = function(name)
         }
     }
     return null;
-}
+};
 
 Tank.prototype.fire = function()
 {
     for (var idx in this.weapons) {
         this.weapons[idx].fire();
     }
-}
+};
 
 Tank.prototype.revertFireStatus = function()
 {
@@ -66,7 +68,9 @@ Tank.prototype.revertFireStatus = function()
             this.weapons[idx].resetFireDelay();
         }
     }
-}
+};
 
 module.exports = Tank;
+
+})();
 

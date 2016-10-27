@@ -1,12 +1,10 @@
-var Victor = require("victor");
+(function(){ "use strict";
 
 var Config = require("../modules/config");
-var Obstacle = require("../modules/obstacle");
 var Player = require("../modules/player");
-var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
-function World(view)
+function World()
 {
     this.frame = 0;
     this.cfg = new Config();
@@ -14,7 +12,7 @@ function World(view)
     this.w = this.cfg.configMap.w;
     this.h = this.cfg.configMap.h;
 
-    this.spawnRegion = {}
+    this.spawnRegion = {};
     this.spawnRegion.x = this.w * (1.0 - this.cfg.configMap.obstacleRegion.wRatio) / 2;
     this.spawnRegion.w = this.w * this.cfg.configMap.obstacleRegion.wRatio;
     this.spawnRegion.y = this.h * (1.0 - this.cfg.configMap.obstacleRegion.hRatio) / 2;
@@ -58,7 +56,7 @@ World.prototype.addPlayer = function(connid, name, viewW, viewH)
     this.playerCount ++;
     console.log("add player:" + connid);
     return player;
-}
+};
 
 World.prototype.removePlayer = function(connid)
 {
@@ -73,24 +71,24 @@ World.prototype.removePlayer = function(connid)
             player.tank.die();
         }
     }
-}
+};
 
 World.prototype.dumpPlayers = function(players)
 {
     for (var i in this.players) {
         players.push(this.players[i].dump());
     }
-}
+};
 
 World.prototype.addUnit = function(unit)
 {
     this.unitsToAdd.push(unit);
-}
+};
 
 World.prototype.removeUnit = function(unit)
 {
     this.unitsToRemove.push(unit);
-}
+};
 
 World.prototype.findUnit = function(id)
 {
@@ -108,7 +106,7 @@ World.prototype.findUnit = function(id)
         }
     }
     return null;
-}
+};
 
 World.prototype.checkAddUnits = function()
 {
@@ -133,7 +131,7 @@ World.prototype.checkAddUnits = function()
         }
     }
     this.unitsToAdd = [];
-}
+};
 
 World.prototype.checkRemoveUnits = function()
 {
@@ -161,23 +159,24 @@ World.prototype.checkRemoveUnits = function()
         }
     }
     this.unitsToRemove = [];
-}
+};
 
 World.prototype.dumpUnits = function(units)
 {
-    for (var i in this.bullets) {
+    var i;
+    for (i in this.bullets) {
         units.push(this.bullets[i].dump());
     }
-    for (var i in this.obstacles) {
+    for (i in this.obstacles) {
         units.push(this.obstacles[i].dump());
     }
-    for (var i in this.tanks) {
+    for (i in this.tanks) {
         units.push(this.tanks[i].dump());
     }
-    for (var i in this.unitsToAdd) {
+    for (i in this.unitsToAdd) {
         units.push(this.unitsToAdd[i].dump());
     }
-}
+};
 
 World.prototype.updatePlayers = function()
 {
@@ -185,7 +184,7 @@ World.prototype.updatePlayers = function()
         var player = this.players[i];
         player.update();
     }
-}
+};
 
 World.prototype.updateTanks = function()
 {
@@ -193,7 +192,7 @@ World.prototype.updateTanks = function()
         var tank = this.tanks[i];
         tank.update();
     }
-}
+};
 
 World.prototype.updateObstacles = function()
 {
@@ -204,7 +203,7 @@ World.prototype.updateObstacles = function()
         obstacle.update();
         this.updateUnitGrid(obstacle, { x: oldx, y: oldy });
     }
-}
+};
 
 World.prototype.updateBullets = function()
 {
@@ -215,7 +214,7 @@ World.prototype.updateBullets = function()
         bullet.update();
         this.updateUnitGrid(bullet, { x: oldx, y: oldy });
     }
-}
+};
 
 World.prototype.updateUnitGrid = function(unit, oldPos)
 {
@@ -238,7 +237,7 @@ World.prototype.updateUnitGrid = function(unit, oldPos)
         delete this.grids[oidx][unit.id];
     }
     this.grids[idx][unit.id] = unit;
-}
+};
 
 World.prototype.removeUnitFromGrid = function(unit)
 {
@@ -246,7 +245,7 @@ World.prototype.removeUnitFromGrid = function(unit)
     var gy = Math.floor(unit.y / this.gridSize);
     var idx = gy * this.gridW + gx;
     delete this.grids[idx][unit.id];
-}
+};
 
 World.prototype.updateLogic = function()
 {
@@ -256,7 +255,7 @@ World.prototype.updateLogic = function()
     this.updateTanks();
     this.updateObstacles();
     this.updateBullets();
-}
+};
 
 World.prototype.update = function()
 {
@@ -268,7 +267,8 @@ World.prototype.update = function()
         this.frame ++;
         this.updateLogic();
     }
-}
+};
 
 module.exports = World;
 
+})();

@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 function Synchronizer(world)
 {
     this.world = world;
@@ -7,7 +9,7 @@ function Synchronizer(world)
 
 Synchronizer.prototype = {
     constructor: Synchronizer,
-}
+};
 
 Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
 {
@@ -51,7 +53,7 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
     socket.emit('pkg', pkg.encode().toArrayBuffer());
     // console.log("send message cmd=" + pkg.cmd);
     // console.log(pkg);
-}
+};
 
 Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
 {
@@ -60,7 +62,7 @@ Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
     req.viewH = viewH;
     req.viewW = viewW;
     this.sendPkg(this.world.socket, req, this.cmd.SYNC_START_REQ);
-}
+};
 
 Synchronizer.prototype.syncStartRes = function(socket, result, connid, id)
 {
@@ -74,7 +76,7 @@ Synchronizer.prototype.syncStartRes = function(socket, result, connid, id)
         this.world.dumpPlayers(res.players);
     }
     this.sendPkg(socket, res, this.cmd.SYNC_START_RES, result);
-}
+};
 
 Synchronizer.prototype.syncUnit = function(unit)
 {
@@ -82,28 +84,28 @@ Synchronizer.prototype.syncUnit = function(unit)
     sync.units = [];
     sync.units.push(unit.dump());
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_UNITS);
-}
+};
 
 Synchronizer.prototype.syncUnitDie = function(unit)
 {
     var sync = new this.world.proto.SyncUnitDie();
     sync.id = unit.id;
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_UNIT_DIE);
-}
+};
 
 Synchronizer.prototype.syncPlayerJoin = function(player)
 {
     var sync = new this.world.proto.SyncPlayerJoin();
     sync.player = player.dump();
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER_JOIN);
-}
+};
 
 Synchronizer.prototype.syncPlayerQuit = function(connid)
 {
     var sync = new this.world.proto.SyncPlayerQuit();
     sync.connid = connid;
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER_QUIT);
-}
+};
 
 Synchronizer.prototype.syncCollision = function(unit1, unit2)
 {
@@ -111,7 +113,7 @@ Synchronizer.prototype.syncCollision = function(unit1, unit2)
     sync.u1 = unit1.dump();
     sync.u2 = unit2.dump();
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_COLLISION);
-}
+};
 
 Synchronizer.prototype.syncOperation = function(player, moveDir)
 {
@@ -129,7 +131,9 @@ Synchronizer.prototype.syncOperation = function(player, moveDir)
         }
     }
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_OPERATION);
-}
+};
 
 module.exports = Synchronizer;
+
+})();
 

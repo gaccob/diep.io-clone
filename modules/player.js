@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Victor = require("victor");
 
 var Tank = require("../modules/tank");
@@ -24,13 +26,13 @@ function Player(world, connid, name, viewW, viewH)
 
 Player.prototype = {
     constructor: Player,
-}
+};
 
 Player.prototype.handleKeyDown = function()
 {
     var player = this;
     document.body.addEventListener('keydown', function(e) {
-        if (player.tank == null) {
+        if (player.tank === null) {
             return;
         }
         switch (e.keyCode) {
@@ -68,20 +70,20 @@ Player.prototype.handleKeyDown = function()
                 break;
         }
     }, false);
-}
+};
 
 Player.prototype.handleKeyUp = function()
 {
     var player = this;
     document.body.addEventListener('keyup', function(e) {
-        if (player.tank == null) {
+        if (player.tank === null) {
             return;
         }
         switch (e.keyCode) {
             // 'w' or 'W'
             case 87:
             case 119:
-                if (player.controlDir.up != 0) {
+                if (player.controlDir.up !== 0) {
                     player.controlDir.up = 0;
                     player.needSync = true;
                 }
@@ -89,7 +91,7 @@ Player.prototype.handleKeyUp = function()
             // 'd' or 'D'
             case 68:
             case 100:
-                if (player.controlDir.right != 0) {
+                if (player.controlDir.right !== 0) {
                     player.controlDir.right = 0;
                     player.needSync = true;
                 }
@@ -97,7 +99,7 @@ Player.prototype.handleKeyUp = function()
             // 's' or 'S'
             case 83:
             case 115:
-                if (player.controlDir.down != 0) {
+                if (player.controlDir.down !== 0) {
                     player.controlDir.down = 0;
                     player.needSync = true;
                 }
@@ -105,39 +107,39 @@ Player.prototype.handleKeyUp = function()
             // 'a' or 'A'
             case 65:
             case 97:
-                if (player.controlDir.left != 0) {
+                if (player.controlDir.left !== 0) {
                     player.controlDir.left = 0;
                     player.needSync = true;
                 }
                 break;
         }
     }, false);
-}
+};
 
 Player.prototype.handleMouseMove = function()
 {
     var player = this;
     document.body.addEventListener('mousemove', function(e) {
         var targetPos = new Victor(e.offsetX - player.world.view.x, e.offsetY - player.world.view.y);
-        if (player.tank != null) {
+        if (player.tank !== null) {
             var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
             player.tank.rotation = dir.angle() + Math.PI / 2;
             // TODO: threshold
             player.needSync = true;
         }
     }, false);
-}
+};
 
 Player.prototype.handleMouseDown = function()
 {
     var player = this;
-    document.body.addEventListener('mousedown', function(e) {
-        if (player.tank != null) {
+    document.body.addEventListener('mousedown', function() {
+        if (player.tank !== null) {
             player.tank.revertFireStatus();
             player.needSync = true;
         }
     }, false);
-}
+};
 
 Player.prototype.addControl = function()
 {
@@ -146,7 +148,7 @@ Player.prototype.addControl = function()
     this.handleKeyUp();
     this.handleMouseMove();
     this.handleMouseDown();
-}
+};
 
 Player.prototype.resetControl = function()
 {
@@ -155,7 +157,7 @@ Player.prototype.resetControl = function()
     this.controlDir.right = 0;
     this.controlDir.up = 0;
     this.controlDir.down = 0;
-}
+};
 
 Player.prototype.createTank = function()
 {
@@ -168,19 +170,19 @@ Player.prototype.createTank = function()
     this.tank.player = this;
     this.resetControl();
     this.world.addUnit(this.tank);
-}
+};
 
 Player.prototype.bindTank = function(tank)
 {
     this.tank = tank;
     tank.player = this;
     this.resetControl();
-}
+};
 
 Player.prototype.update = function()
 {
     if (this.needSync === true) {
-        if (this.control == true) {
+        if (this.control === true) {
             var dir = Util.getVectorByControlDir(this.controlDir);
             this.world.synchronizer.syncOperation(this, dir);
         } else {
@@ -188,7 +190,7 @@ Player.prototype.update = function()
         }
         this.needSync = false;
     }
-}
+};
 
 Player.prototype.dump = function()
 {
@@ -204,7 +206,7 @@ Player.prototype.dump = function()
         p.die = true;
     }
     return p;
-}
+};
 
 Object.defineProperties(Player.prototype, {
     x: {
@@ -217,3 +219,4 @@ Object.defineProperties(Player.prototype, {
 
 module.exports = Player;
 
+})();

@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Victor = require("victor");
 var Bullet = require("../modules/bullet");
 var Util = require("../modules/util");
@@ -35,12 +37,12 @@ function Weapon(world, tank, name, view)
 
 Weapon.prototype = {
     constructor: Weapon,
-}
+};
 
 Weapon.prototype.resetFireDelay = function()
 {
     this.fireFrame = this.world.frame + this.cfg.shootDelayFrame;
-}
+};
 
 Weapon.prototype.update = function()
 {
@@ -58,14 +60,15 @@ Weapon.prototype.update = function()
     if (this.view) {
         this.view.update();
     }
-}
+};
 
 // for client
+// jshint unused: false
 Weapon.prototype.fireBullet = function(bullet)
 {
     this.fireFrame = this.world.frame;
     this.fireAnimFrame = this.world.frame;
-}
+};
 
 // for server
 Weapon.prototype.fire = function()
@@ -98,7 +101,8 @@ Weapon.prototype.fire = function()
         var recoil = this.cfg.recoil / this.owner.m;
         this.owner.motion.addRecoil(recoil, angle);
     }
-}
+};
 
 module.exports = Weapon;
 
+})();

@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Bullet = require("../modules/bullet");
 var Obstacle = require("../modules/obstacle");
 var Tank = require("../modules/tank");
@@ -10,7 +12,7 @@ function CDispatcher(world)
 
 CDispatcher.prototype = {
     constructor: CDispatcher,
-}
+};
 
 CDispatcher.prototype.createUnit = function(u, slf)
 {
@@ -68,7 +70,7 @@ CDispatcher.prototype.createUnit = function(u, slf)
         this.world.addUnit(unit);
     }
     return unit;
-}
+};
 
 CDispatcher.prototype.createPlayer = function(p)
 {
@@ -89,7 +91,7 @@ CDispatcher.prototype.createPlayer = function(p)
     }
 
     return player;
-}
+};
 
 CDispatcher.prototype.onStartRes = function(message)
 {
@@ -102,7 +104,8 @@ CDispatcher.prototype.onStartRes = function(message)
     var res = message.syncStartRes;
     this.world.connid = res.connid;
 
-    for (var i in res.units) {
+    var i;
+    for (i in res.units) {
         var u = res.units[i];
         var unit = this.world.findUnit(u.id);
         if (unit) {
@@ -112,10 +115,10 @@ CDispatcher.prototype.onStartRes = function(message)
         }
     }
 
-    for (var i in res.players) {
+    for (i in res.players) {
         this.createPlayer(res.players[i]);
     }
-}
+};
 
 CDispatcher.prototype.onOperation = function(msg)
 {
@@ -123,7 +126,7 @@ CDispatcher.prototype.onOperation = function(msg)
 
     var player = this.world.players[sync.connid];
     if (!player) {
-        console.log("player[" + client.id + "] not found");
+        console.log("player[" + sync.connid + "] not found");
         return;
     }
 
@@ -139,7 +142,7 @@ CDispatcher.prototype.onOperation = function(msg)
             player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
         }
     }
-}
+};
 
 CDispatcher.prototype.onSyncUnits = function(msg)
 {
@@ -152,7 +155,7 @@ CDispatcher.prototype.onSyncUnits = function(msg)
             this.createUnit(u);
         }
     }
-}
+};
 
 CDispatcher.prototype.onSyncUnitDie = function(msg)
 {
@@ -160,19 +163,19 @@ CDispatcher.prototype.onSyncUnitDie = function(msg)
     if (unit) {
         unit.die();
     }
-}
+};
 
 CDispatcher.prototype.onSyncPlayerJoin = function(msg)
 {
     if (msg.syncPlayerJoin.player.connid !== this.world.connid) {
         this.createPlayer(msg.syncPlayerJoin.player);
     }
-}
+};
 
 CDispatcher.prototype.onSyncPlayerQuit = function(msg)
 {
     this.world.removePlayer(msg.syncPlayerQuit.connid);
-}
+};
 
 CDispatcher.prototype.onSyncCollision = function(msg)
 {
@@ -187,7 +190,7 @@ CDispatcher.prototype.onSyncCollision = function(msg)
     if (unit2 && unit2.isDead === false) {
         unit2.load(sync.u2);
     }
-}
+};
 
 CDispatcher.prototype.onMessage = function(buffer)
 {
@@ -198,7 +201,7 @@ CDispatcher.prototype.onMessage = function(buffer)
     var cmd = this.world.proto.SyncCmd;
 
     // not start ignpre
-    if (this.world.connid == null && message.cmd != cmd.SYNC_START_RES) {
+    if (this.world.connid === null && message.cmd != cmd.SYNC_START_RES) {
         return;
     }
 
@@ -237,7 +240,8 @@ CDispatcher.prototype.onMessage = function(buffer)
             console.log("invalid cmd=" + message.cmd);
             break;
     }
-}
+};
 
 module.exports = CDispatcher;
 
+})();

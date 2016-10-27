@@ -1,4 +1,4 @@
-var Player = require("../modules/player");
+(function(){ "use strict";
 
 function SDispatcher(world)
 {
@@ -7,12 +7,12 @@ function SDispatcher(world)
 
 SDispatcher.prototype = {
     constructor: SDispatcher,
-}
+};
 
 SDispatcher.prototype.onConnected = function(client)
 {
     console.log("add connection:" + client.id);
-}
+};
 
 SDispatcher.prototype.onDisconnected = function(client)
 {
@@ -21,14 +21,14 @@ SDispatcher.prototype.onDisconnected = function(client)
 
     var sync = this.world.synchronizer;
     sync.syncPlayerQuit(client.id);
-}
+};
 
 SDispatcher.prototype.onStart = function(client, msg)
 {
     var err = this.world.proto.ErrCode;
     var sync = this.world.synchronizer;
 
-    if (this.world.players[client.id] != null) {
+    if (this.world.players[client.id] !== null) {
         console.log("player[" + client.id + "] already existed");
         return sync.syncStartRes(client, err.EC_EXISTED, client.id);
     }
@@ -44,7 +44,7 @@ SDispatcher.prototype.onStart = function(client, msg)
     sync.syncStartRes(client, err.SUCCESS, client.id, player.tank.id);
 
     sync.syncPlayerJoin(player);
-}
+};
 
 SDispatcher.prototype.onOperation = function(client, msg)
 {
@@ -63,7 +63,7 @@ SDispatcher.prototype.onOperation = function(client, msg)
         player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
         this.world.synchronizer.syncOperation(player);
     }
-}
+};
 
 SDispatcher.prototype.onMessage = function(client, buffer)
 {
@@ -86,6 +86,8 @@ SDispatcher.prototype.onMessage = function(client, buffer)
             console.log("invalid cmd=" + message.cmd);
             break;
     }
-}
+};
 
 module.exports = SDispatcher;
+
+})();

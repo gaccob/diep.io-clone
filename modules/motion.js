@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Victor = require("victor");
 var Util = require("../modules/util");
 
@@ -16,7 +18,7 @@ function Motion(owner, cfg, angle)
 
 Motion.prototype = {
     constructor: Motion,
-}
+};
 
 Motion.prototype.toString = function()
 {
@@ -25,49 +27,51 @@ Motion.prototype.toString = function()
         + "iv={" + this.iv.x + "," + this.iv.y + "} "
         + "ev={" + this.ev.x + "," + this.ev.y + "} "
         + "v=" + this.v;
-}
+};
 
 Motion.prototype.randomMoveDir = function()
 {
     var angle = Math.random() * Math.PI * 2;
     this.moveDir.x = Math.cos(angle);
     this.moveDir.y = Math.sin(angle);
-}
+};
 
 Motion.prototype.setMoveDir = function(x, y)
 {
     this.moveDir.x = x;
     this.moveDir.y = y;
-}
+};
 
 Motion.prototype.setMoveDirByAngle = function(angle)
 {
     this.moveDir.x = Math.cos(angle);
     this.moveDir.y = Math.sin(angle);
-}
+};
 
 Motion.prototype.reverseIvX = function()
 {
     this.iv.x = -this.iv.x;
-}
+};
 
 Motion.prototype.reverseIvY = function()
 {
     this.iv.y = -this.iv.y;
-}
+};
 
 Motion.prototype.addRecoil = function(recoil, angle)
 {
     this.ev.x -= recoil * Math.cos(angle);
     this.ev.y -= recoil * Math.sin(angle);
-}
+};
 
 Motion.prototype.update = function(deltaMS)
 {
+    var angle, dec, ilen, elen;
+
     // internal velocity decrese
-    var ilen = this.iv.length();
+    ilen = this.iv.length();
     if (ilen > this.cfg.ivMin) {
-        var dec = this.cfg.ivDec * deltaMS / 1000;
+        dec = this.cfg.ivDec * deltaMS / 1000;
         ilen = ilen > dec ? (ilen - dec) : 0;
         ilen = ilen < this.cfg.ivMin ? this.cfg.ivMin : ilen;
         this.iv.norm().multiply(new Victor(ilen, ilen));
@@ -75,10 +79,10 @@ Motion.prototype.update = function(deltaMS)
 
     // internal velocity increse
     if (this.moveDir.length() > epsilon) {
-        var angle = this.moveDir.angle();
+        angle = this.moveDir.angle();
         this.iv.x += this.cfg.ivAcc * Math.cos(angle) * deltaMS / 1000;
         this.iv.y += this.cfg.ivAcc * Math.sin(angle) * deltaMS / 1000;
-        var ilen = this.iv.length();
+        ilen = this.iv.length();
         if (ilen > this.cfg.ivMax) {
             ilen = this.cfg.ivMax;
             this.iv.norm().multiply(new Victor(ilen, ilen));
@@ -86,9 +90,9 @@ Motion.prototype.update = function(deltaMS)
     }
 
     // eternal velocity decrese
-    var elen = this.ev.length();
+    elen = this.ev.length();
     if (elen > epsilon) {
-        var dec = this.cfg.evDec * deltaMS / 1000;
+        dec = this.cfg.evDec * deltaMS / 1000;
         elen = elen > dec ? (elen - dec) : 0;
         elen = elen > this.cfg.evMax ? this.cfg.evMax : elen;
         this.ev.norm().multiply(new Victor(elen, elen));
@@ -99,10 +103,10 @@ Motion.prototype.update = function(deltaMS)
     this.owner.y += (this.iv.y + this.ev.y) * deltaMS / 1000;
     Util.clampPosition(this.owner, 0, this.owner.world.w, 0, this.owner.world.h);
 
-    if (this.rv != null && Math.abs(this.rv) > epsilon) {
+    if (this.rv !== null && Math.abs(this.rv) > epsilon) {
         this.owner.rotation += this.rv * deltaMS / 1000;
     }
-}
+};
 
 Object.defineProperties(Motion.prototype, {
     vx: {
@@ -117,3 +121,5 @@ Object.defineProperties(Motion.prototype, {
 });
 
 module.exports = Motion;
+
+})();

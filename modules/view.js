@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Victor = require("victor");
 var Util = require("../modules/util");
 
@@ -37,9 +39,7 @@ function drawObstacle(view)
         p.rotate(Math.PI * 2 / view.cfg.side);
         graphics.lineTo(p.x, p.y);
         from.set(p.x, p.y);
-        delete p;
     }
-    delete from;
     graphics.endFill();
 
     var bodySprite = new PIXI.Sprite(graphics.generateTexture());
@@ -151,7 +151,7 @@ function View(owner, slf)
 
 View.prototype = {
     constructor: View,
-}
+};
 
 View.prototype.onDie = function()
 {
@@ -166,14 +166,14 @@ View.prototype.onDie = function()
         }
         delete this.sprite;
     }
-}
+};
 
 View.prototype.update = function()
 {
     this.x = this.owner.x;
     this.y = this.owner.y;
     this.rotation = this.owner.rotation;
-}
+};
 
 View.prototype.updateHpbar = function(oldPercent, newPercent)
 {
@@ -182,7 +182,7 @@ View.prototype.updateHpbar = function(oldPercent, newPercent)
         this.frontSprite.width = this.cfg.w * newPercent;
         this.frontSprite.x -= this.cfg.w * (1 - newPercent) / 2;
     }
-}
+};
 
 Object.defineProperties(View.prototype, {
     x: {
@@ -214,3 +214,5 @@ Object.defineProperties(View.prototype, {
 });
 
 module.exports = View;
+
+})();

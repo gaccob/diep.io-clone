@@ -1,3 +1,5 @@
+(function(){ "use strict";
+
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
@@ -25,7 +27,8 @@ Bullet.prototype.outOfDate = function()
         return true;
     }
     return false;
-}
+};
 
 module.exports = Bullet;
 
+})();

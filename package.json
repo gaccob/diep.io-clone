@@ -1,19 +1,51 @@
 {
     "name": "ppppp",
+
     "version": "0.2.0",
+
     "dependencies": {
-        "browserify": ">=13.0.0",
-        "engine.io-client": ">=1.7.0",
-        "protobufjs": ">=5.0.1",
-        "socket.io": ">=1.5.0",
-        "uglify-js": ">=2.7.0",
-        "victor": ">=1.1.0"
+        "browserify": "latest",
+        "jshint": "latest",
+        "protobufjs": "latest",
+        "socket.io-client": "latest",
+        "socket.io": "latest",
+        "uglify-js": "latest",
+        "victor": "latest"
     },
+
     "engines": {
         "node": ">=4.6.0"
     },
-    "scripts": {
-        "run": "node test.js"
+
+    "jshintConfig": {
+        "curly": true,
+        "laxbreak": true,
+        "strict": true,
+        "undef": true,
+        "unused": true,
+        "predef": [
+            "alert",
+            "console",
+            "document",
+            "module",
+            "PIXI",
+            "require"
+         ]
     },
+
+    "scripts": {
+        "lint": "jshint cfg/*.js modules/*.js",
+        "config": "python cfg/conv2js.py --excel_file=cfg/config.xlsx --output_path=cfg/ --skip_rows=1",
+        "proto": "pbjs proto/tank.proto -t json > www/tank.proto.json",
+
+        "debug": "browserify modules/client.js > www/index.js",
+        "predebug": "npm run lint && npm run config && npm run proto",
+        "postdebug": "node modules/server.js",
+
+        "release": "browserify modules/client.js | uglifyjs -mc > www/index.js",
+        "prerelease": "npm run lint && npm run config && npm run proto",
+        "postrelease": "node modules/server.js"
+    },
+
     "private": true
 }
