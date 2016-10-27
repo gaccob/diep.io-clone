@@ -28,7 +28,7 @@ SDispatcher.prototype.onStart = function(client, msg)
     var err = this.world.proto.ErrCode;
     var sync = this.world.synchronizer;
 
-    if (this.world.players[client.id] !== null) {
+    if (this.world.players[client.id]) {
         console.log("player[" + client.id + "] already existed");
         return sync.syncStartRes(client, err.EC_EXISTED, client.id);
     }

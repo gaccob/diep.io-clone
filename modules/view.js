@@ -9,7 +9,7 @@ function drawBullet(view)
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
 
     var player = view.world.getSelf();
-    if (player.tank == view.owner.owner) {
+    if (player && player.tank === view.owner.owner) {
         graphics.beginFill(view.cfg.body.playerColor);
     } else {
         graphics.beginFill(view.cfg.body.color);

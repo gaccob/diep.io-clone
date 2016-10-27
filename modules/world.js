@@ -164,14 +164,14 @@ World.prototype.checkRemoveUnits = function()
 World.prototype.dumpUnits = function(units)
 {
     var i;
-    for (i in this.bullets) {
-        units.push(this.bullets[i].dump());
-    }
     for (i in this.obstacles) {
         units.push(this.obstacles[i].dump());
     }
     for (i in this.tanks) {
         units.push(this.tanks[i].dump());
+    }
+    for (i in this.bullets) {
+        units.push(this.bullets[i].dump());
     }
     for (i in this.unitsToAdd) {
         units.push(this.unitsToAdd[i].dump());
