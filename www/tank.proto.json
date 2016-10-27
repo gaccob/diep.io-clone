@@ -103,6 +103,12 @@
                     "type": "string",
                     "name": "weaponName",
                     "id": 9
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "playerConnid",
+                    "id": 10
                 }
             ]
         },
@@ -228,7 +234,7 @@
             ]
         },
         {
-            "name": "SyncPlayerJoin",
+            "name": "SyncPlayer",
             "fields": [
                 {
                     "rule": "optional",
@@ -302,6 +308,21 @@
             ]
         },
         {
+            "name": "SyncRebornReq",
+            "fields": []
+        },
+        {
+            "name": "SyncRebornRes",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "Unit",
+                    "name": "unit",
+                    "id": 1
+                }
+            ]
+        },
+        {
             "name": "Pkg",
             "fields": [
                 {
@@ -348,8 +369,8 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "SyncPlayerJoin",
-                    "name": "syncPlayerJoin",
+                    "type": "SyncPlayer",
+                    "name": "syncPlayer",
                     "id": 15
                 },
                 {
@@ -369,6 +390,18 @@
                     "type": "SyncOperation",
                     "name": "syncOperation",
                     "id": 18
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncRebornReq",
+                    "name": "syncRebornReq",
+                    "id": 19
+                },
+                {
+                    "rule": "optional",
+                    "type": "SyncRebornRes",
+                    "name": "syncRebornRes",
+                    "id": 20
                 }
             ]
         }
@@ -394,7 +427,7 @@
                     "id": 4
                 },
                 {
-                    "name": "SYNC_PLAYER_JOIN",
+                    "name": "SYNC_PLAYER",
                     "id": 5
                 },
                 {
@@ -408,6 +441,14 @@
                 {
                     "name": "SYNC_OPERATION",
                     "id": 8
+                },
+                {
+                    "name": "SYNC_REBORN_REQ",
+                    "id": 9
+                },
+                {
+                    "name": "SYNC_REBORN_RES",
+                    "id": 10
                 }
             ]
         },
@@ -425,6 +466,14 @@
                 {
                     "name": "EC_EXISTED",
                     "id": -101
+                },
+                {
+                    "name": "EC_INVALID_PLAYER",
+                    "id": -102
+                },
+                {
+                    "name": "EC_ALIVE",
+                    "id": -103
                 }
             ]
         }

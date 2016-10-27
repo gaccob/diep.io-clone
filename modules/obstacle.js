@@ -35,6 +35,13 @@ Obstacle.prototype.update = function()
     }
 };
 
+Obstacle.prototype.collideUnit = function(caster)
+{
+    this.motion.reverseIvX();
+    this.motion.reverseIvY();
+    Unit.prototype.collideUnit.call(this, caster);
+};
+
 module.exports = Obstacle;
 
 })();

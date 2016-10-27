@@ -41,6 +41,16 @@ Tank.prototype.update = function()
     }
 };
 
+Tank.prototype.die = function()
+{
+    Unit.prototype.die.call(this);
+
+    if (this.player) {
+        this.player.tank = null;
+        console.log("player[" + this.player.connid + "] tank die");
+    }
+};
+
 Tank.prototype.getWeaponByName = function(name)
 {
     for (var idx in this.weapons) {

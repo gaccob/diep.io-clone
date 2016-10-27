@@ -19,9 +19,10 @@ message Unit {
     optional int32 hp = 4;
     optional Motion motion = 5;
     optional float rotation = 6;
-    optional uint32 ownerid = 7;    // only bullets
-    optional uint32 bornTime = 8;   // only bullets
-    optional string weaponName = 9;   // only bullets
+    optional uint32 ownerid = 7;        // only bullets
+    optional uint32 bornTime = 8;       // only bullets
+    optional string weaponName = 9;     // only bullets
+    optional string playerConnid = 10;  // only tank
 }
 
 message Player {
@@ -53,7 +54,7 @@ message SyncUnitDie {
     optional uint32 id = 1;
 }
 
-message SyncPlayerJoin {
+message SyncPlayer {
     optional Player player = 1;
 }
 message SyncPlayerQuit {
@@ -73,21 +74,31 @@ message SyncOperation {
     optional float moveDirY = 5;
 }
 
+message SyncRebornReq {
+}
+message SyncRebornRes {
+    optional Unit unit = 1;
+}
+
 enum SyncCmd {
     SYNC_START_REQ = 1;
     SYNC_START_RES = 2;
     SYNC_UNITS = 3;
     SYNC_UNIT_DIE = 4;
-    SYNC_PLAYER_JOIN = 5;
+    SYNC_PLAYER = 5;
     SYNC_PLAYER_QUIT = 6;
     SYNC_COLLISION = 7;
     SYNC_OPERATION = 8;
+    SYNC_REBORN_REQ = 9;
+    SYNC_REBORN_RES = 10;
 }
 
 enum ErrCode {
     EC_SUCCESS = 0;
     EC_FULL = -100;
     EC_EXISTED = -101;
+    EC_INVALID_PLAYER = -102;
+    EC_ALIVE = -103;
 }
 
 message Pkg {
@@ -98,9 +109,11 @@ message Pkg {
     optional SyncStartRes syncStartRes = 12;
     optional SyncUnits syncUnits = 13;
     optional SyncUnitDie syncUnitDie = 14;
-    optional SyncPlayerJoin syncPlayerJoin = 15;
+    optional SyncPlayer syncPlayer = 15;
     optional SyncPlayerQuit syncPlayerQuit = 16;
     optional SyncCollision syncCollision = 17;
     optional SyncOperation syncOperation = 18;
+    optional SyncRebornReq syncRebornReq = 19;
+    optional SyncRebornRes syncRebornRes = 20;
 }
 

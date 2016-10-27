@@ -28,6 +28,27 @@ Player.prototype = {
     constructor: Player,
 };
 
+Player.prototype.handleBlur = function()
+{
+    var player = this;
+    document.body.addEventListener('blur', function() {
+        console.log("blur....");
+        player.controlDir.up = 0;
+        player.controlDir.down = 0;
+        player.controlDir.left = 0;
+        player.controlDir.right = 0;
+    }, false);
+
+    document.body.addEventListener('focus', function() {
+        console.log("focus....");
+        player.controlDir.up = 0;
+        player.controlDir.down = 0;
+        player.controlDir.left = 0;
+        player.controlDir.right = 0;
+    }, false);
+
+};
+
 Player.prototype.handleKeyDown = function()
 {
     var player = this;
@@ -144,6 +165,7 @@ Player.prototype.handleMouseDown = function()
 Player.prototype.addControl = function()
 {
     this.control = true;
+    this.handleBlur();
     this.handleKeyDown();
     this.handleKeyUp();
     this.handleMouseMove();
@@ -163,20 +185,37 @@ Player.prototype.createTank = function()
 {
     var px = (this.world.w - this.viewW) / 2;
     var py = (this.world.h - this.viewH) / 2;
-    this.tank = new Tank(this.world, "base", {
+    var tank = new Tank(this.world, "base", {
         x: Math.random() * px + this.viewW / 2,
         y: Math.random() * py + this.viewH / 2,
     }, this, this.world.view ? true : false);
-    this.tank.player = this;
-    this.resetControl();
-    this.world.addUnit(this.tank);
+
+    this.world.addUnit(tank);
+
+    this.bindTank(tank);
 };
 
 Player.prototype.bindTank = function(tank)
 {
+    if (this.tank === tank) {
+        return;
+    }
+
+    if (this.tank === null) {
+        console.log("player[" + this.connid + "] tank bind:" + tank.id);
+    } else {
+        console.log("player[" + this.connid + "] tank replace:" + this.tank.id + "->" + tank.id);
+    }
+
     this.tank = tank;
     tank.player = this;
-    this.resetControl();
+
+    // self
+    if (this.world.isLocal === true && this === this.world.getSelf()) {
+        if (this.control === false) {
+            this.addControl();
+        }
+    }
 };
 
 Player.prototype.update = function()
@@ -208,6 +247,30 @@ Player.prototype.dump = function()
     return p;
 };
 
+Player.prototype.load = function(p)
+{
+    this.name = p.name;
+    this.viewW = p.vw;
+    this.viewH = p.vH;
+
+    // player die
+    if (p.die === true) {
+        if (this.tank) {
+            console.log("player[" + this.connid + "] tank die");
+        }
+        this.tank = null;
+    }
+    // player tank alive
+    else {
+        var tank = this.world.findUnit(p.id);
+        if (!tank) {
+            console.log("ERROR: tank[" + p.id + "] not found");
+            return;
+        }
+        this.bindTank(tank);
+    }
+};
+
 Object.defineProperties(Player.prototype, {
     x: {
         get: function() { return this.tank ? this.tank.x : 0; }
@@ -220,3 +283,4 @@ Object.defineProperties(Player.prototype, {
 module.exports = Player;
 
 })();
+

@@ -33,8 +33,8 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
         case this.cmd.SYNC_UNIT_DIE:
             pkg.syncUnitDie = body;
             break;
-        case this.cmd.SYNC_PLAYER_JOIN:
-            pkg.syncPlayerJoin = body;
+        case this.cmd.SYNC_PLAYER:
+            pkg.syncPlayer = body;
             break;
         case this.cmd.SYNC_PLAYER_QUIT:
             pkg.syncPlayerQuit = body;
@@ -44,6 +44,12 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
             break;
         case this.cmd.SYNC_OPERATION:
             pkg.syncOperation = body;
+            break;
+        case this.cmd.SYNC_REBORN_REQ:
+            pkg.syncRebornReq = body;
+            break;
+        case this.cmd.SYNC_REBORN_RES:
+            pkg.syncRebornRes = body;
             break;
         default:
             console.log("invalid cmd=" + cmd);
@@ -93,11 +99,11 @@ Synchronizer.prototype.syncUnitDie = function(unit)
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_UNIT_DIE);
 };
 
-Synchronizer.prototype.syncPlayerJoin = function(player)
+Synchronizer.prototype.syncPlayer = function(player)
 {
-    var sync = new this.world.proto.SyncPlayerJoin();
+    var sync = new this.world.proto.SyncPlayer();
     sync.player = player.dump();
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER_JOIN);
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER);
 };
 
 Synchronizer.prototype.syncPlayerQuit = function(connid)
@@ -131,6 +137,21 @@ Synchronizer.prototype.syncOperation = function(player, moveDir)
         }
     }
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_OPERATION);
+};
+
+Synchronizer.prototype.syncRebornReq = function()
+{
+    var sync = new this.world.proto.SyncRebornReq();
+    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_REBORN_REQ);
+};
+
+Synchronizer.prototype.syncRebornRes = function(socket, result, unit)
+{
+    var res = new this.world.proto.SyncRebornRes();
+    if (unit) {
+        res.unit = unit.dump();
+    }
+    this.sendPkg(socket, res, this.cmd.SYNC_REBORN_RES, result);
 };
 
 module.exports = Synchronizer;

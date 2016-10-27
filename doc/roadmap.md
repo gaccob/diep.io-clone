@@ -17,33 +17,20 @@ Version 0.1
 Version 0.2
 ===========
 - use protobuf as protocol
-- import node.js
-- use browserify & uglify
-- CS communication and simple logic
+- node.js & nmp
+- CS communication and simple PVP logic
 - dependecies:
     - node.js & npm & cnpm
-    - browserify v13.1.1(http://browserify.org/), MIT
-    - UglifyJS 2 v2.7.3 (https://github.com/mishoo/UglifyJS2), BSD-2-Clause
-    - long.js v3.2.0 (https://github.com/dcodeIO/long.js), Apache-2.0
-    - bytebuffer.js v5.0.1 (https://github.com/dcodeIO/bytebuffer.js), Apache-2.0
-    - protobuf.js v5.0.1 (https://github.com/dcodeIO/protobuf.js), Apache-2.0
-    - socket.io v1.5.0 (https://github.com/socketio/socket.io), MIT
+    - browserify (http://browserify.org/), MIT
+    - UglifyJS 2 (https://github.com/mishoo/UglifyJS2), BSD-2-Clause
+    - protobuf.js (https://github.com/dcodeIO/protobuf.js), Apache-2.0
+    - socket.io (https://github.com/socketio/socket.io), MIT
 
-
-Ver 0.3: touch input & Audio
-================================
-
-Ver 0.4: data storage & commercialization
-================================
-
-Ver 0.5: data collection & monitor
-================================
-
-Ver 0.6: load balance & reverse-proxy
-================================
-
-Ver 0.7: WeAPP adaptor
-================================
-
-Ver 1.0: new game mode & terrain
-================================
+TODO
+=====
+- game mode
+- touch input & Audio
+- profiler & data storage
+- match strategy
+- load balance
+- terrain

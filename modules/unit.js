@@ -48,12 +48,17 @@ Unit.prototype.outOfBounds = function()
     return false;
 };
 
-Unit.prototype.takeDamageByUnit = function(caster)
+Unit.prototype.takeDamage = function(damage)
 {
-    this.hp -= caster.damage;
+    this.hp -= damage;
     if (this.hp <= 0) {
         this.die();
     }
+};
+
+Unit.prototype.collideUnit = function(caster)
+{
+    this.takeDamage(caster.damage);
 };
 
 Unit.prototype.die = function()
@@ -101,6 +106,7 @@ Unit.prototype.dump = function()
     u.ownerid = this.owner ? this.owner.id : 0;
     u.bornTime = this.bornTime ? Math.floor(this.bornTime) : 0;
     u.weaponName = this.weaponName ? this.weaponName : "";
+    u.playerConnid = this.player ? this.player.connid : "";
     u.rotation = this.rotation;
     u.motion = new this.world.proto.Motion();
     u.motion.moveDir = new this.world.proto.Vector(this.motion.moveDir.x, this.motion.moveDir.y);

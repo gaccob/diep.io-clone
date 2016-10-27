@@ -72,27 +72,6 @@ CDispatcher.prototype.createUnit = function(u, slf)
     return unit;
 };
 
-CDispatcher.prototype.createPlayer = function(p)
-{
-    var player = this.world.addPlayer(p.connid, p.name, p.vw, p.vh);
-    if (p.die === false) {
-        var tank = this.world.findUnit(p.id);
-        if (!tank) {
-            console.log("player[" + p.connid + "] tank[" + p.id + "] not found");
-        } else {
-            player.bindTank(tank);
-        }
-    }
-
-    // self
-    if (p.connid === this.world.connid) {
-        console.log("player connid=" + p.connid);
-        player.addControl();
-    }
-
-    return player;
-};
-
 CDispatcher.prototype.onStartRes = function(message)
 {
     var err = this.world.proto.ErrCode;
@@ -102,7 +81,9 @@ CDispatcher.prototype.onStartRes = function(message)
     }
 
     var res = message.syncStartRes;
+
     this.world.connid = res.connid;
+    console.log("player connid=" + res.connid);
 
     var i;
     for (i in res.units) {
@@ -116,7 +97,12 @@ CDispatcher.prototype.onStartRes = function(message)
     }
 
     for (i in res.players) {
-        this.createPlayer(res.players[i]);
+        var netPlayer = res.players[i];
+        var player = this.world.addPlayer(netPlayer.connid,
+                                          netPlayer.name,
+                                          netPlayer.vw,
+                                          netPlayer.vh);
+        player.load(netPlayer);
     }
 };
 
@@ -152,7 +138,7 @@ CDispatcher.prototype.onSyncUnits = function(msg)
         if (unit) {
             unit.load(u);
         } else {
-            this.createUnit(u);
+            this.createUnit(u, this.world.connid == u.playerConnid);
         }
     }
 };
@@ -160,16 +146,35 @@ CDispatcher.prototype.onSyncUnits = function(msg)
 CDispatcher.prototype.onSyncUnitDie = function(msg)
 {
     var unit = this.world.findUnit(msg.syncUnitDie.id);
+    var player = this.world.getSelf();
+
+    var lose = false;
+    if (player && unit && player.tank === unit) {
+        lose = true;
+    }
+
     if (unit) {
         unit.die();
     }
+
+    if (lose === true) {
+        alert("You Lose! Click to Reborn!");
+        this.world.synchronizer.syncRebornReq();
+    }
 };
 
-CDispatcher.prototype.onSyncPlayerJoin = function(msg)
+CDispatcher.prototype.onSyncPlayer = function(msg)
 {
-    if (msg.syncPlayerJoin.player.connid !== this.world.connid) {
-        this.createPlayer(msg.syncPlayerJoin.player);
+    var netPlayer = msg.syncPlayer.player;
+
+    var localPlayer = this.world.players[netPlayer.connid];
+    if (!localPlayer) {
+        localPlayer = this.world.addPlayer(netPlayer.connid,
+                                           netPlayer.name,
+                                           netPlayer.vw,
+                                           netPlayer.vh);
     }
+    localPlayer.load(netPlayer);
 };
 
 CDispatcher.prototype.onSyncPlayerQuit = function(msg)
@@ -192,10 +197,17 @@ CDispatcher.prototype.onSyncCollision = function(msg)
     }
 };
 
+CDispatcher.prototype.onSyncRebornRes = function(msg)
+{
+    if (msg.result != this.world.proto.ErrCode.SUCCESS) {
+        alert("reborn result:" + msg.result);
+    }
+};
+
 CDispatcher.prototype.onMessage = function(buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-    // console.log("recv message cmd=" + message.cmd);
+    console.log("recv message cmd=" + message.cmd);
     // console.log(message);
 
     var cmd = this.world.proto.SyncCmd;
@@ -224,8 +236,8 @@ CDispatcher.prototype.onMessage = function(buffer)
             this.onSyncUnitDie(message);
             break;
 
-        case cmd.SYNC_PLAYER_JOIN:
-            this.onSyncPlayerJoin(message);
+        case cmd.SYNC_PLAYER:
+            this.onSyncPlayer(message);
             break;
 
         case cmd.SYNC_PLAYER_QUIT:
@@ -234,6 +246,10 @@ CDispatcher.prototype.onMessage = function(buffer)
 
         case cmd.SYNC_COLLISION:
             this.onSyncCollision(message);
+            break;
+
+        case cmd.SYNC_REBORN_RES:
+            this.onSyncRebornRes(message);
             break;
 
         default:

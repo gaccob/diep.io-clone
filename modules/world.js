@@ -100,7 +100,7 @@ World.prototype.findUnit = function(id)
         return this.tanks[id];
     } else {
         for (var i in this.unitsToAdd) {
-            if (this.unitsToAdd[i].id == id) {
+            if (this.unitsToAdd[i].id === id) {
                 return this.unitsToAdd[i];
             }
         }
@@ -153,9 +153,6 @@ World.prototype.checkRemoveUnits = function()
         if (unit.type == Util.unitType.tank) {
             delete this.tanks[unit.id];
             console.log("remove tank:" + unit.id);
-            if (unit.player) {
-                unit.player.tank = null;
-            }
         }
     }
     this.unitsToRemove = [];

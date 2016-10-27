@@ -243,8 +243,8 @@ SWorld.prototype.collide = function(unit1, unit2, distRatio)
 {
     this.simpleCollide(unit1, unit2, distRatio);
     // console.log("unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
-    unit1.takeDamageByUnit(unit2);
-    unit2.takeDamageByUnit(unit1);
+    unit1.collideUnit(unit2);
+    unit2.collideUnit(unit1);
     this.synchronizer.syncCollision(unit1, unit2);
 };
 

@@ -43,7 +43,30 @@ SDispatcher.prototype.onStart = function(client, msg)
     player.createTank();
     sync.syncStartRes(client, err.SUCCESS, client.id, player.tank.id);
 
-    sync.syncPlayerJoin(player);
+    sync.syncPlayer(player);
+};
+
+// jshint unused: false
+SDispatcher.prototype.onReborn = function(client, msg)
+{
+    var err = this.world.proto.ErrCode;
+    var sync = this.world.synchronizer;
+
+    var player = this.world.players[client.id];
+    if (!player) {
+        console.log("player[" + client.id + "] not found");
+        return sync.syncRebornRes(client, err.EC_INVALID_PLAYER);
+    }
+
+    if (player.tank) {
+        console.log("player[" + client.id + "] tank alive");
+        return sync.syncRebornRes(client, err.EC_ALIVE);
+    }
+
+    player.createTank();
+    sync.syncRebornRes(client, err.EC_SUCCESS, player.unit);
+    sync.syncPlayer(player);
+    console.log("player[" + client.id + "] reborn tank=" + player.tank.id);
 };
 
 SDispatcher.prototype.onOperation = function(client, msg)
@@ -80,6 +103,10 @@ SDispatcher.prototype.onMessage = function(client, buffer)
 
         case cmd.SYNC_OPERATION:
             this.onOperation(client, message);
+            break;
+
+        case cmd.SYNC_REBORN_REQ:
+            this.onReborn(client, message);
             break;
 
         default:
