@@ -8,7 +8,4 @@ install
 2. modify package.json to set app.domain & app.port
 3. npm run release
 
-online sample
-=============
-http://tank.gaccob.com:9000
 
