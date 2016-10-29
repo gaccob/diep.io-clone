@@ -1,9 +1,14 @@
-online instance
-===============
-http://tank.gaccob.com:9000
+description
+===========
+diep.io like game written with PIXI.js & Socket.IO
 
 install
 =======
 1. npm install
-2. npm run release
+2. modify package.json to set app.domain & app.port
+3. npm run release
+
+online sample
+=============
+http://tank.gaccob.com:9000
 

@@ -53,7 +53,7 @@ CDispatcher.prototype.createUnit = function(u, slf)
             break;
 
         default:
-            console.log("ignore unit type=" + u.type);
+            Util.logError("ignore unit type=" + u.type);
             break;
     }
 
@@ -83,7 +83,7 @@ CDispatcher.prototype.onStartRes = function(message)
     var res = message.syncStartRes;
 
     this.world.connid = res.connid;
-    console.log("player connid=" + res.connid);
+    Util.logDebug("player connid=" + res.connid);
 
     var i;
     for (i in res.units) {
@@ -112,7 +112,7 @@ CDispatcher.prototype.onOperation = function(msg)
 
     var player = this.world.players[sync.connid];
     if (!player) {
-        console.log("player[" + sync.connid + "] not found");
+        Util.logError("player[" + sync.connid + "] not found");
         return;
     }
 
@@ -207,8 +207,7 @@ CDispatcher.prototype.onSyncRebornRes = function(msg)
 CDispatcher.prototype.onMessage = function(buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-    console.log("recv message cmd=" + message.cmd);
-    // console.log(message);
+    Util.logTrace("recv message cmd=" + message.cmd);
 
     var cmd = this.world.proto.SyncCmd;
 
@@ -253,7 +252,7 @@ CDispatcher.prototype.onMessage = function(buffer)
             break;
 
         default:
-            console.log("invalid cmd=" + message.cmd);
+            Util.logError("invalid cmd=" + message.cmd);
             break;
     }
 };

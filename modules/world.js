@@ -54,7 +54,7 @@ World.prototype.addPlayer = function(connid, name, viewW, viewH)
     var player = new Player(this, connid, name, viewW, viewH);
     this.players[connid] = player;
     this.playerCount ++;
-    console.log("add player:" + connid);
+    Util.logDebug("add player:" + connid);
     return player;
 };
 
@@ -64,7 +64,7 @@ World.prototype.removePlayer = function(connid)
     if (player) {
         delete this.players[connid];
         -- this.playerCount;
-        console.log("remove player:" + connid);
+        Util.logDebug("remove player:" + connid);
 
         if (player.tank) {
             player.tank.player = null;
@@ -116,18 +116,18 @@ World.prototype.checkAddUnits = function()
 
         if (unit.type == Util.unitType.bullet) {
             this.bullets[unit.id] = unit;
-            console.log("add bullet:" + unit.id);
+            Util.logDebug("add bullet:" + unit.id);
         }
 
         if (unit.type == Util.unitType.obstacle) {
             this.obstacles[unit.id] = unit;
             this.obstacleCount ++;
-            console.log("add obstacle:" + unit.id);
+            Util.logDebug("add obstacle:" + unit.id);
         }
 
         if (unit.type == Util.unitType.tank) {
             this.tanks[unit.id] = unit;
-            console.log("add tank:" + unit.id);
+            Util.logDebug("add tank:" + unit.id);
         }
     }
     this.unitsToAdd = [];
@@ -141,18 +141,18 @@ World.prototype.checkRemoveUnits = function()
 
         if (unit.type == Util.unitType.bullet) {
             delete this.bullets[unit.id];
-            console.log("remove bullet:" + unit.id);
+            Util.logDebug("remove bullet:" + unit.id);
         }
 
         if (unit.type == Util.unitType.obstacle) {
             delete this.obstacles[unit.id];
             -- this.obstacleCount;
-            console.log("remove obstacle:" + unit.id);
+            Util.logDebug("remove obstacle:" + unit.id);
         }
 
         if (unit.type == Util.unitType.tank) {
             delete this.tanks[unit.id];
-            console.log("remove tank:" + unit.id);
+            Util.logDebug("remove tank:" + unit.id);
         }
     }
     this.unitsToRemove = [];

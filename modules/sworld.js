@@ -9,6 +9,7 @@ var Protobuf = require("protobufjs");
 var Victor = require("victor");
 
 var Obstacle = require("../modules/obstacle");
+var Package = require("../package.json");
 var SDispatcher = require("../modules/sdispatcher");
 var Synchronizer = require("../modules/synchronizer");
 var Util = require("../modules/util");
@@ -55,9 +56,9 @@ function SWorld()
     this.isLocal = false;
 
     this.server = Http.createServer(handleHttp);
-    this.server.listen(this.cfg.configApp.port);
+    this.server.listen(Package.app.port);
 
-    var builder = Protobuf.loadJsonFile("./www/" + this.cfg.configApp.proto);
+    var builder = Protobuf.loadJsonFile("./www/" + Package.app.proto);
     this.proto = builder.build("Tank");
 
     this.synchronizer = new Synchronizer(this);
@@ -71,7 +72,7 @@ SWorld.prototype.constructor = SWorld;
 SWorld.prototype.start = function()
 {
     this.socket = IO.listen(this.server);
-    console.log("server listened port=" + this.cfg.configApp.port);
+    Util.logDebug("server listened port=" + Package.app.port);
 
     var world = this;
     this.socket.on('connection', function(client){
@@ -229,20 +230,21 @@ SWorld.prototype.simpleCollide = function(unit1, unit2, distRatio)
     var v2 = unit2.motion.v;
     var spring1 = unit2.cfg.velocity.springBase + (1.0 - distRatio) * unit2.cfg.velocity.springAdd;
     var spring2 = unit1.cfg.velocity.springBase + (1.0 - distRatio) * unit1.cfg.velocity.springAdd;
-    // console.log(unit1.motion.toString());
-    // console.log(unit2.motion.toString());
+
+    Util.logTrace(unit1.motion.toString());
+    Util.logTrace(unit2.motion.toString());
     unit1.motion.ev.x += (v2 + spring1) * dir.x * unit2.m / unit1.m;
     unit1.motion.ev.y += (v2 + spring1) * dir.y * unit2.m / unit1.m;
     unit2.motion.ev.x -= (v1 + spring2) * dir.x * unit1.m / unit2.m;
     unit2.motion.ev.y -= (v1 + spring2) * dir.y * unit1.m / unit2.m;
-    // console.log(unit1.motion.toString());
-    // console.log(unit2.motion.toString());
+    Util.logTrace(unit1.motion.toString());
+    Util.logTrace(unit2.motion.toString());
 };
 
 SWorld.prototype.collide = function(unit1, unit2, distRatio)
 {
     this.simpleCollide(unit1, unit2, distRatio);
-    // console.log("unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
+    Util.logTrace("unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
     unit1.collideUnit(unit2);
     unit2.collideUnit(unit1);
     this.synchronizer.syncCollision(unit1, unit2);

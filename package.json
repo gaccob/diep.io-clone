@@ -47,5 +47,14 @@
         "postrelease": "node modules/server.js"
     },
 
-    "private": true
+    "private": true,
+
+    "app": {
+        "domain": "tank.gaccob.com",
+        "port": 9000,
+        "proto": "tank.proto.json",
+        "maxOnline": 30,
+        "logLevel": 1
+    }
 }
+

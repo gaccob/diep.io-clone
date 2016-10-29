@@ -28,27 +28,6 @@ Player.prototype = {
     constructor: Player,
 };
 
-Player.prototype.handleBlur = function()
-{
-    var player = this;
-    document.body.addEventListener('blur', function() {
-        console.log("blur....");
-        player.controlDir.up = 0;
-        player.controlDir.down = 0;
-        player.controlDir.left = 0;
-        player.controlDir.right = 0;
-    }, false);
-
-    document.body.addEventListener('focus', function() {
-        console.log("focus....");
-        player.controlDir.up = 0;
-        player.controlDir.down = 0;
-        player.controlDir.left = 0;
-        player.controlDir.right = 0;
-    }, false);
-
-};
-
 Player.prototype.handleKeyDown = function()
 {
     var player = this;
@@ -165,7 +144,6 @@ Player.prototype.handleMouseDown = function()
 Player.prototype.addControl = function()
 {
     this.control = true;
-    this.handleBlur();
     this.handleKeyDown();
     this.handleKeyUp();
     this.handleMouseMove();
@@ -202,9 +180,9 @@ Player.prototype.bindTank = function(tank)
     }
 
     if (this.tank === null) {
-        console.log("player[" + this.connid + "] tank bind:" + tank.id);
+        Util.logDebug("player[" + this.connid + "] tank bind:" + tank.id);
     } else {
-        console.log("player[" + this.connid + "] tank replace:" + this.tank.id + "->" + tank.id);
+        Util.logDebug("player[" + this.connid + "] tank replace:" + this.tank.id + "->" + tank.id);
     }
 
     this.tank = tank;
@@ -256,7 +234,7 @@ Player.prototype.load = function(p)
     // player die
     if (p.die === true) {
         if (this.tank) {
-            console.log("player[" + this.connid + "] tank die");
+            Util.logDebug("player[" + this.connid + "] tank die");
         }
         this.tank = null;
     }
@@ -264,7 +242,7 @@ Player.prototype.load = function(p)
     else {
         var tank = this.world.findUnit(p.id);
         if (!tank) {
-            console.log("ERROR: tank[" + p.id + "] not found");
+            Util.logError("tank[" + p.id + "] not found");
             return;
         }
         this.bindTank(tank);

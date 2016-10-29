@@ -1,6 +1,6 @@
-Version 0.1
+v0.1
 ============
-- diep.io like
+- import PIXI.js
 - base obstacles, tanks, bullets
 - base unit
 - motion model
@@ -9,28 +9,21 @@ Version 0.1
 - simple control
 - xls->js config generation (https://github.com/gaccob/gres)
 - seperate view and logic
-- dependecies:
-    - tiny-browser-require (https://github.com/ruanyf/tiny-browser-require), MIT
-    - pixi.js v4.1.0 (https://github.com/pixijs/pixi.js), MIT
-    - victor v1.1.0 (https://github.com/maxkueng/victor), MIT
 
-Version 0.2
+v0.2
 ===========
-- use protobuf as protocol
-- node.js & nmp
-- CS communication and simple PVP logic
-- dependecies:
-    - node.js & npm & cnpm
-    - browserify (http://browserify.org/), MIT
-    - UglifyJS 2 (https://github.com/mishoo/UglifyJS2), BSD-2-Clause
-    - protobuf.js (https://github.com/dcodeIO/protobuf.js), Apache-2.0
-    - socket.io (https://github.com/socketio/socket.io), MIT
+- import node.js & nmp
+- import protobuf.js & socket.io
+- add simple PVP logic
+- use browerify & UglifyJS
+- add npm script to build & run
 
 TODO
 =====
-- game mode
+- smooth motion
+- tank upgrade & transformation
 - touch input & Audio
 - profiler & data storage
+- terrain
 - match strategy
 - load balance
-- terrain

@@ -1,5 +1,8 @@
 (function(){ "use strict";
 
+var Package = require("../package.json");
+var Util = require("../modules/util");
+
 function SDispatcher(world)
 {
     this.world = world;
@@ -11,12 +14,12 @@ SDispatcher.prototype = {
 
 SDispatcher.prototype.onConnected = function(client)
 {
-    console.log("add connection:" + client.id);
+    Util.logDebug("add connection:" + client.id);
 };
 
 SDispatcher.prototype.onDisconnected = function(client)
 {
-    console.log("remove connection:" + client.id);
+    Util.logDebug("remove connection:" + client.id);
     this.world.removePlayer(client.id);
 
     var sync = this.world.synchronizer;
@@ -29,12 +32,12 @@ SDispatcher.prototype.onStart = function(client, msg)
     var sync = this.world.synchronizer;
 
     if (this.world.players[client.id]) {
-        console.log("player[" + client.id + "] already existed");
+        Util.logError("player[" + client.id + "] already existed");
         return sync.syncStartRes(client, err.EC_EXISTED, client.id);
     }
 
-    if (this.world.playerCount > this.world.cfg.configApp.maxOnline) {
-        console.log("world full player count=" + this.world.playerCount);
+    if (this.world.playerCount > Package.app.maxOnline) {
+        Util.logError("world full player count=" + this.world.playerCount);
         return sync.syncStartRes(client, err.EC_FULL, client.id);
     }
 
@@ -54,26 +57,26 @@ SDispatcher.prototype.onReborn = function(client, msg)
 
     var player = this.world.players[client.id];
     if (!player) {
-        console.log("player[" + client.id + "] not found");
+        Util.logError("player[" + client.id + "] not found");
         return sync.syncRebornRes(client, err.EC_INVALID_PLAYER);
     }
 
     if (player.tank) {
-        console.log("player[" + client.id + "] tank alive");
+        Util.logError("player[" + client.id + "] tank alive");
         return sync.syncRebornRes(client, err.EC_ALIVE);
     }
 
     player.createTank();
     sync.syncRebornRes(client, err.EC_SUCCESS, player.unit);
     sync.syncPlayer(player);
-    console.log("player[" + client.id + "] reborn tank=" + player.tank.id);
+    Util.logDebug("player[" + client.id + "] reborn tank=" + player.tank.id);
 };
 
 SDispatcher.prototype.onOperation = function(client, msg)
 {
     var player = this.world.players[client.id];
     if (!player) {
-        console.log("player[" + client.id + "] not found");
+        Util.logError("player[" + client.id + "] not found");
         return;
     }
 
@@ -91,8 +94,7 @@ SDispatcher.prototype.onOperation = function(client, msg)
 SDispatcher.prototype.onMessage = function(client, buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-    // console.log("recv message cmd=" + message.cmd);
-    // console.log(message);
+    Util.logTrace("recv message cmd=" + message.cmd);
 
     var cmd = this.world.proto.SyncCmd;
     switch (message.cmd) {
@@ -110,7 +112,7 @@ SDispatcher.prototype.onMessage = function(client, buffer)
             break;
 
         default:
-            console.log("invalid cmd=" + message.cmd);
+            Util.logError("invalid cmd=" + message.cmd);
             break;
     }
 };

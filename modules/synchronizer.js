@@ -1,5 +1,7 @@
 (function(){ "use strict";
 
+var Util = require("../modules/util");
+
 function Synchronizer(world)
 {
     this.world = world;
@@ -52,13 +54,12 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
             pkg.syncRebornRes = body;
             break;
         default:
-            console.log("invalid cmd=" + cmd);
+            Util.logError("invalid cmd=" + cmd);
             return;
     }
 
     socket.emit('pkg', pkg.encode().toArrayBuffer());
-    // console.log("send message cmd=" + pkg.cmd);
-    // console.log(pkg);
+    Util.logTrace("send message cmd=" + pkg.cmd);
 };
 
 Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)

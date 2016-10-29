@@ -4,6 +4,7 @@ var IO = require('socket.io-client');
 var Protobuf = require("protobufjs");
 
 var CDispatcher = require("../modules/cdispatcher");
+var Package = require("../package.json");
 var Synchronizer = require("../modules/synchronizer");
 var World = require("../modules/world");
 var Util = require("../modules/util");
@@ -60,7 +61,7 @@ function CWorld()
 
     this.dieSprites = [];
 
-    var builder = Protobuf.loadJsonFile(this.cfg.configApp.proto);
+    var builder = Protobuf.loadJsonFile(Package.app.proto);
     this.proto = builder.build("Tank");
 
     this.synchronizer = new Synchronizer(this);
@@ -125,12 +126,12 @@ CWorld.prototype.updateLogic = function()
 
 CWorld.prototype.start = function()
 {
-    console.log("world start");
+    Util.logDebug("world start");
 
-    this.socket = IO("ws://" + this.cfg.configApp.domain + ":" + this.cfg.configApp.port);
+    this.socket = IO("ws://" + Package.app.domain + ":" + Package.app.port);
 
     this.socket.on('connect', function() {
-        console.log('connected to the server!');
+        Util.logDebug('connected to the server!');
     });
 
     var world = this;
@@ -139,7 +140,7 @@ CWorld.prototype.start = function()
     });
 
     this.socket.on('disconnect', function() {
-        console.log('client disconnected!');
+        Util.logDebug('client disconnected!');
     });
 
     this.synchronizer.syncStartReq("test", this.viewW, this.viewH);

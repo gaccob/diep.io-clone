@@ -47,7 +47,7 @@ Tank.prototype.die = function()
 
     if (this.player) {
         this.player.tank = null;
-        console.log("player[" + this.player.connid + "] tank die");
+        Util.logDebug("player[" + this.player.connid + "] tank die");
     }
 };
 
