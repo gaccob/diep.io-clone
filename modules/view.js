@@ -93,7 +93,7 @@ function drawTank(view, slf)
     view.world.view.addChild(view.sprite);
 }
 
-function drawHpbar(view)
+function drawHpBar(view)
 {
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
@@ -129,6 +129,19 @@ function drawHpbar(view)
     view.world.view.addChild(view.sprite);
 }
 
+function drawNameBar(view)
+{
+    var text = new PIXI.Text(view.owner.name, view.cfg);
+    view.sprite.addChild(text);
+
+    // TODO: position bug
+    var holder = view.owner.owner;
+    view.sprite.x = holder.x - view.sprite.width - 300;
+    view.sprite.y = holder.y - holder.radius - 100;
+
+    view.world.view.addChild(view.sprite);
+}
+
 function View(owner, slf)
 {
     this.owner = owner;
@@ -145,7 +158,9 @@ function View(owner, slf)
     } else if (this.owner.type == Util.unitType.tank) {
         drawTank(this, slf);
     } else if (this.owner.type == Util.unitType.hpbar) {
-        drawHpbar(this);
+        drawHpBar(this);
+    } else if (this.owner.type == Util.unitType.namebar) {
+        drawNameBar(this);
     }
 }
 
@@ -160,7 +175,8 @@ View.prototype.onDie = function()
         || this.owner.type == Util.unitType.tank) {
         this.world.dieSprites.push(this.sprite);
     }
-    if (this.owner.type == Util.unitType.hpbar) {
+    if (this.owner.type == Util.unitType.hpbar
+        || this.owner.type == Util.unitType.namebar) {
         if (this.sprite.parent) {
             this.sprite.parent.removeChild(this.sprite);
         }

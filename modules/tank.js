@@ -22,6 +22,9 @@ function Tank(world, cfgName, position, player, view, slf)
 
     if (view === true) {
         Unit.prototype.addHpBar.call(this, "base", true);
+        if (player) {
+            Unit.prototype.addNameBar.call(this, player.name);
+        }
     }
 }
 

@@ -10,6 +10,7 @@ var Util = {
         bullet: 3,
         obstacle: 4,
         hpbar: 5,
+        namebar: 6
     },
 
     logLevelType: {

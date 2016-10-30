@@ -140,9 +140,10 @@ Synchronizer.prototype.syncOperation = function(player, moveDir)
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_OPERATION);
 };
 
-Synchronizer.prototype.syncRebornReq = function()
+Synchronizer.prototype.syncRebornReq = function(name)
 {
     var sync = new this.world.proto.SyncRebornReq();
+    sync.name = name;
     this.sendPkg(this.world.socket, sync, this.cmd.SYNC_REBORN_REQ);
 };
 

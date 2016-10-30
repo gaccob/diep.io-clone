@@ -76,9 +76,10 @@ CDispatcher.prototype.onStartRes = function(message)
 {
     var err = this.world.proto.ErrCode;
     if (message.result != err.SUCCESS) {
-        alert("start fail:" + message.result);
+        Util.logError("start fail:" + message.result);
         return;
     }
+    this.world.startUI.visible = false;
 
     var res = message.syncStartRes;
 
@@ -158,8 +159,10 @@ CDispatcher.prototype.onSyncUnitDie = function(msg)
     }
 
     if (lose === true) {
-        alert("You Lose! Click to Reborn!");
-        this.world.synchronizer.syncRebornReq();
+        EZGUI.components.startButton.text = "CLICK TO REBORN";
+        EZGUI.components.startNameInput.text = player.name;
+        this.world.startUI.visible = true;
+        player.resetControlDir();
     }
 };
 
@@ -200,7 +203,9 @@ CDispatcher.prototype.onSyncCollision = function(msg)
 CDispatcher.prototype.onSyncRebornRes = function(msg)
 {
     if (msg.result != this.world.proto.ErrCode.SUCCESS) {
-        alert("reborn result:" + msg.result);
+        Util.logError("reborn result:" + msg.result);
+    } else {
+        this.world.startUI.visible = false;
     }
 };
 

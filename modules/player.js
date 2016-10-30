@@ -150,9 +150,8 @@ Player.prototype.addControl = function()
     this.handleMouseDown();
 };
 
-Player.prototype.resetControl = function()
+Player.prototype.resetControlDir = function()
 {
-    this.control = false;
     this.controlDir.left = 0;
     this.controlDir.right = 0;
     this.controlDir.up = 0;
@@ -187,6 +186,11 @@ Player.prototype.bindTank = function(tank)
 
     this.tank = tank;
     tank.player = this;
+
+    // player name
+    if (this.tank.view) {
+        this.tank.addNameBar(this.name);
+    }
 
     // self
     if (this.world.isLocal === true && this === this.world.getSelf()) {

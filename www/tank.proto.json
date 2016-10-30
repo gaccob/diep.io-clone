@@ -309,7 +309,14 @@
         },
         {
             "name": "SyncRebornReq",
-            "fields": []
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "name",
+                    "id": 1
+                }
+            ]
         },
         {
             "name": "SyncRebornRes",

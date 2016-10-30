@@ -67,6 +67,7 @@ SDispatcher.prototype.onReborn = function(client, msg)
     }
 
     player.createTank();
+    player.name = msg.syncRebornReq.name;
     sync.syncRebornRes(client, err.EC_SUCCESS, player.unit);
     sync.syncPlayer(player);
     Util.logDebug("player[" + client.id + "] reborn tank=" + player.tank.id);

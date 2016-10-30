@@ -75,6 +75,7 @@ message SyncOperation {
 }
 
 message SyncRebornReq {
+    optional string name = 1;
 }
 message SyncRebornRes {
     optional Unit unit = 1;

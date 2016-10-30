@@ -6,6 +6,7 @@ var Protobuf = require("protobufjs");
 var CDispatcher = require("../modules/cdispatcher");
 var Package = require("../package.json");
 var Synchronizer = require("../modules/synchronizer");
+var StartUI = require("../ui/start");
 var World = require("../modules/world");
 var Util = require("../modules/util");
 
@@ -39,16 +40,9 @@ function CWorld()
     World.call(this);
 
     this.isLocal = true;
+    this.inited = false;
 
-    this.stage = new PIXI.Container();
-
-    this.view = new PIXI.Container();
-    this.view.addChild(getWorldBackground(this));
-    this.stage.addChild(this.view);
-
-    this.ui = new PIXI.Container();
-    this.stage.addChild(this.ui);
-
+    // renderer
     this.viewW = document.documentElement.clientWidth;
     this.viewH = document.documentElement.clientHeight - 10;
     this.renderer = new PIXI.CanvasRenderer(
@@ -58,6 +52,20 @@ function CWorld()
             autoResize: true,
         });
     document.body.appendChild(this.renderer.view);
+
+    this.stage = new PIXI.Container();
+
+    // main view
+    this.view = new PIXI.Container();
+    this.view.addChild(getWorldBackground(this));
+    this.stage.addChild(this.view);
+
+    // ui
+    EZGUI.renderer = this.renderer;
+    var world = this;
+    EZGUI.Theme.load(['assets/theme/metalworks-theme.json'], function() {
+        world.loadStartUI();
+    });
 
     this.dieSprites = [];
 
@@ -78,6 +86,28 @@ CWorld.prototype.constructor = CWorld;
 CWorld.prototype.getSelf = function()
 {
     return this.connid ?  this.players[this.connid] : null;
+};
+
+CWorld.prototype.loadStartUI = function()
+{
+    this.startUI = EZGUI.create(StartUI, 'metalworks');
+    this.startUI.x = (this.viewW - this.startUI.width) / 2;
+    this.startUI.y = (this.viewH - this.startUI.height) / 2;
+
+    var world = this;
+    EZGUI.components.startButton.on('click', function() {
+        var name = EZGUI.components.startNameInput.text.trim();
+        if (name.length > 10) {
+            name = name.substring(0, 10);
+        }
+        if (world.inited === false) {
+            world.init();
+            world.start(name);
+        } else {
+            world.synchronizer.syncRebornReq(name);
+        }
+    });
+    this.stage.addChild(this.startUI);
 };
 
 CWorld.prototype.updateCamera = function()
@@ -124,9 +154,9 @@ CWorld.prototype.updateLogic = function()
     this.updateDieAnimations();
 };
 
-CWorld.prototype.start = function()
+CWorld.prototype.init = function()
 {
-    Util.logDebug("world start");
+    Util.logDebug("world init");
 
     this.socket = IO("ws://" + Package.app.domain + ":" + Package.app.port);
 
@@ -143,7 +173,12 @@ CWorld.prototype.start = function()
         Util.logDebug('client disconnected!');
     });
 
-    this.synchronizer.syncStartReq("test", this.viewW, this.viewH);
+    this.inited = true;
+};
+
+CWorld.prototype.start = function(name)
+{
+    this.synchronizer.syncStartReq(name ? name : "guest", this.viewW, this.viewH);
 };
 
 CWorld.prototype.update = function()
