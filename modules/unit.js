@@ -2,7 +2,6 @@
 
 var HpBar = require("../modules/hpbar");
 var Motion = require("../modules/motion");
-var NameBar = require("../modules/namebar");
 var Util = require("../modules/util");
 var View = require("../modules/view");
 
@@ -34,19 +33,19 @@ Unit.prototype = {
 
 Unit.prototype.addHpBar = function(name, visible)
 {
-    if (this.hpbar) {
-        delete this.hpbar;
+    if (this.view) {
+        if (this.hpbar) {
+            delete this.hpbar;
+        }
+        this.hpbar = new HpBar(this.world, name, this, visible);
     }
-    this.hpbar = new HpBar(this.world, name, this, visible);
 };
 
 Unit.prototype.addNameBar = function(name)
 {
-    if (this.namebar) {
-        this.namebar.die();
-        delete this.namebar;
+    if (this.view) {
+        this.view.addNameBar(name);
     }
-    this.namebar = new NameBar(this.world, name, this);
 };
 
 Unit.prototype.outOfBounds = function()
@@ -79,10 +78,6 @@ Unit.prototype.die = function()
         this.hpbar.die();
     }
 
-    if (this.namebar) {
-        this.namebar.die();
-    }
-
     if (this.view) {
         this.view.onDie();
     }
@@ -107,12 +102,6 @@ Unit.prototype.update = function()
         this.hpbar.x += (this.x - oldX);
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.cfg.hp);
-    }
-
-    if (this.isDead === false && this.namebar) {
-        this.namebar.x += (this.x - oldX);
-        this.namebar.y += (this.y - oldY);
-        this.namebar.update();
     }
 };
 
@@ -158,10 +147,6 @@ Unit.prototype.load = function(u)
         this.hpbar.x += (this.x - oldX);
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.cfg.hp);
-    }
-    if (this.namebar) {
-        this.namebar.x += (this.x - oldX);
-        this.namebar.y += (this.y - oldY);
     }
 };
 

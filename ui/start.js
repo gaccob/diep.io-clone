@@ -5,6 +5,7 @@ var StartUI = {
     position: { x: 10, y: 10 },
     width: 500,
     height: 300,
+    layout: [1, 3],
     children: [
         {
             id: "startText",
@@ -17,7 +18,7 @@ var StartUI = {
             text: "Enter your name:",
             width: 200,
             height: 20,
-            position: {x: 130, y: 60 }
+            position: {x: 130, y: 80 }
         },
         {
             id: "startNameInput",
@@ -29,7 +30,7 @@ var StartUI = {
             text: "guest",
             width: 280,
             height: 50,
-            position: {x: 110, y: 100 }
+            position: "center"
         },
         {
             id: "startButton",
@@ -37,7 +38,7 @@ var StartUI = {
             text: "START GAME",
             width: 240,
             height: 40,
-            position: {x: 130, y: 200 }
+            position: "center"
         }
     ]
 };

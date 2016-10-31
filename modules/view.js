@@ -129,19 +129,6 @@ function drawHpBar(view)
     view.world.view.addChild(view.sprite);
 }
 
-function drawNameBar(view)
-{
-    var text = new PIXI.Text(view.owner.name, view.cfg);
-    view.sprite.addChild(text);
-
-    // TODO: position bug
-    var holder = view.owner.owner;
-    view.sprite.x = holder.x - view.sprite.width - 300;
-    view.sprite.y = holder.y - holder.radius - 100;
-
-    view.world.view.addChild(view.sprite);
-}
-
 function View(owner, slf)
 {
     this.owner = owner;
@@ -159,13 +146,28 @@ function View(owner, slf)
         drawTank(this, slf);
     } else if (this.owner.type == Util.unitType.hpbar) {
         drawHpBar(this);
-    } else if (this.owner.type == Util.unitType.namebar) {
-        drawNameBar(this);
     }
 }
 
 View.prototype = {
     constructor: View,
+};
+
+View.prototype.addNameBar = function(name)
+{
+    if (this.nameBar) {
+        this.nameBar.parent.removeChild(this.nameBar);
+    }
+    this.nameBar = new PIXI.Text(name, {
+        font: '18px Arail',
+        fill: 0x101010,
+        stroke: 0xf0f0f0,
+        strokeThickness: 2,
+        align: 'center'
+    });
+    this.world.view.addChild(this.nameBar);
+
+    console.log("view unit x=" + this.nameBar.x + " y=" + this.nameBar.y);
 };
 
 View.prototype.onDie = function()
@@ -175,12 +177,17 @@ View.prototype.onDie = function()
         || this.owner.type == Util.unitType.tank) {
         this.world.dieSprites.push(this.sprite);
     }
-    if (this.owner.type == Util.unitType.hpbar
-        || this.owner.type == Util.unitType.namebar) {
+
+    if (this.owner.type == Util.unitType.hpbar) {
         if (this.sprite.parent) {
             this.sprite.parent.removeChild(this.sprite);
         }
-        delete this.sprite;
+        this.sprite = null;
+    }
+
+    if (this.nameBar) {
+        this.nameBar.parent.removeChild(this.nameBar);
+        this.nameBar = null;
     }
 };
 
@@ -189,6 +196,12 @@ View.prototype.update = function()
     this.x = this.owner.x;
     this.y = this.owner.y;
     this.rotation = this.owner.rotation;
+
+    // name bar no rotation
+    if (this.nameBar) {
+        this.nameBar.x = this.x - this.nameBar.width / 2;
+        this.nameBar.y = this.y - this.owner.radius - this.nameBar.height - 15;
+    }
 };
 
 View.prototype.updateHpbar = function(oldPercent, newPercent)

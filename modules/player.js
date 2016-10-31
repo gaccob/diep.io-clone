@@ -187,10 +187,8 @@ Player.prototype.bindTank = function(tank)
     this.tank = tank;
     tank.player = this;
 
-    // player name
-    if (this.tank.view) {
-        this.tank.addNameBar(this.name);
-    }
+    // name
+    this.tank.addNameBar(this.name);
 
     // self
     if (this.world.isLocal === true && this === this.world.getSelf()) {

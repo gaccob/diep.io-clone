@@ -20,11 +20,12 @@ function Tank(world, cfgName, position, player, view, slf)
 
     Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view, slf);
 
-    if (view === true) {
-        Unit.prototype.addHpBar.call(this, "base", true);
-        if (player) {
-            Unit.prototype.addNameBar.call(this, player.name);
-        }
+    // hp bar
+    Unit.prototype.addHpBar.call(this, "base", true);
+
+    // name bar
+    if (player) {
+        Unit.prototype.addNameBar.call(this, player.name);
     }
 }
 
