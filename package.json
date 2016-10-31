@@ -44,7 +44,7 @@
         "postdebug": "node modules/server.js",
 
         "release": "browserify modules/client.js | uglifyjs -mc > www/index.js",
-        "prerelease": "npm run lint && npm run config && npm run proto",
+        "prerelease": "npm run lint && npm run proto",
         "postrelease": "node modules/server.js"
     },
 
