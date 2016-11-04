@@ -105,6 +105,20 @@ Util.logFatal = function(str)
     }
 };
 
+Util.findUIObject = function(object, id)
+{
+    if (object.Id === id) {
+        return object;
+    }
+    for (var i in object.children) {
+        var found = Util.findUIObject(object.children[i], id);
+        if (found) {
+            return found;
+        }
+    }
+    return null;
+};
+
 module.exports = Util;
 
 })();

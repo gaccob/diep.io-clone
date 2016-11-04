@@ -3,12 +3,16 @@
 var IO = require('socket.io-client');
 var Protobuf = require("protobufjs");
 
-var CDispatcher = require("../modules/cdispatcher");
 var Package = require("../package.json");
+
+var CDispatcher = require("../modules/cdispatcher");
 var Synchronizer = require("../modules/synchronizer");
-var StartUI = require("../ui/start");
 var World = require("../modules/world");
 var Util = require("../modules/util");
+
+var StartUI = require("../ui/start");
+var LeaderBoardUI = require("../ui/leaderBoard");
+
 
 function getWorldBackground(world)
 {
@@ -60,11 +64,12 @@ function CWorld()
     this.view.addChild(getWorldBackground(this));
     this.stage.addChild(this.view);
 
-    // ui
+    // async load ui window
     EZGUI.renderer = this.renderer;
     var world = this;
     EZGUI.Theme.load(['assets/theme/metalworks-theme.json'], function() {
         world.loadStartUI();
+        world.leaderBoardUI = new LeaderBoardUI(world);
     });
 
     this.dieSprites = [];
@@ -91,8 +96,9 @@ CWorld.prototype.getSelf = function()
 CWorld.prototype.loadStartUI = function()
 {
     this.startUI = EZGUI.create(StartUI, 'metalworks');
-    this.startUI.x = (this.viewW - this.startUI.width) / 2;
-    this.startUI.y = (this.viewH - this.startUI.height) / 2;
+    this.startUI.x = (this.viewW - StartUI.width) / 2;
+    this.startUI.y = (this.viewH - StartUI.height) / 2;
+    this.startUI.visible = true;
 
     var world = this;
     EZGUI.components.startButton.on('click', function() {
@@ -108,6 +114,22 @@ CWorld.prototype.loadStartUI = function()
         }
     });
     this.stage.addChild(this.startUI);
+};
+
+CWorld.prototype.updateUI = function()
+{
+    if (this.startUI) {
+        var player = this.getSelf();
+        if (!player || player.die === true) {
+            this.startUI.visible = true;
+        } else {
+            this.startUI.visible = false;
+        }
+    }
+
+    if (this.leaderBoardUI) {
+        this.leaderBoardUI.update();
+    }
 };
 
 CWorld.prototype.updateCamera = function()
@@ -185,6 +207,7 @@ CWorld.prototype.update = function()
 {
     World.prototype.update.call(this);
     this.updateCamera();
+    this.updateUI();
     this.renderer.render(this.stage);
 };
 

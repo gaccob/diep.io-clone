@@ -161,7 +161,6 @@ CDispatcher.prototype.onSyncUnitDie = function(msg)
     if (lose === true) {
         EZGUI.components.startButton.text = "CLICK TO REBORN";
         EZGUI.components.startNameInput.text = player.name;
-        this.world.startUI.visible = true;
         player.resetControlDir();
     }
 };
@@ -204,8 +203,6 @@ CDispatcher.prototype.onSyncRebornRes = function(msg)
 {
     if (msg.result != this.world.proto.ErrCode.SUCCESS) {
         Util.logError("reborn result:" + msg.result);
-    } else {
-        this.world.startUI.visible = false;
     }
 };
 
