@@ -4,6 +4,7 @@ var configBullets = require("../cfg/configBullets");
 var configDieAnimation = require("../cfg/configDieAnimation");
 var configHpbar = require("../cfg/configHpbar");
 var configObstacles = require("../cfg/configObstacles");
+var configPropAdd = require("../cfg/configPropAdd");
 var configTanks = require("../cfg/configTanks");
 var configWeapons = require("../cfg/configWeapons");
 var configMap = require("../cfg/configMap");
@@ -41,6 +42,11 @@ function Config()
     this.configWeapons = {};
     for (idx in configWeapons) {
         this.configWeapons[configWeapons[idx].alias] = configWeapons[idx];
+    }
+
+    this.configPropAdd = {};
+    for (idx in configPropAdd) {
+        this.configPropAdd[configPropAdd[idx].type] = configPropAdd[idx].add;
     }
 
     this.configMap = configMap[0];

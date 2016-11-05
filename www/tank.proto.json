@@ -415,6 +415,43 @@
     ],
     "enums": [
         {
+            "name": "PropType",
+            "values": [
+                {
+                    "name": "PT_HEALTH_REGEN",
+                    "id": 1
+                },
+                {
+                    "name": "PT_MAX_HEALTH",
+                    "id": 2
+                },
+                {
+                    "name": "PT_BODY_DAMAGE",
+                    "id": 3
+                },
+                {
+                    "name": "PT_BULLET_SPEED",
+                    "id": 4
+                },
+                {
+                    "name": "PT_BULLET_PENETRATION",
+                    "id": 5
+                },
+                {
+                    "name": "PT_BULLET_DAMAGE",
+                    "id": 6
+                },
+                {
+                    "name": "PT_RELOAD",
+                    "id": 7
+                },
+                {
+                    "name": "PT_MOVEMENT_SPEED",
+                    "id": 8
+                }
+            ]
+        },
+        {
             "name": "SyncCmd",
             "values": [
                 {

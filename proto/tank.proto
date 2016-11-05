@@ -1,5 +1,16 @@
 package Tank;
 
+enum PropType {
+    PT_HEALTH_REGEN = 1;
+    PT_MAX_HEALTH = 2;
+    PT_BODY_DAMAGE = 3;
+    PT_BULLET_SPEED = 4;
+    PT_BULLET_PENETRATION = 5;
+    PT_BULLET_DAMAGE = 6;
+    PT_RELOAD = 7;
+    PT_MOVEMENT_SPEED = 8;
+}
+
 message Vector {
     optional float x = 1;
     optional float y = 2;
