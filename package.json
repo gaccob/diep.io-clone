@@ -35,7 +35,7 @@
     },
 
     "scripts": {
-        "lint": "jshint modules/*.js",
+        "lint": "jshint modules/*.js ui/*.js",
         "config": "python cfg/conv2js.py --excel_file=cfg/config.xlsx --output_path=cfg/ --skip_rows=1",
         "proto": "pbjs proto/tank.proto -t json > www/tank.proto.json",
 

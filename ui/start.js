@@ -1,4 +1,6 @@
-var StartUI = {
+(function() { 'use strict';
+
+var cfg = {
     id: "startWindow",
     component: "Window",
     padding: 4,
@@ -43,4 +45,44 @@ var StartUI = {
     ]
 };
 
+function StartUI(world)
+{
+    this.world = world;
+
+    this.ui = EZGUI.create(cfg, 'metalworks');
+    this.ui.x = (world.viewW - cfg.width) / 2;
+    this.ui.y = (world.viewH - cfg.height) / 2;
+    this.ui.visible = true;
+
+    EZGUI.components.startButton.on('click', function() {
+        var name = EZGUI.components.startNameInput.text.trim();
+        if (name.length > 10) {
+            name = name.substring(0, 10);
+        }
+        if (world.inited === false) {
+            world.init();
+            world.start(name);
+        } else {
+            world.synchronizer.syncRebornReq(name);
+        }
+    });
+    world.stage.addChild(this.ui);
+}
+
+StartUI.prototype = {
+    constructor: StartUI
+};
+
+StartUI.prototype.update = function()
+{
+    var player = this.world.getSelf();
+    if (!player || player.die === true) {
+        this.ui.visible = true;
+    } else {
+        this.ui.visible = false;
+    }
+};
+
 module.exports = StartUI;
+
+})();

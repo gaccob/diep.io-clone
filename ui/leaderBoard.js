@@ -15,7 +15,7 @@ var cfg = {
     },
     draggable: false,
     padding: 4,
-    width: 200,
+    width: 180,
     height: 220,
 };
 
@@ -26,7 +26,7 @@ var labelCfg = {
         font: 'Skranji'
     },
     text: '',
-    width: 200,
+    width: 180,
     height: 35,
     anchor: { x: 0, y: 0.5 },
     position: {x: 0, y: 0}
@@ -47,7 +47,7 @@ function LeaderBoardUI(world)
     this.labels = {};
 
     this.world.stage.addChild(this.ui);
-};
+}
 
 LeaderBoardUI.prototype = {
     constructor: LeaderBoardUI
@@ -93,7 +93,8 @@ LeaderBoardUI.prototype.update = function()
             continue;
         }
 
-        label.text = player.name + '  0/0/0';
+        // TODO: kd
+        label.text = player.name + '  0/0';
         label.x = 16;
         label.y = cfg.header.height + i * labelCfg.height + 20;
         ++ i;

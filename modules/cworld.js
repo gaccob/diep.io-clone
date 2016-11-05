@@ -68,7 +68,7 @@ function CWorld()
     EZGUI.renderer = this.renderer;
     var world = this;
     EZGUI.Theme.load(['assets/theme/metalworks-theme.json'], function() {
-        world.loadStartUI();
+        world.startUI = new StartUI(world);
         world.leaderBoardUI = new LeaderBoardUI(world);
     });
 
@@ -93,40 +93,11 @@ CWorld.prototype.getSelf = function()
     return this.connid ?  this.players[this.connid] : null;
 };
 
-CWorld.prototype.loadStartUI = function()
-{
-    this.startUI = EZGUI.create(StartUI, 'metalworks');
-    this.startUI.x = (this.viewW - StartUI.width) / 2;
-    this.startUI.y = (this.viewH - StartUI.height) / 2;
-    this.startUI.visible = true;
-
-    var world = this;
-    EZGUI.components.startButton.on('click', function() {
-        var name = EZGUI.components.startNameInput.text.trim();
-        if (name.length > 10) {
-            name = name.substring(0, 10);
-        }
-        if (world.inited === false) {
-            world.init();
-            world.start(name);
-        } else {
-            world.synchronizer.syncRebornReq(name);
-        }
-    });
-    this.stage.addChild(this.startUI);
-};
-
 CWorld.prototype.updateUI = function()
 {
     if (this.startUI) {
-        var player = this.getSelf();
-        if (!player || player.die === true) {
-            this.startUI.visible = true;
-        } else {
-            this.startUI.visible = false;
-        }
+        this.startUI.update();
     }
-
     if (this.leaderBoardUI) {
         this.leaderBoardUI.update();
     }
