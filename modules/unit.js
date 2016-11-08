@@ -23,8 +23,25 @@ function Unit(world, type, cfg, position, angle, view, slf)
     this.y = position.y;
     this.rotation = 0;
     this.hp = this.cfg.hp;
-    this.damage = this.cfg.damage;
+    this.maxHp = this.cfg.hp;
+
+    this.hpRegen = (this.cfg.hpRegen || 0);
+    this.hpRegenFrame = this.world.frame;
+
+    this.damage = (this.cfg.damage || 0);
+
     this.isDead = false;
+
+    var pt = this.world.proto.PropType;
+    this.props = {};
+    this.props[pt.PT_HEALTH_REGEN] = 0;
+    this.proto[pt.PT_MAX_HEALTH] = 0;
+    this.proto[pt.PT_BODY_DAMAGE] = 0;
+    this.proto[pt.PT_BULLET_SPEED] = 0;
+    this.proto[pt.PT_BULLET_PENETRATION] = 0;
+    this.proto[pt.PT_BULLET_DAMAGE] = 0;
+    this.proto[pt.PT_RELOAD] = 0;
+    this.proto[pt.PT_MOVEMENT_SPEED] = 0;
 }
 
 Unit.prototype = {
@@ -94,6 +111,15 @@ Unit.prototype.update = function()
     this.motion.update(deltaMS);
     this.world.updateUnitGrid(this, {x: oldX, y: oldY});
 
+    if (this.hpRegen > 0) {
+        var hpRegenTime = (this.world.frame - this.hpRegenFrame) * deltaMS;
+        this.hp += this.hpRegen * hpRegenTime / 1000;
+        if (this.hp > this.maxHp) {
+            this.hp = this.maxHp;
+        }
+        this.hpRegenFrame = this.world.frame;
+    }
+
     if (this.view) {
         this.view.update();
     }
@@ -101,7 +127,7 @@ Unit.prototype.update = function()
     if (this.isDead === false && this.hpbar) {
         this.hpbar.x += (this.x - oldX);
         this.hpbar.y += (this.y - oldY);
-        this.hpbar.update(this.hp / this.cfg.hp);
+        this.hpbar.update(this.hp / this.maxHp);
     }
 };
 
@@ -146,7 +172,35 @@ Unit.prototype.load = function(u)
     if (this.hpbar) {
         this.hpbar.x += (this.x - oldX);
         this.hpbar.y += (this.y - oldY);
-        this.hpbar.update(this.hp / this.cfg.hp);
+        this.hpbar.update(this.hp / this.maxHp);
+    }
+};
+
+Unit.prototype.addProp = function(type)
+{
+    // add prop
+    if (!this.props[type]) {
+        Util.logError("prop[" + type + "] not found");
+        return;
+    }
+    ++ this.props[type];
+
+    var value = this.props[type];
+    var add = this.world.cfg.configPropAdd[type][add];
+    Util.logDebug("unit[" + this.id + "] prop[" + type + "]=" + value + " add=" + add);
+
+    // hp regen
+    if (type == this.world.proto.PropType.PT_HEALTH_REGEN) {
+        this.hpRegen = this.cfg.hpRegen * (1.0 + add);
+    }
+    // max hp
+    else if (type == this.world.proto.PropType.PT_MAX_HEALTH) {
+        var oldMaxHp = this.maxHp;
+        this.maxHp = this.cfg.hp * (1.0 + add);
+        this.hp = this.hp * this.maxHp / oldMaxHp;
+        if (this.hp > this.maxHp) {
+            this.hp = this.maxHp;
+        }
     }
 };
 

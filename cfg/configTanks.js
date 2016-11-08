@@ -30,6 +30,7 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
+		"hpRegen": 2.0,
 		"view": {
 			"body": {
 				"color": "0xf14e54",
@@ -79,6 +80,7 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
+		"hpRegen": 3.0,
 		"view": {
 			"body": {
 				"color": "0xf14e54",
@@ -128,6 +130,7 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
+		"hpRegen": 4.0,
 		"view": {
 			"body": {
 				"color": "0xf14e54",
