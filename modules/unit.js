@@ -82,11 +82,6 @@ Unit.prototype.takeDamage = function(damage)
     }
 };
 
-Unit.prototype.collideUnit = function(caster)
-{
-    this.takeDamage(caster.damage);
-};
-
 Unit.prototype.die = function()
 {
     this.isDead = true;

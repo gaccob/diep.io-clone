@@ -20,100 +20,52 @@ SDispatcher.prototype.onConnected = function(client)
 SDispatcher.prototype.onDisconnected = function(client)
 {
     Util.logDebug("remove connection:" + client.id);
-    this.world.removePlayer(client.id);
-
-    var sync = this.world.synchronizer;
-    sync.syncPlayerQuit(client.id);
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_QUIT;
+    commander.connid = client.id;
+    this.world.commander.push(this.world.frame + 1, commander);
 };
 
-SDispatcher.prototype.onStart = function(client, msg)
+SDispatcher.prototype.onStart = function(client, pkg)
 {
     var err = this.world.proto.ErrCode;
     var sync = this.world.synchronizer;
-
     if (this.world.players[client.id]) {
         Util.logError("player[" + client.id + "] already existed");
         return sync.syncStartRes(client, err.EC_EXISTED, client.id);
     }
-
     if (this.world.playerCount > Package.app.maxOnline) {
         Util.logError("world full player count=" + this.world.playerCount);
         return sync.syncStartRes(client, err.EC_FULL, client.id);
     }
+    sync.syncStartRes(client, err.SUCCESS, client.id);
 
-    var req = msg.syncStartReq;
-    var player = this.world.addPlayer(client.id, req.name, req.viewW, req.viewH);
-    player.createTank();
-    sync.syncStartRes(client, err.SUCCESS, client.id, player.tank.id);
-
-    sync.syncPlayer(player);
+    // TODO: join frame
 };
 
-// jshint unused: false
-SDispatcher.prototype.onReborn = function(client, msg)
+SDispatcher.prototype.onCommanders = function(client, pkg)
 {
-    var err = this.world.proto.ErrCode;
-    var sync = this.world.synchronizer;
-
-    var player = this.world.players[client.id];
-    if (!player) {
-        Util.logError("player[" + client.id + "] not found");
-        return sync.syncRebornRes(client, err.EC_INVALID_PLAYER);
-    }
-
-    if (player.tank) {
-        Util.logError("player[" + client.id + "] tank alive");
-        return sync.syncRebornRes(client, err.EC_ALIVE);
-    }
-
-    player.createTank();
-    player.name = msg.syncRebornReq.name;
-    sync.syncRebornRes(client, err.EC_SUCCESS, player.unit);
-    sync.syncPlayer(player);
-    Util.logDebug("player[" + client.id + "] reborn tank=" + player.tank.id);
-};
-
-SDispatcher.prototype.onOperation = function(client, msg)
-{
-    var player = this.world.players[client.id];
-    if (!player) {
-        Util.logError("player[" + client.id + "] not found");
-        return;
-    }
-
-    var sync = msg.syncOperation;
-    if (player.tank) {
-        if (player.tank.autoFire != sync.fire) {
-            player.tank.revertFireStatus();
-        }
-        player.tank.rotation = sync.rotation;
-        player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
-        this.world.synchronizer.syncOperation(player);
+    for (var i in pkg.syncCommands) {
+        var commander = pkg.syncCommands[i];
+        commander.connid = client.id;
+        this.world.commander.push(this.world.frame + 1, commander);
     }
 };
 
 SDispatcher.prototype.onMessage = function(client, buffer)
 {
-    var message = this.world.proto.Pkg.decode(buffer);
-    Util.logTrace("recv message cmd=" + message.cmd);
-
+    var pkg = this.world.proto.Pkg.decode(buffer);
+    Util.logTrace("recv pkg cmd=" + pkg.cmd);
     var cmd = this.world.proto.SyncCmd;
-    switch (message.cmd) {
-
+    switch (pkg.cmd) {
         case cmd.SYNC_START_REQ:
-            this.onStart(client, message);
+            this.onStart(client, pkg);
             break;
-
-        case cmd.SYNC_OPERATION:
-            this.onOperation(client, message);
+        case cmd.SYNC_COMMANDERS:
+            this.onCommanders(client, pkg);
             break;
-
-        case cmd.SYNC_REBORN_REQ:
-            this.onReborn(client, message);
-            break;
-
         default:
-            Util.logError("invalid cmd=" + message.cmd);
+            Util.logError("invalid cmd=" + pkg.cmd);
             break;
     }
 };

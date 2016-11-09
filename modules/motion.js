@@ -9,7 +9,7 @@ function Motion(owner, cfg, angle)
 {
     this.owner = owner;
     this.cfg = cfg;
-    this.moveDir = new Victor(0, 0);
+    this.moveAngle = 0; // 0-360, degree
     this.iv = new Victor(cfg.ivInit * Math.cos(angle),
         cfg.ivInit * Math.sin(angle));
     this.ev = new Victor(0, 0);
@@ -23,29 +23,15 @@ Motion.prototype = {
 Motion.prototype.toString = function()
 {
     return "unit[" + this.owner.id + "] "
-        + "move dir={" + this.moveDir.x + "," + this.moveDir.y + "} "
+        + "move angle={" + this.moveAngle
         + "iv={" + this.iv.x + "," + this.iv.y + "} "
         + "ev={" + this.ev.x + "," + this.ev.y + "} "
         + "v=" + this.v;
 };
 
-Motion.prototype.randomMoveDir = function()
+Motion.prototype.randomMoveAngle = function()
 {
-    var angle = Math.random() * Math.PI * 2;
-    this.moveDir.x = Math.cos(angle);
-    this.moveDir.y = Math.sin(angle);
-};
-
-Motion.prototype.setMoveDir = function(x, y)
-{
-    this.moveDir.x = x;
-    this.moveDir.y = y;
-};
-
-Motion.prototype.setMoveDirByAngle = function(angle)
-{
-    this.moveDir.x = Math.cos(angle);
-    this.moveDir.y = Math.sin(angle);
+    // TODO:
 };
 
 Motion.prototype.reverseIvX = function()

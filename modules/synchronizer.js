@@ -29,29 +29,8 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
         case this.cmd.SYNC_START_RES:
             pkg.syncStartRes = body;
             break;
-        case this.cmd.SYNC_UNITS:
-            pkg.syncUnits = body;
-            break;
-        case this.cmd.SYNC_UNIT_DIE:
-            pkg.syncUnitDie = body;
-            break;
-        case this.cmd.SYNC_PLAYER:
-            pkg.syncPlayer = body;
-            break;
-        case this.cmd.SYNC_PLAYER_QUIT:
-            pkg.syncPlayerQuit = body;
-            break;
-        case this.cmd.SYNC_COLLISION:
-            pkg.syncCollision = body;
-            break;
-        case this.cmd.SYNC_OPERATION:
-            pkg.syncOperation = body;
-            break;
-        case this.cmd.SYNC_REBORN_REQ:
-            pkg.syncRebornReq = body;
-            break;
-        case this.cmd.SYNC_REBORN_RES:
-            pkg.syncRebornRes = body;
+        case this.cmd.SYNC_COMMANDERS:
+            pkg.syncCommanders = body;
             break;
         default:
             Util.logError("invalid cmd=" + cmd);
@@ -62,20 +41,16 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
     Util.logTrace("send message cmd=" + pkg.cmd);
 };
 
-Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
+Synchronizer.prototype.syncStartReq = function()
 {
     var req = new this.world.proto.SyncStartReq();
-    req.name = name;
-    req.viewH = viewH;
-    req.viewW = viewW;
     this.sendPkg(this.world.socket, req, this.cmd.SYNC_START_REQ);
 };
 
-Synchronizer.prototype.syncStartRes = function(socket, result, connid, id)
+Synchronizer.prototype.syncStartRes = function(socket, result, connid)
 {
     var res = new this.world.proto.SyncStartRes();
     res.connid = connid;
-    res.id = id ? id : 0;
     if (result == this.err.SUCCESS) {
         res.units = [];
         this.world.dumpUnits(res.units);
@@ -85,75 +60,71 @@ Synchronizer.prototype.syncStartRes = function(socket, result, connid, id)
     this.sendPkg(socket, res, this.cmd.SYNC_START_RES, result);
 };
 
-Synchronizer.prototype.syncUnit = function(unit)
+Synchronizer.prototype.syncJoin = function(name, viewW, viewH)
 {
-    var sync = new this.world.proto.SyncUnits();
-    sync.units = [];
-    sync.units.push(unit.dump());
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_UNITS);
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_JOIN;
+    commander.join = new this.world.proto.SyncCommander.Join();
+    commander.join.name = name;
+    commander.join.viewH = viewH;
+    commander.join.viewW = viewW;
+
+    var commanders = [];
+    commanders.push(commander);
+    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
-Synchronizer.prototype.syncUnitDie = function(unit)
+Synchronizer.prototype.syncReborn = function(name)
 {
-    var sync = new this.world.proto.SyncUnitDie();
-    sync.id = unit.id;
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_UNIT_DIE);
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_REBORN;
+    commander.reborn = new this.world.proto.SyncCommander.Reborn();
+    commander.reborn.name = name;
+
+    var commanders = [];
+    commanders.push(commander);
+    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
-Synchronizer.prototype.syncPlayer = function(player)
+Synchronizer.prototype.syncMove = function(angle)
 {
-    var sync = new this.world.proto.SyncPlayer();
-    sync.player = player.dump();
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER);
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_MOVE;
+    commander.move = new this.world.proto.SyncCommander.Move();
+    commander.move.angle = angle;
+
+    var commanders = [];
+    commanders.push(commander);
+    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
-Synchronizer.prototype.syncPlayerQuit = function(connid)
+Synchronizer.prototype.syncRotate = function(angle)
 {
-    var sync = new this.world.proto.SyncPlayerQuit();
-    sync.connid = connid;
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_PLAYER_QUIT);
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_ROTATE;
+    commander.rotate = new this.world.proto.SyncCommander.Rotate();
+    commander.rotate.angle = angle;
+
+    var commanders = [];
+    commanders.push(commander);
+    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
-Synchronizer.prototype.syncCollision = function(unit1, unit2)
+Synchronizer.prototype.syncFire = function(fire)
 {
-    var sync = new this.world.proto.SyncCollision();
-    sync.u1 = unit1.dump();
-    sync.u2 = unit2.dump();
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_COLLISION);
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_FIRE;
+    commander.fire = new this.world.proto.SyncCommander.Fire();
+    commander.fire.fire = fire;
+
+    var commanders = [];
+    commanders.push(commander);
+    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
-Synchronizer.prototype.syncOperation = function(player, moveDir)
+Synchronizer.prototype.syncCommanders = function(commanders)
 {
-    var sync = new this.world.proto.SyncOperation();
-    sync.connid = player.connid;
-    if (player.tank) {
-        sync.fire = player.tank.autoFire;
-        sync.rotation = player.tank.rotation;
-        if (moveDir) {
-            sync.moveDirX = moveDir.x;
-            sync.moveDirY = moveDir.y;
-        } else {
-            sync.moveDirX = player.tank.motion.moveDir.x;
-            sync.moveDirY = player.tank.motion.moveDir.y;
-        }
-    }
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_OPERATION);
-};
-
-Synchronizer.prototype.syncRebornReq = function(name)
-{
-    var sync = new this.world.proto.SyncRebornReq();
-    sync.name = name;
-    this.sendPkg(this.world.socket, sync, this.cmd.SYNC_REBORN_REQ);
-};
-
-Synchronizer.prototype.syncRebornRes = function(socket, result, unit)
-{
-    var res = new this.world.proto.SyncRebornRes();
-    if (unit) {
-        res.unit = unit.dump();
-    }
-    this.sendPkg(socket, res, this.cmd.SYNC_REBORN_RES, result);
+    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
 module.exports = Synchronizer;

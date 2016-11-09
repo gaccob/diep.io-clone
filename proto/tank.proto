@@ -47,62 +47,17 @@ message Player {
 }
 
 message SyncStartReq {
-    optional string name = 1;
-    optional uint32 viewW = 2;
-    optional uint32 viewH = 3;
 }
 message SyncStartRes {
     optional string connid = 1;
-    optional uint32 id = 2;
-    repeated Unit units = 3;
-    repeated Player players = 4;
-}
-
-message SyncUnits {
-    repeated Unit units = 1;
-}
-message SyncUnitDie {
-    optional uint32 id = 1;
-}
-
-message SyncPlayer {
-    optional Player player = 1;
-}
-message SyncPlayerQuit {
-    optional string connid = 1;
-}
-
-message SyncCollision {
-    optional Unit u1 = 1;
-    optional Unit u2 = 2;
-}
-
-message SyncOperation {
-    optional string connid = 1;
-    optional bool fire = 2;
-    optional float rotation = 3;
-    optional float moveDirX = 4;
-    optional float moveDirY = 5;
-}
-
-message SyncRebornReq {
-    optional string name = 1;
-}
-message SyncRebornRes {
-    optional Unit unit = 1;
+    repeated Unit units = 2;
+    repeated Player players = 3;
 }
 
 enum SyncCmd {
+    SYNC_COMMANDERS = 0;
     SYNC_START_REQ = 1;
     SYNC_START_RES = 2;
-    SYNC_UNITS = 3;
-    SYNC_UNIT_DIE = 4;
-    SYNC_PLAYER = 5;
-    SYNC_PLAYER_QUIT = 6;
-    SYNC_COLLISION = 7;
-    SYNC_OPERATION = 8;
-    SYNC_REBORN_REQ = 9;
-    SYNC_REBORN_RES = 10;
 }
 
 enum ErrCode {
@@ -113,19 +68,57 @@ enum ErrCode {
     EC_ALIVE = -103;
 }
 
+enum CommanderType {
+    CT_JOIN = 0;
+    CT_QUIT = 1;
+    CT_REBORN = 2;
+    CT_MOVE = 3;
+    CT_ROTATE = 4;
+    CT_FIRE = 5;
+}
+
+message SyncCommander {
+    optional CommanderType cmd = 1;
+    optional string connid = 2;
+
+    message Join {
+        optional string name = 1;
+        optional uint32 viewW = 2;
+        optional uint32 viewH = 3;
+    }
+    optional Join join = 10;
+
+    message Quit {
+    }
+    optional Quit quit = 11;
+
+    message Reborn {
+        optional string name = 1;
+    }
+    optional Reborn reborn = 12;
+
+    message Move {
+        optional uint32 angle = 1; // 0-360
+    }
+    optional Move move = 13;
+
+    message Rotate {
+        optional uint32 angle = 1; // 0-360;
+    }
+    optional Rotate rotate = 14;
+
+    message Fire {
+        optional bool fire = 1;
+    }
+    optional Fire fire = 15;
+}
+
 message Pkg {
     optional uint32 frame = 1;
     optional SyncCmd cmd = 2;
     optional ErrCode result = 3;
+    repeated SyncCommander syncCommanders = 10;
     optional SyncStartReq syncStartReq = 11;
     optional SyncStartRes syncStartRes = 12;
-    optional SyncUnits syncUnits = 13;
-    optional SyncUnitDie syncUnitDie = 14;
-    optional SyncPlayer syncPlayer = 15;
-    optional SyncPlayerQuit syncPlayerQuit = 16;
-    optional SyncCollision syncCollision = 17;
-    optional SyncOperation syncOperation = 18;
-    optional SyncRebornReq syncRebornReq = 19;
-    optional SyncRebornRes syncRebornRes = 20;
 }
 

@@ -107,104 +107,39 @@ CDispatcher.prototype.onStartRes = function(message)
     }
 };
 
-CDispatcher.prototype.onOperation = function(msg)
+CDispatcher.prototype.onCommanders = function(msg)
 {
-    var sync = msg.syncOperation;
-
-    var player = this.world.players[sync.connid];
-    if (!player) {
-        Util.logError("player[" + sync.connid + "] not found");
-        return;
+    var any = false;
+    for (var i in msg.syncCommanders) {
+        this.world.commander.push(msg.frame, msg.syncCommanders[i]);
+        any = true;
     }
-
-    if (player.tank) {
-        // self only sync move dir
-        if (sync.connid == this.world.connid) {
-            player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
-        }
-        // other player sync all
-        else {
-            player.tank.autoFire = sync.fire;
-            player.tank.rotation = sync.rotation;
-            player.tank.motion.setMoveDir(sync.moveDirX, sync.moveDirY);
-        }
+    if (any === false) {
+        this.world.commander.push(msg.frame);
     }
 };
 
-CDispatcher.prototype.onSyncUnits = function(msg)
-{
-    for (var i in msg.syncUnits.units) {
-        var u = msg.syncUnits.units[i];
-        var unit = this.world.findUnit(u.id);
-        if (unit) {
-            unit.load(u);
-        } else {
-            this.createUnit(u, this.world.connid == u.playerConnid);
-        }
-    }
-};
-
-CDispatcher.prototype.onSyncUnitDie = function(msg)
-{
-    var unit = this.world.findUnit(msg.syncUnitDie.id);
-    var player = this.world.getSelf();
-
-    var lose = false;
-    if (player && unit && player.tank === unit) {
-        lose = true;
-    }
-
-    if (unit) {
-        unit.die();
-    }
-
-    if (lose === true) {
-        EZGUI.components.startButton.text = "CLICK TO REBORN";
-        EZGUI.components.startNameInput.text = player.name;
-        player.resetControlDir();
-    }
-};
-
-CDispatcher.prototype.onSyncPlayer = function(msg)
-{
-    var netPlayer = msg.syncPlayer.player;
-
-    var localPlayer = this.world.players[netPlayer.connid];
-    if (!localPlayer) {
-        localPlayer = this.world.addPlayer(netPlayer.connid,
-                                           netPlayer.name,
-                                           netPlayer.vw,
-                                           netPlayer.vh);
-    }
-    localPlayer.load(netPlayer);
-};
-
-CDispatcher.prototype.onSyncPlayerQuit = function(msg)
-{
-    this.world.removePlayer(msg.syncPlayerQuit.connid);
-};
-
-CDispatcher.prototype.onSyncCollision = function(msg)
-{
-    var sync = msg.syncCollision;
-
-    var unit1 = this.world.findUnit(sync.u1.id);
-    if (unit1 && unit1.isDead === false) {
-        unit1.load(sync.u1);
-    }
-
-    var unit2 = this.world.findUnit(sync.u2.id);
-    if (unit2 && unit2.isDead === false) {
-        unit2.load(sync.u2);
-    }
-};
-
-CDispatcher.prototype.onSyncRebornRes = function(msg)
-{
-    if (msg.result != this.world.proto.ErrCode.SUCCESS) {
-        Util.logError("reborn result:" + msg.result);
-    }
-};
+// TODO:
+// CDispatcher.prototype.onSyncUnitDie = function(msg)
+// {
+//     var unit = this.world.findUnit(msg.syncUnitDie.id);
+//     var player = this.world.getSelf();
+//
+//     var lose = false;
+//     if (player && unit && player.tank === unit) {
+//         lose = true;
+//     }
+//
+//     if (unit) {
+//         unit.die();
+//     }
+//
+//     if (lose === true) {
+//         EZGUI.components.startButton.text = "CLICK TO REBORN";
+//         EZGUI.components.startNameInput.text = player.name;
+//         player.resetControlDir();
+//     }
+// };
 
 CDispatcher.prototype.onMessage = function(buffer)
 {
@@ -225,32 +160,8 @@ CDispatcher.prototype.onMessage = function(buffer)
             this.onStartRes(message);
             break;
 
-        case cmd.SYNC_OPERATION:
-            this.onOperation(message);
-            break;
-
-        case cmd.SYNC_UNITS:
-            this.onSyncUnits(message);
-            break;
-
-        case cmd.SYNC_UNIT_DIE:
-            this.onSyncUnitDie(message);
-            break;
-
-        case cmd.SYNC_PLAYER:
-            this.onSyncPlayer(message);
-            break;
-
-        case cmd.SYNC_PLAYER_QUIT:
-            this.onSyncPlayerQuit(message);
-            break;
-
-        case cmd.SYNC_COLLISION:
-            this.onSyncCollision(message);
-            break;
-
-        case cmd.SYNC_REBORN_RES:
-            this.onSyncRebornRes(message);
+        case cmd.SYNC_COMMANDERS:
+            this.onCommanders(message);
             break;
 
         default:

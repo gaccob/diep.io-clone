@@ -1,12 +1,10 @@
 (function(){ "use strict";
 
 var IO = require('socket.io-client');
-var Protobuf = require("protobufjs");
 
 var Package = require("../package.json");
 
 var CDispatcher = require("../modules/cdispatcher");
-var Synchronizer = require("../modules/synchronizer");
 var World = require("../modules/world");
 var Util = require("../modules/util");
 
@@ -41,10 +39,7 @@ function getWorldBackground(world)
 
 function CWorld()
 {
-    World.call(this);
-
-    this.isLocal = true;
-    this.inited = false;
+    World.call(this, true);
 
     // renderer
     this.viewW = document.documentElement.clientWidth;
@@ -74,12 +69,9 @@ function CWorld()
 
     this.dieSprites = [];
 
-    var builder = Protobuf.loadJsonFile(Package.app.proto);
-    this.proto = builder.build("Tank");
-
-    this.synchronizer = new Synchronizer(this);
-
     this.dispatcher = new CDispatcher(this);
+
+    this.inited = false;
 
     // self
     this.connid = null;
@@ -171,7 +163,7 @@ CWorld.prototype.init = function()
 
 CWorld.prototype.start = function(name)
 {
-    this.synchronizer.syncStartReq(name ? name : "guest", this.viewW, this.viewH);
+    this.synchronizer.syncJoin(name ? name : "guest", this.viewW, this.viewH);
 };
 
 CWorld.prototype.update = function()
