@@ -41,9 +41,12 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
     Util.logTrace("send message cmd=" + pkg.cmd);
 };
 
-Synchronizer.prototype.syncStartReq = function()
+Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
 {
     var req = new this.world.proto.SyncStartReq();
+    req.name = name;
+    req.viewH = viewH;
+    req.viewW = viewW;
     this.sendPkg(this.world.socket, req, this.cmd.SYNC_START_REQ);
 };
 
@@ -58,20 +61,6 @@ Synchronizer.prototype.syncStartRes = function(socket, result, connid)
         this.world.dumpPlayers(res.players);
     }
     this.sendPkg(socket, res, this.cmd.SYNC_START_RES, result);
-};
-
-Synchronizer.prototype.syncJoin = function(name, viewW, viewH)
-{
-    var commander = new this.world.proto.SyncCommander();
-    commander.cmd = this.world.proto.CommanderType.CT_JOIN;
-    commander.join = new this.world.proto.SyncCommander.Join();
-    commander.join.name = name;
-    commander.join.viewH = viewH;
-    commander.join.viewW = viewW;
-
-    var commanders = [];
-    commanders.push(commander);
-    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
 Synchronizer.prototype.syncReborn = function(name)

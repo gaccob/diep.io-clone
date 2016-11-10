@@ -47,6 +47,9 @@ message Player {
 }
 
 message SyncStartReq {
+    optional string name = 1;
+    optional uint32 viewW = 2;
+    optional uint32 viewH = 3;
 }
 message SyncStartRes {
     optional string connid = 1;

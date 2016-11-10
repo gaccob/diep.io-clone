@@ -20,6 +20,7 @@ SDispatcher.prototype.onConnected = function(client)
 SDispatcher.prototype.onDisconnected = function(client)
 {
     Util.logDebug("remove connection:" + client.id);
+
     var commander = new this.world.proto.SyncCommander();
     commander.cmd = this.world.proto.CommanderType.CT_QUIT;
     commander.connid = client.id;
@@ -40,7 +41,15 @@ SDispatcher.prototype.onStart = function(client, pkg)
     }
     sync.syncStartRes(client, err.SUCCESS, client.id);
 
-    // TODO: join frame
+    // join commander
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_JOIN;
+    commander.connid = client.id;
+    commander.join = new this.world.proto.SyncCommander.Join();
+    commander.join.name = pkg.syncStartReq.name;
+    commander.join.viewW = pkg.syncStartReq.viewW;
+    commander.join.viewH = pkg.syncStartReq.viewH;
+    this.world.commander.push(this.world.frame + 1, commander);
 };
 
 SDispatcher.prototype.onCommanders = function(client, pkg)

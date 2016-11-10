@@ -163,7 +163,7 @@ CWorld.prototype.init = function()
 
 CWorld.prototype.start = function(name)
 {
-    this.synchronizer.syncJoin(name ? name : "guest", this.viewW, this.viewH);
+    this.synchronizer.syncStartReq(name ? name : "guest", this.viewW, this.viewH);
 };
 
 CWorld.prototype.update = function()
