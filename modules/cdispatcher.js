@@ -119,28 +119,6 @@ CDispatcher.prototype.onCommanders = function(msg)
     }
 };
 
-// TODO:
-// CDispatcher.prototype.onSyncUnitDie = function(msg)
-// {
-//     var unit = this.world.findUnit(msg.syncUnitDie.id);
-//     var player = this.world.getSelf();
-//
-//     var lose = false;
-//     if (player && unit && player.tank === unit) {
-//         lose = true;
-//     }
-//
-//     if (unit) {
-//         unit.die();
-//     }
-//
-//     if (lose === true) {
-//         EZGUI.components.startButton.text = "CLICK TO REBORN";
-//         EZGUI.components.startNameInput.text = player.name;
-//         player.resetControlDir();
-//     }
-// };
-
 CDispatcher.prototype.onMessage = function(buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);

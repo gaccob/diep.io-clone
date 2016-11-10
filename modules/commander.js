@@ -27,7 +27,10 @@ Commander.prototype.push = function(frame, commander)
 
 Commander.prototype.exeJoin = function(commander)
 {
-    // TODO: update random seed
+    // update random seed
+    this.world.seed = commander.connid;
+
+    // join
     var player = this.world.players[commander.connid];
     if (player) {
         Util.logError("player[" + commander.connid + "] already existed");
@@ -75,7 +78,8 @@ Commander.prototype.exeMove = function(commander)
         Util.logError("player[" + commander.connid + "] tank not found");
         return false;
     }
-    player.tank.motion.moveAngle = commander.move.angle;
+    player.tank.motion.forceAngle = commander.move.angle;
+    player.tank.motion.force = commander.move.force;
     return true;
 };
 
@@ -105,7 +109,7 @@ Commander.prototype.exeFire = function(commander)
         Util.logError("player[" + commander.connid + "] tank not found");
         return false;
     }
-    player.tank.autoFire = commander.fire.fire;
+    player.tank.revertFireStatus();
     return true;
 };
 

@@ -17,7 +17,8 @@ message Vector {
 }
 
 message Motion {
-    optional Vector moveDir = 1;
+    optional uint32 moveAngle = 1; // 0-3600 (multi * 10)
+    optional bool moving = 2;
     optional Vector iv = 2;
     optional Vector ev = 3;
     optional Vector position = 4;
@@ -101,19 +102,15 @@ message SyncCommander {
     optional Reborn reborn = 12;
 
     message Move {
-        optional uint32 angle = 1; // 0-360
+        optional float angle = 1;
+        optional bool force = 2;
     }
     optional Move move = 13;
 
     message Rotate {
-        optional uint32 angle = 1; // 0-360;
+        optional float angle = 1;
     }
     optional Rotate rotate = 14;
-
-    message Fire {
-        optional bool fire = 1;
-    }
-    optional Fire fire = 15;
 }
 
 message Pkg {

@@ -75,12 +75,13 @@ Synchronizer.prototype.syncReborn = function(name)
     this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
-Synchronizer.prototype.syncMove = function(angle)
+Synchronizer.prototype.syncMove = function(angle, force)
 {
     var commander = new this.world.proto.SyncCommander();
     commander.cmd = this.world.proto.CommanderType.CT_MOVE;
     commander.move = new this.world.proto.SyncCommander.Move();
     commander.move.angle = angle;
+    commander.move.force = force;
 
     var commanders = [];
     commanders.push(commander);
@@ -99,13 +100,10 @@ Synchronizer.prototype.syncRotate = function(angle)
     this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
 };
 
-Synchronizer.prototype.syncFire = function(fire)
+Synchronizer.prototype.syncFire = function()
 {
     var commander = new this.world.proto.SyncCommander();
     commander.cmd = this.world.proto.CommanderType.CT_FIRE;
-    commander.fire = new this.world.proto.SyncCommander.Fire();
-    commander.fire.fire = fire;
-
     var commanders = [];
     commanders.push(commander);
     this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);

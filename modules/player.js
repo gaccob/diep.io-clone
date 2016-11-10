@@ -5,6 +5,8 @@ var Victor = require("victor");
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
+var epsilon = 1e-6;
+
 function Player(world, connid, name, viewW, viewH)
 {
     this.world = world;
@@ -15,13 +17,17 @@ function Player(world, connid, name, viewW, viewH)
     this.viewH = viewH;
 
     this.control = false;
-    this.controlDir = {
+
+    this.controlForceDir = {
         left: 0,
         right: 0,
         up: 0,
         down: 0,
     };
-    this.needSync = false;
+    this.needSyncForce = false;
+
+    this.controlRotation = 0;
+    this.needSyncRotation = false;
 }
 
 Player.prototype = {
@@ -39,33 +45,33 @@ Player.prototype.handleKeyDown = function()
             // 'w' or 'W'
             case 87:
             case 119:
-                if (player.controlDir.up != 1) {
-                    player.controlDir.up = 1;
-                    player.needSync = true;
+                if (player.controlForceDir.up != 1) {
+                    player.controlForceDir.up = 1;
+                    player.needSyncForce = true;
                 }
                 break;
             // 'd' or 'D'
             case 68:
             case 100:
-                if (player.controlDir.right != 1) {
-                    player.controlDir.right = 1;
-                    player.needSync = true;
+                if (player.controlForceDir.right != 1) {
+                    player.controlForceDir.right = 1;
+                    player.needSyncForce = true;
                 }
                 break;
             // 's' or 'S'
             case 83:
             case 115:
-                if (player.controlDir.down != 1) {
-                    player.controlDir.down = 1;
-                    player.needSync = true;
+                if (player.controlForceDir.down != 1) {
+                    player.controlForceDir.down = 1;
+                    player.needSyncForce = true;
                 }
                 break;
             // 'a' or 'A'
             case 65:
             case 97:
-                if (player.controlDir.left != 1) {
-                    player.controlDir.left = 1;
-                    player.needSync = true;
+                if (player.controlForceDir.left != 1) {
+                    player.controlForceDir.left = 1;
+                    player.needSyncForce = true;
                 }
                 break;
         }
@@ -83,33 +89,33 @@ Player.prototype.handleKeyUp = function()
             // 'w' or 'W'
             case 87:
             case 119:
-                if (player.controlDir.up !== 0) {
-                    player.controlDir.up = 0;
-                    player.needSync = true;
+                if (player.controlForceDir.up !== 0) {
+                    player.controlForceDir.up = 0;
+                    player.needSyncForce = true;
                 }
                 break;
             // 'd' or 'D'
             case 68:
             case 100:
-                if (player.controlDir.right !== 0) {
-                    player.controlDir.right = 0;
-                    player.needSync = true;
+                if (player.controlForceDir.right !== 0) {
+                    player.controlForceDir.right = 0;
+                    player.needSyncForce = true;
                 }
                 break;
             // 's' or 'S'
             case 83:
             case 115:
-                if (player.controlDir.down !== 0) {
-                    player.controlDir.down = 0;
-                    player.needSync = true;
+                if (player.controlForceDir.down !== 0) {
+                    player.controlForceDir.down = 0;
+                    player.needSyncForce = true;
                 }
                 break;
             // 'a' or 'A'
             case 65:
             case 97:
-                if (player.controlDir.left !== 0) {
-                    player.controlDir.left = 0;
-                    player.needSync = true;
+                if (player.controlForceDir.left !== 0) {
+                    player.controlForceDir.left = 0;
+                    player.needSyncForce = true;
                 }
                 break;
         }
@@ -121,11 +127,14 @@ Player.prototype.handleMouseMove = function()
     var player = this;
     document.body.addEventListener('mousemove', function(e) {
         var targetPos = new Victor(e.offsetX - player.world.view.x, e.offsetY - player.world.view.y);
-        if (player.tank !== null) {
-            var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
-            player.tank.rotation = dir.angle() + Math.PI / 2;
-            // TODO: threshold
-            player.needSync = true;
+        if (!player.tank) {
+            return;
+        }
+        var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
+        var angle = dir.angle() + Math.PI / 2;
+        if (Math.abs(player.controlRotation - angle) > epsilon) {
+            player.controlRotation = angle;
+            player.needSyncRotation = true;
         }
     }, false);
 };
@@ -135,8 +144,7 @@ Player.prototype.handleMouseDown = function()
     var player = this;
     document.body.addEventListener('mousedown', function() {
         if (player.tank !== null) {
-            player.tank.revertFireStatus();
-            player.needSync = true;
+            player.world.synchronizer.syncFire();
         }
     }, false);
 };
@@ -152,10 +160,10 @@ Player.prototype.addControl = function()
 
 Player.prototype.resetControlDir = function()
 {
-    this.controlDir.left = 0;
-    this.controlDir.right = 0;
-    this.controlDir.up = 0;
-    this.controlDir.down = 0;
+    this.controlForceDir.left = 0;
+    this.controlForceDir.right = 0;
+    this.controlForceDir.up = 0;
+    this.controlForceDir.down = 0;
 };
 
 Player.prototype.createTank = function()
@@ -163,8 +171,8 @@ Player.prototype.createTank = function()
     var px = (this.world.w - this.viewW) / 2;
     var py = (this.world.h - this.viewH) / 2;
     var tank = new Tank(this.world, "base", {
-        x: Math.random() * px + this.viewW / 2,
-        y: Math.random() * py + this.viewH / 2,
+        x: this.world.randomBetween(0, px) + this.viewW / 2,
+        y: this.world.randomBetween(0, py) + this.viewH / 2,
     }, this, this.world.view ? true : false);
 
     this.world.addUnit(tank);
@@ -200,14 +208,21 @@ Player.prototype.bindTank = function(tank)
 
 Player.prototype.update = function()
 {
-    if (this.needSync === true) {
-        if (this.control === true) {
-            var dir = Util.getVectorByControlDir(this.controlDir);
-            this.world.synchronizer.syncOperation(this, dir);
-        } else {
-            this.world.synchronizer.syncOperation(this);
+    if (this.needSyncRotation === true) {
+        if (Math.abs(this.controlRotation - this.tank.rotation) > epsilon) {
+            this.world.synchronizer.syncRotate(this.controlRotation);
         }
-        this.needSync = false;
+        this.needSyncRotation = false;
+    }
+
+    if (this.needSyncForce === true) {
+        var dir = Util.getVectorByForceDir(this.controlForceDir);
+        if (dir.lengthSq() < epsilon) {
+            this.world.synchronizer.syncMove(0, false);
+        } else {
+            this.world.synchronizer.syncMove(dir.angle(), true);
+        }
+        this.needSyncForce = false;
     }
 };
 

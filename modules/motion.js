@@ -9,9 +9,11 @@ function Motion(owner, cfg, angle)
 {
     this.owner = owner;
     this.cfg = cfg;
-    this.moveAngle = 0; // 0-360, degree
-    this.iv = new Victor(cfg.ivInit * Math.cos(angle),
-        cfg.ivInit * Math.sin(angle));
+
+    this.forceAngle = 0;
+    this.force = false;
+
+    this.iv = new Victor(cfg.ivInit * Math.cos(angle), cfg.ivInit * Math.sin(angle));
     this.ev = new Victor(0, 0);
     this.rv = cfg.rv;
 }
@@ -23,15 +25,10 @@ Motion.prototype = {
 Motion.prototype.toString = function()
 {
     return "unit[" + this.owner.id + "] "
-        + "move angle={" + this.moveAngle
+        + "move angle={" + this.forceAngle
         + "iv={" + this.iv.x + "," + this.iv.y + "} "
         + "ev={" + this.ev.x + "," + this.ev.y + "} "
         + "v=" + this.v;
-};
-
-Motion.prototype.randomMoveAngle = function()
-{
-    // TODO:
 };
 
 Motion.prototype.reverseIvX = function()
@@ -52,7 +49,7 @@ Motion.prototype.addRecoil = function(recoil, angle)
 
 Motion.prototype.update = function(deltaMS)
 {
-    var angle, dec, ilen, elen;
+    var dec, ilen, elen;
 
     // internal velocity decrese
     ilen = this.iv.length();
@@ -64,10 +61,9 @@ Motion.prototype.update = function(deltaMS)
     }
 
     // internal velocity increse
-    if (this.moveDir.length() > epsilon) {
-        angle = this.moveDir.angle();
-        this.iv.x += this.cfg.ivAcc * Math.cos(angle) * deltaMS / 1000;
-        this.iv.y += this.cfg.ivAcc * Math.sin(angle) * deltaMS / 1000;
+    if (this.force === true) {
+        this.iv.x += this.cfg.ivAcc * Math.cos(this.forceAngle) * deltaMS / 1000;
+        this.iv.y += this.cfg.ivAcc * Math.sin(this.forceAngle) * deltaMS / 1000;
         ilen = this.iv.length();
         if (ilen > this.cfg.ivMax) {
             ilen = this.cfg.ivMax;

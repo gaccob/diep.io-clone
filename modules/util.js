@@ -1,5 +1,7 @@
 (function(){ "use strict";
 
+var Victor = require("victor");
+
 var Package = require("../package.json");
 
 var Util = {
@@ -18,11 +20,6 @@ var Util = {
         error: 2,
         fatal: 3,
     },
-};
-
-Util.randomBetween = function(min, max)
-{
-    return Math.random() * (max - min) + min;
 };
 
 Util.assert = function(condition, message)
@@ -59,22 +56,22 @@ Util.clampPosition = function(pos, minx, maxx, miny, maxy)
     }
 };
 
-Util.getVectorByControlDir = function(controlDir)
+Util.getVectorByForceDir = function(dir)
 {
     var x = 0, y = 0;
-    if (controlDir.left == 1) {
+    if (dir.left == 1) {
         x -= 1;
     }
-    if (controlDir.right == 1) {
+    if (dir.right == 1) {
         x += 1;
     }
-    if (controlDir.up == 1) {
+    if (dir.up == 1) {
         y -= 1;
     }
-    if (controlDir.down == 1) {
+    if (dir.down == 1) {
         y += 1;
     }
-    return {x: x, y: y};
+    return new Victor(x, y);
 };
 
 Util.logTrace = function(str)

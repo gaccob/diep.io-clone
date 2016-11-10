@@ -7,7 +7,6 @@
         "browserify": "latest",
         "jshint": "latest",
         "protobufjs": "latest",
-        "seedrandom": "latest",
         "socket.io-client": "latest",
         "socket.io": "latest",
         "uglify-js": "latest",

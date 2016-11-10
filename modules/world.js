@@ -1,7 +1,7 @@
 (function(){ "use strict";
 
 var Protobuf = require("protobufjs");
-var SeedRandom = require("seedrandom");
+var SeedRandom = require('seedrandom');
 var Victor = require("victor");
 
 var Config = require("../modules/config");
@@ -14,8 +14,6 @@ var Util = require("../modules/util");
 
 function World(isLocal)
 {
-    SeedRandom(Package.name, { global: true });
-
     this.frame = 0;
     this.cfg = new Config();
 
@@ -57,6 +55,7 @@ function World(isLocal)
     // client or server
     this.isLocal = isLocal;
 
+    // proto & synchronizer
     var builder;
     if (this.isLocal === true) {
         builder = Protobuf.loadJsonFile(Package.app.proto);
@@ -70,10 +69,26 @@ function World(isLocal)
 
     // lock-step commander
     this.commander = new Commander(this);
+
+    // random
+    this.seed = Package.name;
 }
 
 World.prototype = {
     constructor: World,
+};
+
+World.prototype.random = function()
+{
+    var rng = SeedRandom(this.seed);
+    var result = rng();
+    this.seed = String(result);
+    return result;
+};
+
+World.prototype.randomBetween = function(min, max)
+{
+    return Math.floor(this.random() * (max - min) + min);
 };
 
 World.prototype.addPlayer = function(connid, name, viewW, viewH)
@@ -231,11 +246,11 @@ World.prototype.updateObstacles = function()
     }
 
     if (this.obstacleCount < this.cfg.configWorld.maxObstaclesCount) {
-        var names = ["triangle", "quad", "pentagon"];
-        var name = names[Math.floor((Math.random() * names.length))];
+        var names = ["triangle", "triangle", "quad", "pentagon"];
+        var name = names[Math.floor((this.random() * names.length))];
         obstacle = new Obstacle(this, name, {
-            x: Util.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
-            y: Util.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
+            x: this.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
+            y: this.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
         }, this.view ? true : false);
         this.addUnit(obstacle);
     }
@@ -405,6 +420,20 @@ World.prototype.collide = function(unit1, unit2, distRatio)
     this.simpleCollide(unit1, unit2, distRatio);
     unit1.takeDamage(unit2.damage);
     unit2.takeDamage(unit1.damage);
+
+    // check client player dead
+    if (this.isLocal === true) {
+        var player = this.getSelf();
+        if (!player) {
+            return;
+        }
+        if ((player.tank === unit1 && unit1.isDead === true)
+            || (player.tank === unit2 && unit2.isDead === true)) {
+            EZGUI.components.startButton.text = "CLICK TO REBORN";
+            EZGUI.components.startNameInput.text = player.name;
+            player.resetControlDir();
+        }
+    }
 };
 
 World.prototype.updateCollision = function()
