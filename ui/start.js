@@ -63,7 +63,7 @@ function StartUI(world)
             world.init();
             world.start(name);
         } else {
-            world.synchronizer.syncRebornReq(name);
+            world.synchronizer.syncReborn(name);
         }
     });
     world.stage.addChild(this.ui);

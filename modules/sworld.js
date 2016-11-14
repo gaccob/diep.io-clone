@@ -75,6 +75,22 @@ SWorld.prototype.start = function()
     });
 };
 
+SWorld.prototype.update = function()
+{
+    var dateTime = new Date();
+    var ms = dateTime.getTime();
+    var updateMS = Math.floor(1000.0 / this.cfg.configWorld.frame);
+    while (ms > this.time + updateMS) {
+        this.time += updateMS;
+        this.frame ++;
+
+        // lock-step execute
+        this.commander.execute();
+
+        this.updateLogic();
+    }
+};
+
 module.exports = SWorld;
 
 })();

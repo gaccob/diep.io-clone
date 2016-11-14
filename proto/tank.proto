@@ -17,11 +17,11 @@ message Vector {
 }
 
 message Motion {
-    optional uint32 moveAngle = 1; // 0-3600 (multi * 10)
-    optional bool moving = 2;
-    optional Vector iv = 2;
-    optional Vector ev = 3;
-    optional Vector position = 4;
+    optional float forceAngle = 1;
+    optional bool force = 2;
+    optional Vector iv = 3;
+    optional Vector ev = 4;
+    optional Vector position = 5;
 }
 
 message Unit {
@@ -32,7 +32,7 @@ message Unit {
     optional Motion motion = 5;
     optional float rotation = 6;
     optional uint32 ownerid = 7;        // only bullets
-    optional uint32 bornTime = 8;       // only bullets
+    optional uint32 bornFrame = 8;      // only bullets
     optional string weaponName = 9;     // only bullets
     optional string playerConnid = 10;  // only tank
 }
@@ -55,10 +55,12 @@ message SyncStartReq {
 message SyncStartRes {
     optional string connid = 1;
     repeated Unit units = 2;
-    repeated Player players = 3;
+    repeated Unit unitsToAdd = 3;
+    repeated Player players = 4;
+    optional uint32 unitBaseId = 5;
 }
 
-enum SyncCmd {
+enum PkgCmd {
     SYNC_COMMANDERS = 0;
     SYNC_START_REQ = 1;
     SYNC_START_RES = 2;
@@ -115,7 +117,7 @@ message SyncCommander {
 
 message Pkg {
     optional uint32 frame = 1;
-    optional SyncCmd cmd = 2;
+    optional PkgCmd cmd = 2;
     optional ErrCode result = 3;
     repeated SyncCommander syncCommanders = 10;
     optional SyncStartReq syncStartReq = 11;

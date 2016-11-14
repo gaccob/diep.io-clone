@@ -148,6 +148,8 @@ Commander.prototype.execute = function()
             if (result !== true) {
                 Util.logError("commander[" + commander.cmd + "] execute error ignore");
             } else {
+                // TODO: dump commanders
+                Util.logDebug("frame[" + this.world.frame + "] cmd=" + commander.cmd + " " + commander.connid);
                 dispatchers.push(commander);
             }
         }

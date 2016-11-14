@@ -2,8 +2,8 @@ var configWeapons = {
 	"0": {
 		"disturbDeg": 15.0,
 		"fireAnimDistance": 5.0,
-		"angle": 0.0,
 		"bullet": "normal",
+		"degree": 0.0,
 		"shootOffset": 45.0,
 		"alias": "base",
 		"fireAnimFrame": 16.0,
@@ -25,8 +25,8 @@ var configWeapons = {
 	"1": {
 		"disturbDeg": 15.0,
 		"fireAnimDistance": 5.0,
-		"angle": 0.0,
 		"bullet": "normal",
+		"degree": 0.0,
 		"shootOffset": 50.0,
 		"alias": "twin-left",
 		"fireAnimFrame": 16.0,
@@ -48,8 +48,8 @@ var configWeapons = {
 	"2": {
 		"disturbDeg": 15.0,
 		"fireAnimDistance": 5.0,
-		"angle": 0.0,
 		"bullet": "normal",
+		"degree": 0.0,
 		"shootOffset": 50.0,
 		"alias": "twin-right",
 		"fireAnimFrame": 16.0,
@@ -71,8 +71,8 @@ var configWeapons = {
 	"3": {
 		"disturbDeg": 15.0,
 		"fireAnimDistance": 5.0,
-		"angle": 0.0,
 		"bullet": "normal",
+		"degree": 0.0,
 		"shootOffset": 48.0,
 		"alias": "quad-up",
 		"fireAnimFrame": 16.0,
@@ -94,8 +94,8 @@ var configWeapons = {
 	"4": {
 		"disturbDeg": 15.0,
 		"fireAnimDistance": 5.0,
-		"angle": 90.0,
 		"bullet": "normal",
+		"degree": 90.0,
 		"shootOffset": 48.0,
 		"alias": "quad-right",
 		"fireAnimFrame": 16.0,
@@ -117,8 +117,8 @@ var configWeapons = {
 	"5": {
 		"disturbDeg": 15.0,
 		"fireAnimDistance": 5.0,
-		"angle": 180.0,
 		"bullet": "normal",
+		"degree": 180.0,
 		"shootOffset": 48.0,
 		"alias": "quad-down",
 		"fireAnimFrame": 16.0,
@@ -140,8 +140,8 @@ var configWeapons = {
 	"6": {
 		"disturbDeg": 15.0,
 		"fireAnimDistance": 5.0,
-		"angle": 270.0,
 		"bullet": "normal",
+		"degree": 270.0,
 		"shootOffset": 48.0,
 		"alias": "quad-left",
 		"fireAnimFrame": 16.0,

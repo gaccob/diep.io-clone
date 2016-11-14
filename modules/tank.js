@@ -7,7 +7,7 @@ var Util = require("../modules/util");
 function Tank(world, cfgName, position, player, view, slf)
 {
     this.player = player;
-    this.autoFire = true;
+    this.autoFire = false;
 
     this.weapons = [];
     var cfg = world.cfg.configTanks[cfgName];

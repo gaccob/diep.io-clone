@@ -5,7 +5,7 @@ var Util = require("../modules/util");
 function Synchronizer(world)
 {
     this.world = world;
-    this.cmd = this.world.proto.SyncCmd;
+    this.cmd = this.world.proto.PkgCmd;
     this.err = this.world.proto.ErrCode;
 }
 
@@ -54,9 +54,12 @@ Synchronizer.prototype.syncStartRes = function(socket, result, connid)
 {
     var res = new this.world.proto.SyncStartRes();
     res.connid = connid;
+    res.unitBaseId = this.world.unitBaseId;
     if (result == this.err.SUCCESS) {
         res.units = [];
         this.world.dumpUnits(res.units);
+        res.unitsToAdd = [];
+        this.world.dumpUnitsToAdd(res.unitsToAdd);
         res.players = [];
         this.world.dumpPlayers(res.players);
     }

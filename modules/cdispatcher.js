@@ -16,9 +16,14 @@ CDispatcher.prototype = {
 
 CDispatcher.prototype.createUnit = function(u, slf)
 {
-    var unit = null;
-    switch (u.type) {
+    var unit = this.world.findUnit(u.id);
+    if (unit) {
+        alert("unit[" + u.id + "] already existed!");
+        this.world.finish();
+        return null;
+    }
 
+    switch (u.type) {
         case Util.unitType.tank:
             unit = new Tank(this.world,
                             u.cfgName,
@@ -63,37 +68,48 @@ CDispatcher.prototype.createUnit = function(u, slf)
         unit.motion.ev.y = u.motion.ev.y;
         unit.motion.iv.x = u.motion.iv.x;
         unit.motion.iv.y = u.motion.iv.y;
-        unit.motion.moveDir.x = u.motion.moveDir.x;
-        unit.motion.moveDir.y = u.motion.moveDir.y;
+        unit.motion.forceAngle = u.motion.forceAngle;
+        unit.motion.force = u.motion.force;
         unit.rotation = u.rotation;
         unit.hp = u.hp;
-        this.world.addUnit(unit);
     }
     return unit;
 };
 
 CDispatcher.prototype.onStartRes = function(message)
 {
+    var res = message.syncStartRes;
     var err = this.world.proto.ErrCode;
+
     if (message.result != err.SUCCESS) {
         Util.logError("start fail:" + message.result);
         return;
     }
+
+    // start UI
     this.world.startUI.visible = false;
 
-    var res = message.syncStartRes;
-
+    // world
+    this.world.frame = message.frame;
+    this.world.unitBaseId = res.unitBaseId;
+    Util.logDebug("world frame=" + message.frame + " unit base id=" + res.unitBaseId);
     this.world.connid = res.connid;
     Util.logDebug("player connid=" + res.connid);
 
-    var i;
+    // world units
+    var i, unit;
     for (i in res.units) {
-        var u = res.units[i];
-        var unit = this.world.findUnit(u.id);
+        unit = this.createUnit(res.units[i], res.units[i].id === res.id);
         if (unit) {
-            unit.load(u);
-        } else {
-            this.createUnit(u, u.id === res.id);
+            this.world.addUnit(unit);
+        }
+    }
+    this.world.checkAddUnits();
+
+    for (i in res.unitsToAdd) {
+        unit = this.createUnit(res.unitsToAdd[i], res.unitsToAdd[i].id === res.id);
+        if (unit) {
+            this.world.addUnit(unit);
         }
     }
 
@@ -105,10 +121,23 @@ CDispatcher.prototype.onStartRes = function(message)
                                           netPlayer.vh);
         player.load(netPlayer);
     }
+
+    // world start run
+    this.world.started = true;
 };
 
 CDispatcher.prototype.onCommanders = function(msg)
 {
+    if (msg.frame !== this.world.frame + this.world.step + 1) {
+        alert("sync frame=" + msg.frame + " but world frame=" + this.world.frame);
+        this.world.finish();
+        return;
+    }
+
+    // step
+    ++ this.world.step;
+
+    // commander
     var any = false;
     for (var i in msg.syncCommanders) {
         this.world.commander.push(msg.frame, msg.syncCommanders[i]);
@@ -122,9 +151,9 @@ CDispatcher.prototype.onCommanders = function(msg)
 CDispatcher.prototype.onMessage = function(buffer)
 {
     var message = this.world.proto.Pkg.decode(buffer);
-    Util.logTrace("recv message cmd=" + message.cmd);
+    Util.logTrace("frame[" + this.world.frame + "] recv message cmd=" + message.cmd);
 
-    var cmd = this.world.proto.SyncCmd;
+    var cmd = this.world.proto.PkgCmd;
 
     // not start ignpre
     if (this.world.connid === null && message.cmd != cmd.SYNC_START_RES) {

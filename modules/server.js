@@ -6,7 +6,10 @@ world.start();
 
 // jshint undef: false
 setInterval(function() {
+
     "use strict";
+
     world.update();
+
 }, 1);
 

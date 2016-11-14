@@ -10,7 +10,7 @@ function Obstacle(world, name, position, view)
               Util.unitType.obstacle,
               world.cfg.configObstacles[name],
               position,
-              world.randomBetweem(0, 360),
+              world.random() * 2 * Math.PI,
               view);
 
     if (view === true) {

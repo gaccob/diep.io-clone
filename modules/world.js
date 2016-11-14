@@ -1,7 +1,7 @@
 (function(){ "use strict";
 
 var Protobuf = require("protobufjs");
-var SeedRandom = require('seedrandom');
+var SeedRandom = require("../extern/seedrandom");
 var Victor = require("victor");
 
 var Config = require("../modules/config");
@@ -15,6 +15,7 @@ var Util = require("../modules/util");
 function World(isLocal)
 {
     this.frame = 0;
+    this.unitBaseId = 0;
     this.cfg = new Config();
 
     this.w = this.cfg.configMap.w;
@@ -158,18 +159,18 @@ World.prototype.checkAddUnits = function()
 
         if (unit.type == Util.unitType.bullet) {
             this.bullets[unit.id] = unit;
-            Util.logDebug("add bullet:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] add bullet:" + unit.id);
         }
 
         if (unit.type == Util.unitType.obstacle) {
             this.obstacles[unit.id] = unit;
             this.obstacleCount ++;
-            Util.logDebug("add obstacle:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] add obstacle:" + unit.id + " total count=" + this.obstacleCount);
         }
 
         if (unit.type == Util.unitType.tank) {
             this.tanks[unit.id] = unit;
-            Util.logDebug("add tank:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] add tank:" + unit.id);
         }
     }
     this.unitsToAdd = [];
@@ -183,18 +184,18 @@ World.prototype.checkRemoveUnits = function()
 
         if (unit.type == Util.unitType.bullet) {
             delete this.bullets[unit.id];
-            Util.logDebug("remove bullet:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] remove bullet:" + unit.id);
         }
 
         if (unit.type == Util.unitType.obstacle) {
             delete this.obstacles[unit.id];
             -- this.obstacleCount;
-            Util.logDebug("remove obstacle:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] remove obstacle:" + unit.id);
         }
 
         if (unit.type == Util.unitType.tank) {
             delete this.tanks[unit.id];
-            Util.logDebug("remove tank:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] remove tank:" + unit.id);
         }
     }
     this.unitsToRemove = [];
@@ -212,7 +213,11 @@ World.prototype.dumpUnits = function(units)
     for (i in this.bullets) {
         units.push(this.bullets[i].dump());
     }
-    for (i in this.unitsToAdd) {
+};
+
+World.prototype.dumpUnitsToAdd = function(units)
+{
+    for (var i in this.unitsToAdd) {
         units.push(this.unitsToAdd[i].dump());
     }
 };
@@ -238,11 +243,7 @@ World.prototype.updateObstacles = function()
     var obstacle;
 
     for (var i in this.obstacles) {
-        obstacle = this.obstacles[i];
-        var oldx = obstacle.x;
-        var oldy = obstacle.y;
-        obstacle.update();
-        this.updateUnitGrid(obstacle, { x: oldx, y: oldy });
+        this.obstacles[i].update();
     }
 
     if (this.obstacleCount < this.cfg.configWorld.maxObstaclesCount) {
@@ -260,11 +261,7 @@ World.prototype.updateBullets = function()
 {
     var i, bullet;
     for (i in this.bullets) {
-        bullet = this.bullets[i];
-        var oldx = bullet.x;
-        var oldy = bullet.y;
-        bullet.update();
-        this.updateUnitGrid(bullet, { x: oldx, y: oldy });
+        this.bullets[i].update();
     }
     for (i in this.bullets) {
         bullet = this.bullets[i];
@@ -290,6 +287,10 @@ World.prototype.updateUnitGrid = function(unit, oldPos)
     var gx = Math.floor(unit.x / this.gridSize);
     var gy = Math.floor(unit.y / this.gridSize);
     var idx = gy * this.gridW + gx;
+
+    if (oidx !== idx) {
+        Util.logTrace("frame[" + this.frame + "] unit[" + unit.id + "] grid[" + oidx + "->" + idx + "]");
+    }
 
     if (oidx && idx != oidx) {
         delete this.grids[oidx][unit.id];
@@ -417,9 +418,16 @@ World.prototype.simpleCollide = function(unit1, unit2, distRatio)
 World.prototype.collide = function(unit1, unit2, distRatio)
 {
     Util.logTrace("unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
+
+    Util.logTrace(unit1.toString());
+    Util.logTrace(unit2.toString());
+
     this.simpleCollide(unit1, unit2, distRatio);
     unit1.takeDamage(unit2.damage);
     unit2.takeDamage(unit1.damage);
+
+    Util.logTrace(unit1.toString());
+    Util.logTrace(unit2.toString());
 
     // check client player dead
     if (this.isLocal === true) {
@@ -446,8 +454,8 @@ World.prototype.updateCollision = function()
                 var unit = this.grids[idx][i];
 
                 // avoid multi-collision
-                if (unit.collideTime) {
-                    if (this.time - unit.collideTime < this.cfg.configWorld.unitCollideCheckMS) {
+                if (unit.collideFrame) {
+                    if (this.frame - unit.collideFrame < this.cfg.configWorld.unitCollideCheckFrame) {
                         continue;
                     }
                 }
@@ -470,8 +478,8 @@ World.prototype.updateCollision = function()
                     var distR = unit.radius + target.radius;
                     var dist2 = distX * distX + distY * distY;
                     if (dist2 < distR * distR) {
-                        unit.collideTime = this.time;
-                        target.collideTime = this.time;
+                        unit.collideFrame = this.frame;
+                        target.collideFrame = this.frame;
                         this.collide(unit, target, dist2 / (distR * distR));
                     }
                 }
@@ -483,9 +491,6 @@ World.prototype.updateCollision = function()
 
 World.prototype.updateLogic = function()
 {
-    // lock-step execute
-    this.commander.execute();
-
     this.checkRemoveUnits();
     this.checkAddUnits();
     this.updatePlayers();
@@ -493,18 +498,6 @@ World.prototype.updateLogic = function()
     this.updateObstacles();
     this.updateBullets();
     this.updateCollision();
-};
-
-World.prototype.update = function()
-{
-    var dateTime = new Date();
-    var ms = dateTime.getTime();
-    var updateMS = Math.floor(1000.0 / this.cfg.configWorld.frame);
-    while (ms > this.time + updateMS) {
-        this.time += updateMS;
-        this.frame ++;
-        this.updateLogic();
-    }
 };
 
 module.exports = World;

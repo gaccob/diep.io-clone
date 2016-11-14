@@ -5,13 +5,11 @@ var Motion = require("../modules/motion");
 var Util = require("../modules/util");
 var View = require("../modules/view");
 
-var id = 0;
-
 function Unit(world, type, cfg, position, angle, view, slf)
 {
     this.world = world;
-    if (this.world.isLocal === false) {
-        this.id = (++ id);
+    if (this.world.isLocal === false || this.world.started === true) {
+        this.id = (++ this.world.unitBaseId);
     }
     this.type = type;
     this.cfg = cfg;
@@ -35,13 +33,13 @@ function Unit(world, type, cfg, position, angle, view, slf)
     var pt = this.world.proto.PropType;
     this.props = {};
     this.props[pt.PT_HEALTH_REGEN] = 0;
-    this.proto[pt.PT_MAX_HEALTH] = 0;
-    this.proto[pt.PT_BODY_DAMAGE] = 0;
-    this.proto[pt.PT_BULLET_SPEED] = 0;
-    this.proto[pt.PT_BULLET_PENETRATION] = 0;
-    this.proto[pt.PT_BULLET_DAMAGE] = 0;
-    this.proto[pt.PT_RELOAD] = 0;
-    this.proto[pt.PT_MOVEMENT_SPEED] = 0;
+    this.props[pt.PT_MAX_HEALTH] = 0;
+    this.props[pt.PT_BODY_DAMAGE] = 0;
+    this.props[pt.PT_BULLET_SPEED] = 0;
+    this.props[pt.PT_BULLET_PENETRATION] = 0;
+    this.props[pt.PT_BULLET_DAMAGE] = 0;
+    this.props[pt.PT_RELOAD] = 0;
+    this.props[pt.PT_MOVEMENT_SPEED] = 0;
 }
 
 Unit.prototype = {
@@ -134,12 +132,13 @@ Unit.prototype.dump = function()
     u.cfgName = this.cfg.alias;
     u.hp = this.hp;
     u.ownerid = this.owner ? this.owner.id : 0;
-    u.bornTime = this.bornTime ? Math.floor(this.bornTime) : 0;
+    u.bornFrame = this.bornFrame ? Math.floor(this.bornFrame) : 0;
     u.weaponName = this.weaponName ? this.weaponName : "";
     u.playerConnid = this.player ? this.player.connid : "";
     u.rotation = this.rotation;
     u.motion = new this.world.proto.Motion();
-    u.motion.moveDir = new this.world.proto.Vector(this.motion.moveDir.x, this.motion.moveDir.y);
+    u.motion.forceAngle = this.motion.forceAngle;
+    u.motion.force = this.motion.force;
     u.motion.iv = new this.world.proto.Vector(this.motion.iv.x, this.motion.iv.y);
     u.motion.ev = new this.world.proto.Vector(this.motion.ev.x, this.motion.ev.y);
     u.motion.position = new this.world.proto.Vector(this.x, this.y);
@@ -157,8 +156,8 @@ Unit.prototype.load = function(u)
     this.motion.iv.y = u.motion.iv.y;
     this.motion.ev.x = u.motion.ev.x;
     this.motion.ev.y = u.motion.ev.y;
-    this.motion.moveDir.x = u.motion.moveDir.x;
-    this.motion.moveDir.y = u.motion.moveDir.y;
+    this.motion.forceAngle = u.motion.forceAngle;
+    this.motion.force = u.motion.force;
 
     var oldX = this.x;
     var oldY = this.y;
@@ -197,6 +196,15 @@ Unit.prototype.addProp = function(type)
             this.hp = this.maxHp;
         }
     }
+};
+
+Unit.prototype.toString = function()
+{
+    return "Unit[" + this.id + "] frame=" + this.world.frame + " hp=" + this.hp
+        + " position[" + this.x + "," + this.y + "["
+        + " iv[" + this.motion.iv.x + "," + this.motion.iv.y + "]"
+        + " ev[" + this.motion.ev.x + "," + this.motion.ev.y + "]"
+        + " force[" + this.motion.force + "," + this.motion.forceAngle + "]";
 };
 
 Object.defineProperties(Unit.prototype, {

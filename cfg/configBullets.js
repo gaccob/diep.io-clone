@@ -4,8 +4,8 @@ var configBullets = {
 		"hp": 1.0,
 		"damage": 10.0,
 		"alias": "normal",
+		"durationFrame": 25.0,
 		"radius": 8.0,
-		"duration": 900.0,
 		"velocity": {
 			"ivMax": 300.0,
 			"ivDec": 50.0,

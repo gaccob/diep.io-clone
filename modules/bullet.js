@@ -7,7 +7,7 @@ function Bullet(world, cfgName, position, angle, owner, weaponName, view)
 {
     this.owner = owner;
     this.weaponName = weaponName;
-    this.bornTime = world.time;
+    this.bornFrame = world.frame;
 
     Unit.call(this,
               world,
@@ -23,7 +23,7 @@ Bullet.prototype.constructor = Bullet;
 
 Bullet.prototype.outOfDate = function()
 {
-    if (this.world.time > this.bornTime + this.cfg.duration) {
+    if (this.world.frame > this.bornFrame + this.cfg.durationFrame) {
         return true;
     }
     return false;

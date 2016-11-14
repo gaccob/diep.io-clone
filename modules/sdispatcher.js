@@ -27,7 +27,7 @@ SDispatcher.prototype.onDisconnected = function(client)
     this.world.commander.push(this.world.frame + 1, commander);
 };
 
-SDispatcher.prototype.onStart = function(client, pkg)
+SDispatcher.prototype.onStartReq = function(client, pkg)
 {
     var err = this.world.proto.ErrCode;
     var sync = this.world.synchronizer;
@@ -64,11 +64,11 @@ SDispatcher.prototype.onCommanders = function(client, pkg)
 SDispatcher.prototype.onMessage = function(client, buffer)
 {
     var pkg = this.world.proto.Pkg.decode(buffer);
-    Util.logTrace("recv pkg cmd=" + pkg.cmd);
-    var cmd = this.world.proto.SyncCmd;
+    Util.logTrace("frame[" + this.world.frame + "] recv pkg cmd=" + pkg.cmd);
+    var cmd = this.world.proto.PkgCmd;
     switch (pkg.cmd) {
         case cmd.SYNC_START_REQ:
-            this.onStart(client, pkg);
+            this.onStartReq(client, pkg);
             break;
         case cmd.SYNC_COMMANDERS:
             this.onCommanders(client, pkg);

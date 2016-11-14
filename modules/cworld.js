@@ -72,6 +72,10 @@ function CWorld()
     this.dispatcher = new CDispatcher(this);
 
     this.inited = false;
+    this.started = false;
+
+    // lock-step
+    this.step = 0;
 
     // self
     this.connid = null;
@@ -166,9 +170,23 @@ CWorld.prototype.start = function(name)
     this.synchronizer.syncStartReq(name ? name : "guest", this.viewW, this.viewH);
 };
 
+CWorld.prototype.finish = function()
+{
+    this.socket.disconnect();
+    Util.logDebug("world finish");
+};
+
 CWorld.prototype.update = function()
 {
-    World.prototype.update.call(this);
+    // lock-step execute
+    if (this.started === true && this.step > 0) {
+        ++ this.frame;
+        -- this.step;
+        this.commander.execute();
+        this.updateLogic();
+    }
+
+    // view
     this.updateCamera();
     this.updateUI();
     this.renderer.render(this.stage);

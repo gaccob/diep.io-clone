@@ -21,11 +21,11 @@ function Weapon(world, tank, name, view)
     }
 
     this.offset = new Victor(0, - this.cfg.shootOffset);
-    this.offset.rotateDeg(this.cfg.angle)
+    this.offset.rotateDeg(this.cfg.degree)
                .add(new Victor(this.cfg.x, this.cfg.y));
 
     // rotation & position
-    this.rotation = this.cfg.angle * Math.PI / 180;
+    this.rotation = this.cfg.degree * Math.PI / 180;
     this.x = this.cfg.x;
     this.y = this.cfg.y;
 
@@ -85,7 +85,7 @@ Weapon.prototype.fire = function()
             return;
         }
 
-        var angle = this.owner.rotation + this.cfg.angle * Math.PI / 180 - Math.PI / 2;
+        var angle = this.owner.rotation + this.cfg.degree * Math.PI / 180 - Math.PI / 2;
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
         var bulletAngle = angle + (Math.random() * disturb - disturb / 2);
 
