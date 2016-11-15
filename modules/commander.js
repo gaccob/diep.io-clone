@@ -96,7 +96,7 @@ Commander.prototype.exeRotate = function(commander)
         Util.logError("player[" + commander.connid + "] tank not found");
         return false;
     }
-    player.tank.rotationTarget = commander.rotate.angle;
+    player.tank.rotation = commander.rotate.angle;
     return true;
 };
 

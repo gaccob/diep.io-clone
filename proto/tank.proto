@@ -31,11 +31,10 @@ message Unit {
     optional int32 hp = 4;
     optional Motion motion = 5;
     optional float rotation = 6;
-    optional float rotationTarget = 7;
-    optional uint32 ownerid = 8;        // only bullets
-    optional uint32 bornFrame = 9;      // only bullets
-    optional string weaponName = 10;    // only bullets
-    optional string playerConnid = 11;  // only tank
+    optional uint32 ownerid = 7;        // only bullets
+    optional uint32 bornFrame = 8;      // only bullets
+    optional string weaponName = 9;     // only bullets
+    optional string playerConnid = 10;  // only tank
 }
 
 message Player {

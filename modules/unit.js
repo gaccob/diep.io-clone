@@ -20,7 +20,6 @@ function Unit(world, type, cfg)
     this.x = 0;
     this.y = 0;
     this.rotation = 0;
-    this.rotationTarget = 0;
     this.hp = this.cfg.hp;
     this.maxHp = this.cfg.hp;
 
@@ -135,7 +134,6 @@ Unit.prototype.dump = function()
     u.weaponName = this.weaponName ? this.weaponName : "";
     u.playerConnid = this.player ? this.player.connid : "";
     u.rotation = this.rotation;
-    u.rotationTarget = this.rotationTarget;
     u.motion = new this.world.proto.Motion();
     u.motion.forceAngle = this.motion.forceAngle;
     u.motion.force = this.motion.force;
@@ -151,7 +149,6 @@ Unit.prototype.load = function(u)
     this.hp = u.hp;
     this.bornFrame = u.bornFrame;
     this.rotation = u.rotation;
-    this.rotationTarget = u.rotationTarget;
     this.motion.iv.x = u.motion.iv.x;
     this.motion.iv.y = u.motion.iv.y;
     this.motion.ev.x = u.motion.ev.x;

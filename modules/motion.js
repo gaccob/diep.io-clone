@@ -91,24 +91,7 @@ Motion.prototype.update = function(deltaMS)
     Util.clampPosition(this.owner, 0, this.owner.world.w, 0, this.owner.world.h);
 
     if (this.rv !== null && Math.abs(this.rv) > Util.epsilon) {
-        // has rotation target
-        if (this.owner.rotationTarget) {
-            if (this.owner.rotationTarget > this.owner.rotation) {
-                this.owner.rotation += this.rv * deltaMS / 1000;
-                if (this.owner.rotation > this.owner.rotationTarget) {
-                    this.owner.rotation = this.owner.rotationTarget;
-                }
-            } else if (this.owner.rotationTarget < this.owner.rotation) {
-                this.owner.rotation -= this.rv * deltaMS / 1000;
-                if (this.owner.rotation < this.owner.rotationTarget) {
-                    this.owner.rotation = this.owner.rotationTarget;
-                }
-            }
-        }
-        // self rotation
-        else {
-            this.owner.rotation += this.rv * deltaMS / 1000;
-        }
+        this.owner.rotation += this.rv * deltaMS / 1000;
     }
 };
 
