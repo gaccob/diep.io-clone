@@ -14,7 +14,7 @@ CDispatcher.prototype = {
     constructor: CDispatcher,
 };
 
-CDispatcher.prototype.createUnit = function(u, slf)
+CDispatcher.prototype.createUnit = function(u)
 {
     var unit = this.world.findUnit(u.id);
     if (unit) {
@@ -25,53 +25,20 @@ CDispatcher.prototype.createUnit = function(u, slf)
 
     switch (u.type) {
         case Util.unitType.tank:
-            unit = new Tank(this.world,
-                            u.cfgName,
-                            u.motion.position,
-                            null,
-                            true,
-                            slf);
+            unit = new Tank(this.world, u.cfgName);
             break;
 
         case Util.unitType.bullet:
-            unit = new Bullet(this.world,
-                              u.cfgName,
-                              u.motion.position,
-                              0,
-                              this.world.findUnit(u.ownerid),
-                              u.weaponName,
-                              true);
-            unit.bornTime = u.bornTime;
-            if (unit.owner) {
-                var weapon = unit.owner.getWeaponByName(u.weaponName);
-                if (weapon) {
-                    weapon.fireBullet(unit);
-                }
-            }
+            unit = new Bullet(this.world, u.cfgName, this.world.findUnit(u.ownerid), u.weaponName);
             break;
 
         case Util.unitType.obstacle:
-            unit = new Obstacle(this.world,
-                                u.cfgName,
-                                u.motion.position,
-                                true);
+            unit = new Obstacle(this.world, u.cfgName);
             break;
 
         default:
             Util.logError("ignore unit type=" + u.type);
             break;
-    }
-
-    if (unit) {
-        unit.id = u.id;
-        unit.motion.ev.x = u.motion.ev.x;
-        unit.motion.ev.y = u.motion.ev.y;
-        unit.motion.iv.x = u.motion.iv.x;
-        unit.motion.iv.y = u.motion.iv.y;
-        unit.motion.forceAngle = u.motion.forceAngle;
-        unit.motion.force = u.motion.force;
-        unit.rotation = u.rotation;
-        unit.hp = u.hp;
     }
     return unit;
 };
@@ -92,23 +59,25 @@ CDispatcher.prototype.onStartRes = function(message)
     // world
     this.world.frame = message.frame;
     this.world.unitBaseId = res.unitBaseId;
-    Util.logDebug("world frame=" + message.frame + " unit base id=" + res.unitBaseId);
+    Util.logDebug("world frame=" + message.frame + " base-id=" + res.unitBaseId);
     this.world.connid = res.connid;
     Util.logDebug("player connid=" + res.connid);
 
     // world units
     var i, unit;
     for (i in res.units) {
-        unit = this.createUnit(res.units[i], res.units[i].id === res.id);
+        unit = this.createUnit(res.units[i]);
         if (unit) {
+            unit.load(res.units[i]);
             this.world.addUnit(unit);
         }
     }
     this.world.checkAddUnits();
 
     for (i in res.unitsToAdd) {
-        unit = this.createUnit(res.unitsToAdd[i], res.unitsToAdd[i].id === res.id);
+        unit = this.createUnit(res.unitsToAdd[i]);
         if (unit) {
+            unit.load(res.unitsToAdd[i]);
             this.world.addUnit(unit);
         }
     }
@@ -119,7 +88,9 @@ CDispatcher.prototype.onStartRes = function(message)
                                           netPlayer.name,
                                           netPlayer.vw,
                                           netPlayer.vh);
-        player.load(netPlayer);
+        if (player) {
+            player.load(netPlayer);
+        }
     }
 
     // world start run

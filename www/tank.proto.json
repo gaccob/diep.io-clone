@@ -94,27 +94,33 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "uint32",
-                    "name": "ownerid",
+                    "type": "float",
+                    "name": "rotationTarget",
                     "id": 7
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "bornFrame",
+                    "name": "ownerid",
                     "id": 8
                 },
                 {
                     "rule": "optional",
-                    "type": "string",
-                    "name": "weaponName",
+                    "type": "uint32",
+                    "name": "bornFrame",
                     "id": 9
                 },
                 {
                     "rule": "optional",
                     "type": "string",
-                    "name": "playerConnid",
+                    "name": "weaponName",
                     "id": 10
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "playerConnid",
+                    "id": 11
                 }
             ]
         },

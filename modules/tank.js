@@ -4,28 +4,24 @@ var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Tank(world, cfgName, position, player, view, slf)
+function Tank(world, cfgName, player)
 {
-    this.player = player;
     this.autoFire = false;
+    this.player = player;
 
     this.weapons = [];
     var cfg = world.cfg.configTanks[cfgName];
     for (var idx in cfg.weapons) {
         if (cfg.weapons[idx] !== "") {
-            var weapon = new Weapon(world, this, cfg.weapons[idx], view);
+            var weapon = new Weapon(world, this, cfg.weapons[idx]);
             this.weapons.push(weapon);
         }
     }
 
-    Unit.call(this, world, Util.unitType.tank, cfg, position, 0, view, slf);
+    Unit.call(this, world, Util.unitType.tank, cfg);
 
-    // hp bar
-    Unit.prototype.addHpBar.call(this, "base", true);
-
-    // name bar
-    if (player) {
-        Unit.prototype.addNameBar.call(this, player.name);
+    if (this.view) {
+        Unit.prototype.addHpBar.call(this, "base", true);
     }
 }
 

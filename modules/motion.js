@@ -3,9 +3,7 @@
 var Victor = require("victor");
 var Util = require("../modules/util");
 
-var epsilon = 1e-6;
-
-function Motion(owner, cfg, angle)
+function Motion(owner, cfg)
 {
     this.owner = owner;
     this.cfg = cfg;
@@ -13,7 +11,7 @@ function Motion(owner, cfg, angle)
     this.forceAngle = 0;
     this.force = false;
 
-    this.iv = new Victor(cfg.ivInit * Math.cos(angle), cfg.ivInit * Math.sin(angle));
+    this.iv = new Victor(cfg.ivInit, 0);
     this.ev = new Victor(0, 0);
     this.rv = cfg.rv;
 }
@@ -29,6 +27,13 @@ Motion.prototype.toString = function()
         + "iv={" + this.iv.x + "," + this.iv.y + "} "
         + "ev={" + this.ev.x + "," + this.ev.y + "} "
         + "v=" + this.v;
+};
+
+Motion.prototype.setIvAngle = function(angle)
+{
+    var len = this.iv.length();
+    this.iv.x = len * Math.cos(angle);
+    this.iv.y = len * Math.sin(angle);
 };
 
 Motion.prototype.reverseIvX = function()
@@ -73,7 +78,7 @@ Motion.prototype.update = function(deltaMS)
 
     // eternal velocity decrese
     elen = this.ev.length();
-    if (elen > epsilon) {
+    if (elen > Util.epsilon) {
         dec = this.cfg.evDec * deltaMS / 1000;
         elen = elen > dec ? (elen - dec) : 0;
         elen = elen > this.cfg.evMax ? this.cfg.evMax : elen;
@@ -85,8 +90,25 @@ Motion.prototype.update = function(deltaMS)
     this.owner.y += (this.iv.y + this.ev.y) * deltaMS / 1000;
     Util.clampPosition(this.owner, 0, this.owner.world.w, 0, this.owner.world.h);
 
-    if (this.rv !== null && Math.abs(this.rv) > epsilon) {
-        this.owner.rotation += this.rv * deltaMS / 1000;
+    if (this.rv !== null && Math.abs(this.rv) > Util.epsilon) {
+        // has rotation target
+        if (this.owner.rotationTarget) {
+            if (this.owner.rotationTarget > this.owner.rotation) {
+                this.owner.rotation += this.rv * deltaMS / 1000;
+                if (this.owner.rotation > this.owner.rotationTarget) {
+                    this.owner.rotation = this.owner.rotationTarget;
+                }
+            } else if (this.owner.rotationTarget < this.owner.rotation) {
+                this.owner.rotation -= this.rv * deltaMS / 1000;
+                if (this.owner.rotation < this.owner.rotationTarget) {
+                    this.owner.rotation = this.owner.rotationTarget;
+                }
+            }
+        }
+        // self rotation
+        else {
+            this.owner.rotation += this.rv * deltaMS / 1000;
+        }
     }
 };
 

@@ -37,7 +37,9 @@ Commander.prototype.exeJoin = function(commander)
         return false;
     }
     player = this.world.addPlayer(commander.connid,
-        commander.join.name, commander.join.viewW, commander.join.viewH);
+                                  commander.join.name,
+                                  commander.join.viewW,
+                                  commander.join.viewH);
     if (!player) {
         return false;
     }
@@ -94,7 +96,7 @@ Commander.prototype.exeRotate = function(commander)
         Util.logError("player[" + commander.connid + "] tank not found");
         return false;
     }
-    player.tank.rotation = commander.rotate.angle;
+    player.tank.rotationTarget = commander.rotate.angle;
     return true;
 };
 
@@ -149,7 +151,7 @@ Commander.prototype.execute = function()
                 Util.logError("commander[" + commander.cmd + "] execute error ignore");
             } else {
                 // TODO: dump commanders
-                Util.logDebug("frame[" + this.world.frame + "] cmd=" + commander.cmd + " " + commander.connid);
+                Util.logDebug("frame[" + this.world.frame + "] client[" + commander.connid + "] cmd=" + commander.cmd);
                 dispatchers.push(commander);
             }
         }

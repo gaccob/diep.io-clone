@@ -5,8 +5,6 @@ var Victor = require("victor");
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
-var epsilon = 1e-6;
-
 function Player(world, connid, name, viewW, viewH)
 {
     this.world = world;
@@ -132,7 +130,7 @@ Player.prototype.handleMouseMove = function()
         }
         var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
         var angle = dir.angle() + Math.PI / 2;
-        if (Math.abs(player.controlRotation - angle) > epsilon) {
+        if (Math.abs(player.controlRotation - angle) > Util.epsilon) {
             player.controlRotation = angle;
             player.needSyncRotation = true;
         }
@@ -168,16 +166,20 @@ Player.prototype.resetControlDir = function()
 
 Player.prototype.createTank = function()
 {
+    var tank = new Tank(this.world, "base", this);
+
+    this.bindTank(tank);
+
     var px = (this.world.w - this.viewW) / 2;
     var py = (this.world.h - this.viewH) / 2;
-    var tank = new Tank(this.world, "base", {
-        x: this.world.randomBetween(0, px) + this.viewW / 2,
-        y: this.world.randomBetween(0, py) + this.viewH / 2,
-    }, this, this.world.view ? true : false);
+    tank.x = this.world.randomBetween(0, px) + this.viewW / 2;
+    tank.y = this.world.randomBetween(0, py) + this.viewH / 2;
 
     this.world.addUnit(tank);
 
-    this.bindTank(tank);
+    if (this.world.connid === this.connid && this.control === false) {
+        this.addControl();
+    }
 };
 
 Player.prototype.bindTank = function(tank)
@@ -197,19 +199,12 @@ Player.prototype.bindTank = function(tank)
 
     // name
     this.tank.addNameBar(this.name);
-
-    // self
-    if (this.world.isLocal === true && this === this.world.getSelf()) {
-        if (this.control === false) {
-            this.addControl();
-        }
-    }
 };
 
 Player.prototype.update = function()
 {
     if (this.needSyncRotation === true) {
-        if (Math.abs(this.controlRotation - this.tank.rotation) > epsilon) {
+        if (Math.abs(this.controlRotation - this.tank.rotation) > Util.epsilon) {
             this.world.synchronizer.syncRotate(this.controlRotation);
         }
         this.needSyncRotation = false;
@@ -217,7 +212,7 @@ Player.prototype.update = function()
 
     if (this.needSyncForce === true) {
         var dir = Util.getVectorByForceDir(this.controlForceDir);
-        if (dir.lengthSq() < epsilon) {
+        if (dir.lengthSq() < Util.epsilon) {
             this.world.synchronizer.syncMove(0, false);
         } else {
             this.world.synchronizer.syncMove(dir.angle(), true);

@@ -5,7 +5,7 @@ var Motion = require("../modules/motion");
 var Util = require("../modules/util");
 var View = require("../modules/view");
 
-function Unit(world, type, cfg, position, angle, view, slf)
+function Unit(world, type, cfg)
 {
     this.world = world;
     if (this.world.isLocal === false || this.world.started === true) {
@@ -13,13 +13,14 @@ function Unit(world, type, cfg, position, angle, view, slf)
     }
     this.type = type;
     this.cfg = cfg;
-    this.motion = new Motion(this, this.cfg.velocity, angle);
-    if (view === true) {
-        this.view = new View(this, slf);
+    this.motion = new Motion(this, this.cfg.velocity);
+    if (world.isLocal === true) {
+        this.view = new View(this);
     }
-    this.x = position.x;
-    this.y = position.y;
+    this.x = 0;
+    this.y = 0;
     this.rotation = 0;
+    this.rotationTarget = 0;
     this.hp = this.cfg.hp;
     this.maxHp = this.cfg.hp;
 
@@ -48,12 +49,10 @@ Unit.prototype = {
 
 Unit.prototype.addHpBar = function(name, visible)
 {
-    if (this.view) {
-        if (this.hpbar) {
-            delete this.hpbar;
-        }
-        this.hpbar = new HpBar(this.world, name, this, visible);
+    if (this.hpbar) {
+        delete this.hpbar;
     }
+    this.hpbar = new HpBar(this.world, name, this, visible);
 };
 
 Unit.prototype.addNameBar = function(name)
@@ -136,6 +135,7 @@ Unit.prototype.dump = function()
     u.weaponName = this.weaponName ? this.weaponName : "";
     u.playerConnid = this.player ? this.player.connid : "";
     u.rotation = this.rotation;
+    u.rotationTarget = this.rotationTarget;
     u.motion = new this.world.proto.Motion();
     u.motion.forceAngle = this.motion.forceAngle;
     u.motion.force = this.motion.force;
@@ -147,11 +147,11 @@ Unit.prototype.dump = function()
 
 Unit.prototype.load = function(u)
 {
-    Util.assert(this.id === u.id);
-    Util.assert(this.type === u.type);
-
+    this.id = u.id;
     this.hp = u.hp;
+    this.bornFrame = u.bornFrame;
     this.rotation = u.rotation;
+    this.rotationTarget = u.rotationTarget;
     this.motion.iv.x = u.motion.iv.x;
     this.motion.iv.y = u.motion.iv.y;
     this.motion.ev.x = u.motion.ev.x;
@@ -167,6 +167,13 @@ Unit.prototype.load = function(u)
         this.hpbar.x += (this.x - oldX);
         this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.maxHp);
+    }
+
+    if (this.owner) {
+        var weapon = this.owner.getWeaponByName(u.weaponName);
+        if (weapon) {
+            weapon.fireBullet(this);
+        }
     }
 };
 

@@ -3,19 +3,13 @@
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Bullet(world, cfgName, position, angle, owner, weaponName, view)
+function Bullet(world, cfgName, owner, weaponName)
 {
     this.owner = owner;
     this.weaponName = weaponName;
     this.bornFrame = world.frame;
 
-    Unit.call(this,
-              world,
-              Util.unitType.bullet,
-              world.cfg.configBullets[cfgName],
-              position,
-              angle,
-              view);
+    Unit.call(this, world, Util.unitType.bullet, world.cfg.configBullets[cfgName]);
 }
 
 Bullet.prototype = Object.create(Unit.prototype);

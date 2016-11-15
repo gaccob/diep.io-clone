@@ -97,7 +97,7 @@ World.prototype.addPlayer = function(connid, name, viewW, viewH)
     var player = new Player(this, connid, name, viewW, viewH);
     this.players[connid] = player;
     this.playerCount ++;
-    Util.logDebug("add player:" + connid);
+    Util.logDebug("frame[" + this.frame + "] add player:" + connid);
     return player;
 };
 
@@ -107,7 +107,7 @@ World.prototype.removePlayer = function(connid)
     if (player) {
         delete this.players[connid];
         -- this.playerCount;
-        Util.logDebug("remove player:" + connid);
+        Util.logDebug("frame[" + this.frame + "] remove player:" + connid);
 
         if (player.tank) {
             player.tank.player = null;
@@ -249,10 +249,13 @@ World.prototype.updateObstacles = function()
     if (this.obstacleCount < this.cfg.configWorld.maxObstaclesCount) {
         var names = ["triangle", "triangle", "quad", "pentagon"];
         var name = names[Math.floor((this.random() * names.length))];
-        obstacle = new Obstacle(this, name, {
-            x: this.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w),
-            y: this.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h),
-        }, this.view ? true : false);
+        obstacle = new Obstacle(this, name);
+
+        obstacle.x = this.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w);
+        obstacle.y = this.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h);
+
+        obstacle.motion.setIvAngle(this.random() * 2 * Math.PI);
+
         this.addUnit(obstacle);
     }
 };
@@ -417,7 +420,7 @@ World.prototype.simpleCollide = function(unit1, unit2, distRatio)
 
 World.prototype.collide = function(unit1, unit2, distRatio)
 {
-    Util.logTrace("unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
+    Util.logDebug("frame[" + this.frame + "] unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
 
     Util.logTrace(unit1.toString());
     Util.logTrace(unit2.toString());

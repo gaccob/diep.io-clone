@@ -20,6 +20,8 @@ var Util = {
         error: 2,
         fatal: 3,
     },
+
+    epsilon: 0.000001,
 };
 
 Util.assert = function(condition, message)

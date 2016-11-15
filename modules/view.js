@@ -66,7 +66,7 @@ function drawWeapon(view)
     view.sprite.addChild(bodySprite);
 }
 
-function drawTank(view, slf)
+function drawTank(view, me)
 {
     for (var idx in view.owner.weapons) {
         var weapon = view.owner.weapons[idx];
@@ -76,7 +76,7 @@ function drawTank(view, slf)
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
 
-    if (slf === true) {
+    if (me === true) {
         graphics.beginFill(view.cfg.body.playerColor);
     } else {
         graphics.beginFill(view.cfg.body.color);
@@ -129,7 +129,7 @@ function drawHpBar(view)
     view.world.view.addChild(view.sprite);
 }
 
-function View(owner, slf)
+function View(owner)
 {
     this.owner = owner;
     this.cfg = this.owner.cfg.view;
@@ -143,7 +143,13 @@ function View(owner, slf)
     } else if (this.owner.type == Util.unitType.weapon) {
         drawWeapon(this);
     } else if (this.owner.type == Util.unitType.tank) {
-        drawTank(this, slf);
+        var me = false;
+        if (this.owner.player) {
+            if (this.owner.player.connid === this.world.connid) {
+                me = true;
+            }
+        }
+        drawTank(this, me);
     } else if (this.owner.type == Util.unitType.hpbar) {
         drawHpBar(this);
     }

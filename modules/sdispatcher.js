@@ -54,8 +54,8 @@ SDispatcher.prototype.onStartReq = function(client, pkg)
 
 SDispatcher.prototype.onCommanders = function(client, pkg)
 {
-    for (var i in pkg.syncCommands) {
-        var commander = pkg.syncCommands[i];
+    for (var i in pkg.syncCommanders) {
+        var commander = pkg.syncCommanders[i];
         commander.connid = client.id;
         this.world.commander.push(this.world.frame + 1, commander);
     }
