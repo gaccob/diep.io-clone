@@ -17,8 +17,6 @@ function Unit(world, type, cfg)
     if (world.isLocal === true) {
         this.view = new View(this);
     }
-    this.x = 0;
-    this.y = 0;
     this.rotation = 0;
     this.hp = this.cfg.hp;
     this.maxHp = this.cfg.hp;
@@ -40,6 +38,10 @@ function Unit(world, type, cfg)
     this.props[pt.PT_BULLET_DAMAGE] = 0;
     this.props[pt.PT_RELOAD] = 0;
     this.props[pt.PT_MOVEMENT_SPEED] = 0;
+
+    // private
+    this._x = 0;
+    this._y = 0;
 }
 
 Unit.prototype = {
@@ -116,8 +118,6 @@ Unit.prototype.update = function()
     }
 
     if (this.isDead === false && this.hpbar) {
-        this.hpbar.x += (this.x - oldX);
-        this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.maxHp);
     }
 };
@@ -217,6 +217,24 @@ Object.defineProperties(Unit.prototype, {
     },
     m: {
         get: function() { return this.radius * this.radius * this.cfg.density; }
+    },
+    x: {
+        get: function() { return this._x; },
+        set: function(v) {
+            if (this.hpbar) {
+                this.hpbar.x += (v - this._x);
+            }
+            this._x = v;
+        }
+    },
+    y: {
+        get: function() { return this._y; },
+        set: function(v) {
+            if (this.hpbar) {
+                this.hpbar.y += (v - this._y);
+            }
+            this._y = v;
+        }
     },
 });
 
