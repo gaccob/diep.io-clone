@@ -137,9 +137,9 @@ CWorld.prototype.updateDieAnimations = function()
     }
 };
 
-CWorld.prototype.updateLogic = function()
+CWorld.prototype.updateFrameLogic = function()
 {
-    World.prototype.updateLogic.call(this);
+    World.prototype.updateFrameLogic.call(this);
     this.updateDieAnimations();
 };
 
@@ -180,10 +180,8 @@ CWorld.prototype.update = function()
 {
     // lock-step execute
     if (this.started === true && this.step > 0) {
-        ++ this.frame;
         -- this.step;
-        this.commander.execute();
-        this.updateLogic();
+        this.updateFrameLogic();
     }
 
     // view

@@ -491,8 +491,13 @@ World.prototype.updateCollision = function()
     }
 };
 
-World.prototype.updateLogic = function()
+World.prototype.updateFrameLogic = function()
 {
+    this.frame ++;
+    this.time += 1000.0 / this.cfg.configWorld.frame;
+
+    this.commander.execute();
+
     this.checkRemoveUnits();
     this.checkAddUnits();
     this.updatePlayers();

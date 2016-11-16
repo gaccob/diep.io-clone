@@ -23,9 +23,11 @@ function Player(world, connid, name, viewW, viewH)
         down: 0,
     };
     this.needSyncForce = false;
+    this.lastSyncForceFrame = 0;
 
     this.controlRotation = 0;
     this.needSyncRotation = false;
+    this.lastSyncRotationFrame = 0;
 }
 
 Player.prototype = {
@@ -203,21 +205,29 @@ Player.prototype.bindTank = function(tank)
 
 Player.prototype.update = function()
 {
-    if (this.needSyncRotation === true) {
-        if (Math.abs(this.controlRotation - this.tank.rotation) > Util.epsilon) {
-            this.world.synchronizer.syncRotate(this.controlRotation);
+    var cfg = this.world.cfg.configWorld;
+
+    if (this.world.frame > cfg.syncRotationFrame + this.lastSyncRotationFrame) {
+        if (this.needSyncRotation === true) {
+            if (Math.abs(this.controlRotation - this.tank.rotation) > Util.epsilon) {
+                this.world.synchronizer.syncRotate(this.controlRotation);
+            }
+            this.needSyncRotation = false;
+            this.lastSyncRotationFrame = this.world.frame;
         }
-        this.needSyncRotation = false;
     }
 
-    if (this.needSyncForce === true) {
-        var dir = Util.getVectorByForceDir(this.controlForceDir);
-        if (dir.lengthSq() < Util.epsilon) {
-            this.world.synchronizer.syncMove(0, false);
-        } else {
-            this.world.synchronizer.syncMove(dir.angle(), true);
+    if (this.world.frame > cfg.syncForceFrame + this.lastSyncForceFrame) {
+        if (this.needSyncForce === true) {
+            var dir = Util.getVectorByForceDir(this.controlForceDir);
+            if (dir.lengthSq() < Util.epsilon) {
+                this.world.synchronizer.syncMove(0, false);
+            } else {
+                this.world.synchronizer.syncMove(dir.angle(), true);
+            }
+            this.needSyncForce = false;
+            this.lastSyncForceFrame = this.world.frame;
         }
-        this.needSyncForce = false;
     }
 };
 
