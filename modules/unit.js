@@ -146,6 +146,8 @@ Unit.prototype.dump = function()
 Unit.prototype.load = function(u)
 {
     this.id = u.id;
+    this.x = u.motion.position.x;
+    this.y = u.motion.position.y;
     this.hp = u.hp;
     this.bornFrame = u.bornFrame;
     this.rotation = u.rotation;
@@ -156,13 +158,7 @@ Unit.prototype.load = function(u)
     this.motion.forceAngle = u.motion.forceAngle;
     this.motion.force = u.motion.force;
 
-    var oldX = this.x;
-    var oldY = this.y;
-    this.x = u.motion.position.x;
-    this.y = u.motion.position.y;
     if (this.hpbar) {
-        this.hpbar.x += (this.x - oldX);
-        this.hpbar.y += (this.y - oldY);
         this.hpbar.update(this.hp / this.maxHp);
     }
 

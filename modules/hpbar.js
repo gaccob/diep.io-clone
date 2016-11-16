@@ -32,19 +32,16 @@ HpBar.prototype.die = function()
 HpBar.prototype.update = function(percent)
 {
     if (this.isDead === false) {
-
         if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
             this.view.visible = false;
         } else {
             this.view.visible = true;
         }
-
         if (this.percent != percent) {
             this.view.updateHpbar(this.percent, percent);
             this.percent = percent;
         }
     }
-
     this.view.update();
 };
 

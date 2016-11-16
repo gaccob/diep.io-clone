@@ -253,7 +253,6 @@ World.prototype.updateObstacles = function()
 
         obstacle.x = this.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w);
         obstacle.y = this.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h);
-
         obstacle.motion.setIvAngle(this.random() * 2 * Math.PI);
 
         this.addUnit(obstacle);
