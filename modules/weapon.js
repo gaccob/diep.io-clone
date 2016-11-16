@@ -43,8 +43,12 @@ Weapon.prototype.resetFireDelay = function()
     this.fireFrame = this.world.frame + this.cfg.shootDelayFrame;
 };
 
-Weapon.prototype.update = function()
+Weapon.prototype.update = function(fire)
 {
+    if (fire === true) {
+        this.fire();
+    }
+
     if (this.fireAnimFrame) {
         var frame = this.world.frame - this.fireAnimFrame;
         if (frame > this.cfg.fireAnimFrame) {

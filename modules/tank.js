@@ -32,12 +32,8 @@ Tank.prototype.update = function()
 {
     Unit.prototype.update.call(this);
 
-    if (this.world.isLocal === false && this.autoFire === true) {
-        this.fire();
-    }
-
     for (var idx in this.weapons) {
-        this.weapons[idx].update();
+        this.weapons[idx].update(this.autoFire);
     }
 };
 
@@ -59,13 +55,6 @@ Tank.prototype.getWeaponByName = function(name)
         }
     }
     return null;
-};
-
-Tank.prototype.fire = function()
-{
-    for (var idx in this.weapons) {
-        this.weapons[idx].fire();
-    }
 };
 
 Tank.prototype.revertFireStatus = function()
