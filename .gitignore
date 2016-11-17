@@ -1,4 +1,5 @@
 www/index.js
+www/record/*
 node_modules/*
 *.swp
 ._*

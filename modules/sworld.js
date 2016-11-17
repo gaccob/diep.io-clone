@@ -7,6 +7,7 @@ var Path = require("path");
 var Url = require("url");
 
 var Package = require("../package.json");
+var Record = require("../modules/record");
 var SDispatcher = require("../modules/sdispatcher");
 var Util = require("../modules/util");
 var World = require("../modules/world");
@@ -53,6 +54,8 @@ function SWorld()
 
     this.server = Http.createServer(handleHttp);
     this.server.listen(Package.app.port);
+
+    this.record = new Record();
 }
 
 SWorld.prototype = Object.create(World.prototype);

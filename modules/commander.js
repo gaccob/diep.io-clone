@@ -118,7 +118,7 @@ Commander.prototype.exeFire = function(commander)
 Commander.prototype.execute = function()
 {
     var commanders = this.commanders[this.world.frame];
-    var dispatchers = [];
+    var dispatchCommanders = [];
     var ct = this.world.proto.CommanderType;
     if (commanders) {
         for (var i in commanders) {
@@ -150,16 +150,20 @@ Commander.prototype.execute = function()
             if (result !== true) {
                 Util.logError("commander[" + commander.cmd + "] execute error ignore");
             } else {
-                // TODO: dump commanders
                 Util.logDebug("frame[" + this.world.frame + "] client[" + commander.connid + "] cmd=" + commander.cmd);
-                dispatchers.push(commander);
+                dispatchCommanders.push(commander);
             }
         }
     }
 
     // server dispatcher
     if (this.world.isLocal === false) {
-        this.world.synchronizer.syncCommanders(dispatchers);
+        this.world.synchronizer.syncCommanders(dispatchCommanders);
+
+        // dump commander record
+        if (this.world.record) {
+            this.world.record.append(this.world.frame, dispatchCommanders);
+        }
     }
 
     // release

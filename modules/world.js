@@ -87,6 +87,10 @@ World.prototype.start = function()
     var dateTime = new Date();
     this.time = dateTime.getTime();
 
+    if (this.record) {
+        this.record.start();
+    }
+
     Util.logDebug("world start");
 };
 
