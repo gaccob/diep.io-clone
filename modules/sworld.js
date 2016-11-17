@@ -58,7 +58,7 @@ function SWorld()
 SWorld.prototype = Object.create(World.prototype);
 SWorld.prototype.constructor = SWorld;
 
-SWorld.prototype.start = function()
+SWorld.prototype.init = function()
 {
     this.socket = IO.listen(this.server);
     Util.logDebug("server listened port=" + Package.app.port);
@@ -77,6 +77,10 @@ SWorld.prototype.start = function()
 
 SWorld.prototype.update = function()
 {
+    if (this.started === false) {
+        return;
+    }
+
     var dateTime = new Date();
     var ms = dateTime.getTime();
     var updateMS = 1000.0 / this.cfg.configWorld.frame;

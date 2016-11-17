@@ -61,7 +61,7 @@ function StartUI(world)
         }
         if (world.inited === false) {
             world.init();
-            world.start(name);
+            world.synchronizer.syncStartReq(name, world.viewW, world.viewH);
         } else {
             world.synchronizer.syncReborn(name);
         }

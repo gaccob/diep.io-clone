@@ -72,7 +72,6 @@ function CWorld()
     this.dispatcher = new CDispatcher(this);
 
     this.inited = false;
-    this.started = false;
 
     // lock-step
     this.step = 0;
@@ -163,11 +162,6 @@ CWorld.prototype.init = function()
     });
 
     this.inited = true;
-};
-
-CWorld.prototype.start = function(name)
-{
-    this.synchronizer.syncStartReq(name ? name : "guest", this.viewW, this.viewH);
 };
 
 CWorld.prototype.finish = function()

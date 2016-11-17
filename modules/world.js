@@ -37,9 +37,6 @@ function World(isLocal)
         }
     }
 
-    var dateTime = new Date();
-    this.time = dateTime.getTime();
-
     this.bullets = {};
     this.obstacles = {};
     this.obstacleCount = 0;
@@ -73,10 +70,24 @@ function World(isLocal)
 
     // random
     this.seed = Package.name;
+
+    // start flag
+    this.started = false;
+    this.time = 0;
 }
 
 World.prototype = {
     constructor: World,
+};
+
+World.prototype.start = function()
+{
+    this.started = true;
+
+    var dateTime = new Date();
+    this.time = dateTime.getTime();
+
+    Util.logDebug("world start");
 };
 
 World.prototype.random = function()
@@ -493,6 +504,10 @@ World.prototype.updateCollision = function()
 
 World.prototype.updateFrameLogic = function()
 {
+    if (this.started === false) {
+        return;
+    }
+
     this.frame ++;
     this.time += 1000.0 / this.cfg.configWorld.frame;
 

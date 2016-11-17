@@ -57,6 +57,7 @@ CDispatcher.prototype.onStartRes = function(message)
     this.world.startUI.visible = false;
 
     // world
+    this.world.start();
     this.world.frame = message.frame;
     this.world.unitBaseId = res.unitBaseId;
     Util.logDebug("world frame=" + message.frame + " base-id=" + res.unitBaseId);
@@ -92,9 +93,6 @@ CDispatcher.prototype.onStartRes = function(message)
             player.load(netPlayer);
         }
     }
-
-    // world start run
-    this.world.started = true;
 };
 
 CDispatcher.prototype.onCommanders = function(msg)

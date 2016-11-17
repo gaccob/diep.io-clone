@@ -2,7 +2,7 @@ var SWorld = require("../modules/sworld");
 
 var world = new SWorld();
 
-world.start();
+world.init();
 
 // jshint undef: false
 setInterval(function() {

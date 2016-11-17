@@ -15,6 +15,10 @@ SDispatcher.prototype = {
 SDispatcher.prototype.onConnected = function(client)
 {
     Util.logDebug("add connection:" + client.id);
+
+    if (this.world.started === false) {
+        this.world.start();
+    }
 };
 
 SDispatcher.prototype.onDisconnected = function(client)
