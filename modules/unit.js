@@ -130,10 +130,22 @@ Unit.prototype.dump = function()
     u.type = this.type;
     u.cfgName = this.cfg.alias;
     u.hp = this.hp;
-    u.ownerid = this.owner ? this.owner.id : 0;
-    u.bornFrame = this.bornFrame ? Math.floor(this.bornFrame) : 0;
-    u.weaponName = this.weaponName ? this.weaponName : "";
-    u.playerConnid = this.player ? this.player.connid : "";
+
+    if (this.type == Util.unitType.bullet) {
+        u.ownerid = this.owner.id;
+        u.bornFrame = Math.floor(this.bornFrame);
+        u.weaponName = this.weaponName;
+    }
+
+    if (this.type == Util.unitType.tank) {
+        u.playerConnid = this.player ? this.player.connid : "";
+        u.autoFire = this.autoFire;
+        u.weaponFireFrame = [];
+        for (var i in this.weapons) {
+            u.weaponFireFrame.push(this.weapons[i].fireFrame);
+        }
+    }
+
     u.rotation = this.rotation;
     u.motion = new this.world.proto.Motion();
     u.motion.forceAngle = this.motion.forceAngle;
@@ -150,7 +162,6 @@ Unit.prototype.load = function(u)
     this.x = u.motion.position.x;
     this.y = u.motion.position.y;
     this.hp = u.hp;
-    this.bornFrame = u.bornFrame;
     this.rotation = u.rotation;
     this.motion.iv.x = u.motion.iv.x;
     this.motion.iv.y = u.motion.iv.y;
@@ -163,10 +174,17 @@ Unit.prototype.load = function(u)
         this.hpbar.update(this.hp / this.maxHp);
     }
 
-    if (this.owner) {
+    if (this.type == Util.unitType.bullet) {
+        this.bornFrame = u.bornFrame;
         var weapon = this.owner.getWeaponByName(u.weaponName);
-        if (weapon) {
-            weapon.fireBullet(this);
+        weapon.fireBullet(this);
+    }
+
+    if (this.type == Util.unitType.tank) {
+        this.autoFire = u.autoFire;
+        var idx = 0;
+        for (var i in this.weapons) {
+            this.weapons[i].fireFrame = u.weaponFireFrame[idx++];
         }
     }
 };

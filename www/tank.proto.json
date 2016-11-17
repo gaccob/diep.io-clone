@@ -115,6 +115,18 @@
                     "type": "string",
                     "name": "playerConnid",
                     "id": 10
+                },
+                {
+                    "rule": "optional",
+                    "type": "bool",
+                    "name": "autoFire",
+                    "id": 11
+                },
+                {
+                    "rule": "repeated",
+                    "type": "uint32",
+                    "name": "weaponFireFrame",
+                    "id": 12
                 }
             ]
         },
