@@ -135,6 +135,7 @@ Player.prototype.handleMouseMove = function()
         if (Math.abs(player.controlRotation - angle) > Util.epsilon) {
             player.controlRotation = angle;
             player.needSyncRotation = true;
+            player.tank.viewRotation = angle;
         }
     }, false);
 };

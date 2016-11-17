@@ -16,9 +16,9 @@ v0.2
 - import protobuf.js & socket.io
 - use browerify & UglifyJS
 - add npm script to build & run
-- add simple PVP logic
 - add start UI
 - add leader board
+- lockstep pvp logic
 
 TODO
 =====

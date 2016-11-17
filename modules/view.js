@@ -204,7 +204,11 @@ View.prototype.update = function()
 {
     this.x = this.owner.x;
     this.y = this.owner.y;
-    this.rotation = this.owner.rotation;
+    if (this.owner.viewRotation) {
+        this.rotation = this.owner.viewRotation;
+    } else {
+        this.rotation = this.owner.rotation;
+    }
 
     // name bar no rotation
     if (this.nameBar) {

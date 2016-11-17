@@ -18,6 +18,7 @@ function Unit(world, type, cfg)
         this.view = new View(this);
     }
     this.rotation = 0;
+    this.viewRotation = null;
     this.hp = this.cfg.hp;
     this.maxHp = this.cfg.hp;
 
