@@ -1,5 +1,6 @@
 (function(){ "use strict";
 
+var Fs = require("fs");
 var Victor = require("victor");
 
 var Package = require("../package.json");
@@ -143,6 +144,35 @@ Date.prototype.Format = function (fmt) {
 Util.timeStamp = function(format)
 {
     return new Date().Format(format);
+};
+
+Util.readLines = function(file, callback)
+{
+    Fs.exists(file, function(existed) {
+        if (existed !== true) {
+            Util.logError("file[" + file + "] not found");
+            return;
+        }
+
+        var input = Fs.createReadStream(file);
+        var remaining = '';
+        input.on('data', function(data) {
+            remaining += data;
+            var index = remaining.indexOf('\n');
+            while (index > -1) {
+                var line = remaining.substring(0, index);
+                remaining = remaining.substring(index + 1);
+                callback(line);
+                index = remaining.indexOf('\n');
+            }
+        });
+        input.on('end', function() {
+            if (remaining.length > 0) {
+                callback(remaining);
+            }
+            callback();
+        });
+    });
 };
 
 module.exports = Util;

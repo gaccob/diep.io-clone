@@ -1,19 +1,17 @@
 (function() { "use strict";
 
 var Fs = require("fs");
-
 var Util = require("../modules/util");
 
-function Record()
+function Recorder()
 {
-    // nothing to do
 }
 
-Record.prototype = {
-    constructor: Record,
+Recorder.prototype = {
+    constructor: Recorder,
 };
 
-Record.prototype.start = function()
+Recorder.prototype.start = function()
 {
     var date = Util.timeStamp("yyyyMMdd");
     var dir = "www/record/" + date;
@@ -32,7 +30,7 @@ Record.prototype.start = function()
     this.file = dir + "/" + Util.timeStamp("hhmmss") + ".dat";
 };
 
-Record.prototype.append = function(frame, commanders)
+Recorder.prototype.append = function(frame, commanders)
 {
     if (commanders.length > 0) {
         var option = {flag: 'a+'};
@@ -40,6 +38,6 @@ Record.prototype.append = function(frame, commanders)
     }
 };
 
-module.exports = Record;
+module.exports = Recorder;
 
 })();

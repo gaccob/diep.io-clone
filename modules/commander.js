@@ -161,8 +161,8 @@ Commander.prototype.execute = function()
         this.world.synchronizer.syncCommanders(dispatchCommanders);
 
         // dump commander record
-        if (this.world.record) {
-            this.world.record.append(this.world.frame, dispatchCommanders);
+        if (this.world.recorder) {
+            this.world.recorder.append(this.world.frame, dispatchCommanders);
         }
     }
 

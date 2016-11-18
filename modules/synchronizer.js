@@ -37,8 +37,10 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
             return;
     }
 
-    socket.emit('pkg', pkg.encode().toArrayBuffer());
-    Util.logTrace("send message cmd=" + pkg.cmd);
+    if (socket) {
+        socket.emit('pkg', pkg.encode().toArrayBuffer());
+        Util.logTrace("send message cmd=" + pkg.cmd);
+    }
 };
 
 Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)

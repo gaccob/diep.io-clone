@@ -35,17 +35,19 @@
     },
 
     "scripts": {
-        "lint": "jshint modules/*.js ui/*.js",
+        "lint": "jshint modules/*.js ui/*.js app/*.js",
         "config": "python cfg/conv2js.py --excel_file=cfg/config.xlsx --output_path=cfg/ --skip_rows=1",
         "proto": "pbjs proto/tank.proto -t json > www/tank.proto.json",
 
-        "debug": "browserify modules/client.js > www/index.js",
+        "debug": "browserify app/client.js > www/index.js",
         "predebug": "npm run lint && npm run config && npm run proto",
-        "postdebug": "node modules/server.js",
+        "postdebug": "node app/server.js",
 
-        "release": "browserify modules/client.js | uglifyjs -mc > www/index.js",
+        "release": "browserify app/client.js | uglifyjs -mc > www/index.js",
         "prerelease": "npm run lint && npm run proto",
-        "postrelease": "node modules/server.js"
+        "postrelease": "node app/server.js",
+
+        "replay": "node app/replay.js $RECORD"
     },
 
     "private": true,
