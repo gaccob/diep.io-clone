@@ -1,6 +1,7 @@
 var Replayer = require("../modules/replayer");
 var Util = require("../modules/util");
 
+// jshint undef: false
 var recordFile = process.argv[2];
 if (!recordFile) {
     Util.logError("invalid record file");

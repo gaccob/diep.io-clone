@@ -39,7 +39,7 @@ function LeaderBoardUI(world)
     this.topCount = 5;
 
     this.ui = EZGUI.create(cfg, 'metalworks');
-    this.ui.x = this.world.viewW - cfg.width;
+    this.ui.x = this.world.viewW - cfg.width - cfg.padding;
     this.ui.y = cfg.padding;
     this.ui.visible = false;
     this.ui.alpha = 0.75;

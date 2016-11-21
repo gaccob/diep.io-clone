@@ -8,8 +8,9 @@ var CDispatcher = require("../modules/cdispatcher");
 var World = require("../modules/world");
 var Util = require("../modules/util");
 
-var StartUI = require("../ui/start");
 var LeaderBoardUI = require("../ui/leaderBoard");
+var PropAddUI = require("../ui/propAdd");
+var StartUI = require("../ui/start");
 
 
 function getWorldBackground(world)
@@ -65,6 +66,7 @@ function CWorld()
     EZGUI.Theme.load(['assets/theme/metalworks-theme.json'], function() {
         world.startUI = new StartUI(world);
         world.leaderBoardUI = new LeaderBoardUI(world);
+        world.propAddUI = new PropAddUI(world);
     });
 
     this.dieSprites = [];
@@ -95,6 +97,9 @@ CWorld.prototype.updateUI = function()
     }
     if (this.leaderBoardUI) {
         this.leaderBoardUI.update();
+    }
+    if (this.propAddUI) {
+        this.propAddUI.update();
     }
 };
 
