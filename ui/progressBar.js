@@ -35,6 +35,11 @@ ProgressBar.prototype = {
     constructor: ProgressBar
 };
 
+ProgressBar.prototype.getProgress = function()
+{
+    return this.frontSprites.length;
+};
+
 ProgressBar.prototype.setProgress = function(progress)
 {
     if (progress < 0) {

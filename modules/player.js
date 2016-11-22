@@ -140,14 +140,14 @@ Player.prototype.handleMouseMove = function()
     }, false);
 };
 
-Player.prototype.handleMouseDown = function()
+Player.prototype.handleMouseClick = function()
 {
     var player = this;
-    document.body.addEventListener('mousedown', function() {
+    this.world.stage.on('click', function(e) {
         if (player.tank !== null) {
             player.world.synchronizer.syncFire();
         }
-    }, false);
+    });
 };
 
 Player.prototype.addControl = function()
@@ -156,7 +156,7 @@ Player.prototype.addControl = function()
     this.handleKeyDown();
     this.handleKeyUp();
     this.handleMouseMove();
-    this.handleMouseDown();
+    this.handleMouseClick();
 };
 
 Player.prototype.resetControlDir = function()

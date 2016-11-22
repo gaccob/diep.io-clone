@@ -47,7 +47,7 @@ var cfg = {
             weight: "normal",
             fill: "#f0f0f0",
             y: 10,
-            height: 12,
+            height: 16,
         },
 
         padding: 6,
@@ -77,11 +77,9 @@ function addPropBar(container, prop, name)
     progressBar.x = cfg.panel.progressBar.x;
     progressBar.y = cfg.panel.progressBar.y;
     panel.addChild(progressBar.sprite);
+    container.progressBars[prop] = progressBar;
 
-    progressBar.setProgress(3);
-    progressBar.setProgress(2);
-
-    var text = new PIXI.Text(name + "(" + prop + ")", {
+    var text = new PIXI.Text(name + " [" + prop + "]", {
         fill: cfg.panel.text.fill,
         font: cfg.panel.text.font,
         fontWeight: cfg.panel.text.weight,
@@ -103,26 +101,37 @@ function addPropBar(container, prop, name)
         panel.x = cfg.panel.padding + (prop - 1 - col) * (cfg.panel.bg.width + cfg.panel.padding);
         panel.y = cfg.panel.padding + cfg.panel.bg.height + cfg.panel.padding;
     }
-    container.addChild(panel);
+    container.ui.addChild(panel);
+
+    // click event
+    panel.interactive = true;
+    panel.on('click', function(e) {
+        if (container.ui.visible === true) {
+            container.addProp(prop);
+            // TODO: not work
+            e.stopPropagation();
+        }
+    });
 }
 
 function PropAddUI(world)
 {
     this.world = world;
     this.ui = new PIXI.Container();
+    this.progressBars = {};
 
     var pt = this.world.proto.PropType;
-    addPropBar(this.ui, pt.PT_HEALTH_REGEN, "HP Regen");
-    addPropBar(this.ui, pt.PT_MAX_HEALTH, "Max HP");
-    addPropBar(this.ui, pt.PT_BODY_DAMAGE, "Body Damage");
-    addPropBar(this.ui, pt.PT_BULLET_SPEED, "Bullet Speed");
-    addPropBar(this.ui, pt.PT_BULLET_PENETRATION, "Penetration");
-    addPropBar(this.ui, pt.PT_BULLET_DAMAGE, "Damage");
-    addPropBar(this.ui, pt.PT_RELOAD, "Reload");
-    addPropBar(this.ui, pt.PT_MOVEMENT_SPEED, "Speed");
+    addPropBar(this, pt.PT_HEALTH_REGEN, "HP Regen");
+    addPropBar(this, pt.PT_MAX_HEALTH, "Max HP");
+    addPropBar(this, pt.PT_BODY_DAMAGE, "Body Damage");
+    addPropBar(this, pt.PT_BULLET_SPEED, "Bullet Speed");
+    addPropBar(this, pt.PT_BULLET_PENETRATION, "Penetration");
+    addPropBar(this, pt.PT_BULLET_DAMAGE, "Damage");
+    addPropBar(this, pt.PT_RELOAD, "Reload");
+    addPropBar(this, pt.PT_MOVEMENT_SPEED, "Speed");
 
     this.x = (this.world.viewW - this.ui.width) / 2;
-    this.y = (this.world.viewH - this.ui.height);
+    this.y = (this.world.viewH - this.ui.height) - 10;
 
     this.ui.visible = false;
     this.world.stage.addChild(this.ui);
@@ -130,6 +139,21 @@ function PropAddUI(world)
 
 PropAddUI.prototype = {
     constructor: PropAddUI
+};
+
+PropAddUI.prototype.addProp = function(propType)
+{
+    var pb = this.progressBars[propType];
+    if (pb) {
+        pb.setProgress(pb.getProgress() + 1);
+    }
+};
+
+PropAddUI.prototype.reset = function()
+{
+    for (var i in this.progressBars) {
+        this.progressBars[i].setProgress(0);
+    }
 };
 
 PropAddUI.prototype.update = function()

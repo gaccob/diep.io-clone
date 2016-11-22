@@ -12,7 +12,6 @@ var LeaderBoardUI = require("../ui/leaderBoard");
 var PropAddUI = require("../ui/propAdd");
 var StartUI = require("../ui/start");
 
-
 function getWorldBackground(world)
 {
     var cfg = world.cfg.configMap;
