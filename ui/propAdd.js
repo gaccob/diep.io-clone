@@ -105,11 +105,9 @@ function addPropBar(container, prop, name)
 
     // click event
     panel.interactive = true;
-    panel.on('click', function(e) {
+    panel.on('click', function() {
         if (container.ui.visible === true) {
             container.addProp(prop);
-            // TODO: not work
-            e.stopPropagation();
         }
     });
 }

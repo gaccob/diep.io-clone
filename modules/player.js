@@ -143,7 +143,8 @@ Player.prototype.handleMouseMove = function()
 Player.prototype.handleMouseClick = function()
 {
     var player = this;
-    this.world.stage.on('click', function(e) {
+    this.world.view.interactive = true;
+    this.world.view.on('click', function() {
         if (player.tank !== null) {
             player.world.synchronizer.syncFire();
         }
