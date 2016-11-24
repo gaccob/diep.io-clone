@@ -3,6 +3,7 @@
 var configBullets = require("../cfg/configBullets");
 var configDieAnimation = require("../cfg/configDieAnimation");
 var configHpbar = require("../cfg/configHpbar");
+var configLevelUp = require("../cfg/configLevelUp");
 var configObstacles = require("../cfg/configObstacles");
 var configPropAdd = require("../cfg/configPropAdd");
 var configTanks = require("../cfg/configTanks");
@@ -47,6 +48,11 @@ function Config()
     this.configPropAdd = {};
     for (idx in configPropAdd) {
         this.configPropAdd[configPropAdd[idx].type] = configPropAdd[idx].add;
+    }
+
+    this.configLevelUp = {};
+    for (idx in configLevelUp) {
+        this.configLevelUp[configLevelUp[idx].level] = configLevelUp[idx];
     }
 
     this.configMap = configMap[0];

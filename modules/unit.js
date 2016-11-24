@@ -40,6 +40,10 @@ function Unit(world, type, cfg)
     this.props[pt.PT_RELOAD] = 0;
     this.props[pt.PT_MOVEMENT_SPEED] = 0;
 
+    this.exp = 0;
+    this.level = 0;
+    this.freeSkillPoints = 0;
+
     // private
     this._x = 0;
     this._y = 0;
@@ -73,12 +77,39 @@ Unit.prototype.outOfBounds = function()
     return false;
 };
 
-Unit.prototype.takeDamage = function(damage)
+Unit.prototype.takeDamage = function(damage, caster)
 {
     this.hp -= damage;
     if (this.hp <= 0) {
         this.die();
+        if (this.type === Util.unitType.obstacle
+            && caster.type === Util.unitType.tank) {
+            caster.addExp(this.cfg.killExp);
+        }
     }
+};
+
+Unit.prototype.addExp = function(exp)
+{
+    if (exp < 0) {
+        Util.logError("cant add exp=" + exp);
+        return;
+    }
+
+    this.exp += exp;
+
+    var cfg = this.world.cfg.configLevelUp;
+    var oldLevel = this.level;
+    var level = this.level + 1;
+    while (cfg[level] && this.exp > cfg[level].exp) {
+        this.freeSkillPoints += cfg[level].skillPoint;
+        this.level = level ++;
+    }
+
+    Util.logDebug("unit[" + this.id + "] "
+        + " exp " + (this.exp - exp) + "->" + this.exp
+        + " level " + oldLevel + "->" + this.level
+        + " freeSkillPoint=" + this.freeSkillPoints);
 };
 
 Unit.prototype.die = function()

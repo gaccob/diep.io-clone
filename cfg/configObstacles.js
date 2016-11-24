@@ -1,5 +1,6 @@
 var configObstacles = {
 	"0": {
+		"killExp": 10.0,
 		"density": 1.0,
 		"hp": 20.0,
 		"damage": 2.0,
@@ -34,6 +35,7 @@ var configObstacles = {
 		},
 	},
 	"1": {
+		"killExp": 20.0,
 		"density": 1.0,
 		"hp": 40.0,
 		"damage": 4.0,
@@ -68,6 +70,7 @@ var configObstacles = {
 		},
 	},
 	"2": {
+		"killExp": 40.0,
 		"density": 1.0,
 		"hp": 80.0,
 		"damage": 8.0,
