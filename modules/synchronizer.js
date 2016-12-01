@@ -109,6 +109,19 @@ Synchronizer.prototype.syncFire = function()
 {
     var commander = new this.world.proto.SyncCommander();
     commander.cmd = this.world.proto.CommanderType.CT_FIRE;
+
+    var commanders = [];
+    commanders.push(commander);
+    this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);
+};
+
+Synchronizer.prototype.syncAddProp = function(propType)
+{
+    var commander = new this.world.proto.SyncCommander();
+    commander.cmd = this.world.proto.CommanderType.CT_ADD_PROP;
+    commander.addProp = new this.world.proto.SyncCommander.AddProp();
+    commander.addProp.propType = propType;
+
     var commanders = [];
     commanders.push(commander);
     this.sendPkg(this.world.socket, commanders, this.cmd.SYNC_COMMANDERS);

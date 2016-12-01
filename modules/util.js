@@ -175,6 +175,31 @@ Util.readLines = function(file, callback)
     });
 };
 
+Util.propTypeToString = function(propType, propTypeEnum)
+{
+    switch (propType) {
+        case propTypeEnum.PT_HEALTH_REGEN:
+            return "PT_HEALTH_REGEN";
+        case propTypeEnum.PT_MAX_HEALTH:
+            return "PT_MAX_HEALTH";
+        case propTypeEnum.PT_BODY_DAMAGE:
+            return "PT_BODY_DAMAGE";
+        case propTypeEnum.PT_BULLET_SPEED:
+            return "PT_BULLET_SPEED";
+        case propTypeEnum.PT_BULLET_PENETRATION:
+            return "PT_BULLET_PENETRATION";
+        case propTypeEnum.PT_BULLET_DAMAGE:
+            return "PT_BULLET_DAMAGE";
+        case propTypeEnum.PT_RELOAD:
+            return "PT_RELOAD";
+        case propTypeEnum.PT_MOVEMENT_SPEED:
+            return "PT_MOVEMENT_SPEED";
+        default:
+            Util.logError("prop type=" + propType + " not found");
+            break;
+    }
+};
+
 module.exports = Util;
 
 })();

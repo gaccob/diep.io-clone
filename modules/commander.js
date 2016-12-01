@@ -115,6 +115,33 @@ Commander.prototype.exeFire = function(commander)
     return true;
 };
 
+Commander.prototype.exeAddProp = function(commander)
+{
+    var player = this.world.players[commander.connid];
+    if (!player) {
+        Util.logError("player[" + commander.connid + "] not found");
+        return false;
+    }
+    if (!player.tank) {
+        Util.logError("player[" + commander.connid + "] tank not found");
+        return false;
+    }
+    var pt = commander.addProp.propType;
+    if (player.tank.freeSkillPoints <= 0) {
+        Util.logError("player[" + commander.connid + "] tank no free skill points");
+        return false;
+    }
+    if (player.tank.addProp(pt) !== true) {
+        Util.logError("player[" + commander.connid + "] tank add prop[" + pt + "] fail");
+        return false;
+    }
+    -- player.tank.freeSkillPoints;
+    if (this.world.propAddUI) {
+        this.world.propAddUI.onPropAdd(pt);
+    }
+    return true;
+};
+
 Commander.prototype.execute = function()
 {
     var commanders = this.commanders[this.world.frame];
@@ -142,6 +169,9 @@ Commander.prototype.execute = function()
                     break;
                 case ct.CT_FIRE:
                     result = this.exeFire(commander);
+                    break;
+                case ct.CT_ADD_PROP:
+                    result = this.exeAddProp(commander);
                     break;
                 default:
                     Util.logError("invalid commander:" + commander.cmd);

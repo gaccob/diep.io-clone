@@ -279,6 +279,12 @@
                     "type": "Rotate",
                     "name": "rotate",
                     "id": 14
+                },
+                {
+                    "rule": "optional",
+                    "type": "AddProp",
+                    "name": "addProp",
+                    "id": 15
                 }
             ],
             "messages": [
@@ -344,6 +350,17 @@
                             "rule": "optional",
                             "type": "float",
                             "name": "angle",
+                            "id": 1
+                        }
+                    ]
+                },
+                {
+                    "name": "AddProp",
+                    "fields": [
+                        {
+                            "rule": "optional",
+                            "type": "int32",
+                            "name": "propType",
                             "id": 1
                         }
                     ]
@@ -498,6 +515,10 @@
                 {
                     "name": "CT_FIRE",
                     "id": 5
+                },
+                {
+                    "name": "CT_ADD_PROP",
+                    "id": 6
                 }
             ]
         }

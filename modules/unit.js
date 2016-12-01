@@ -19,15 +19,17 @@ function Unit(world, type, cfg)
     }
     this.rotation = 0;
     this.viewRotation = null;
-    this.hp = this.cfg.hp;
-    this.maxHp = this.cfg.hp;
+    this.bulletResist = (this.cfg.bulletResist || 0);
 
+    // bullet penetration means more hp
+    if (this.type === Util.unitType.bullet) {
+        this.maxHp = this.cfg.hp * (1.0 + this.owner.getBulletPenetrationAdd());
+    } else {
+        this.maxHp = this.cfg.hp;
+    }
+    this.hp = this.maxHp;
     this.hpRegen = (this.cfg.hpRegen || 0);
     this.hpRegenFrame = this.world.frame;
-
-    this.damage = (this.cfg.damage || 0);
-
-    this.isDead = false;
 
     var pt = this.world.proto.PropType;
     this.props = {};
@@ -44,9 +46,13 @@ function Unit(world, type, cfg)
     this.level = 0;
     this.freeSkillPoints = 0;
 
+    this.isDead = false;
+
     // private
     this._x = 0;
     this._y = 0;
+
+    this._damage = (this.cfg.damage || 0);
 }
 
 Unit.prototype = {
@@ -77,14 +83,16 @@ Unit.prototype.outOfBounds = function()
     return false;
 };
 
-Unit.prototype.takeDamage = function(damage, caster)
+Unit.prototype.takeDamage = function(caster)
 {
+    var dest = caster.owner ? caster.owner : caster;
+    var damage = (this.type == Util.unitType.bullet ? dest.bulletResist : dest.getDamage());
     this.hp -= damage;
+
     if (this.hp <= 0) {
         this.die();
-        if (this.type === Util.unitType.obstacle
-            && caster.type === Util.unitType.tank) {
-            caster.addExp(this.cfg.killExp);
+        if (dest.type === Util.unitType.tank) {
+            dest.addExp(this.cfg.killExp || 0);
         }
     }
 };
@@ -106,7 +114,7 @@ Unit.prototype.addExp = function(exp)
         this.level = level ++;
     }
 
-    Util.logDebug("unit[" + this.id + "] "
+    Util.logTrace("unit[" + this.id + "] "
         + " exp " + (this.exp - exp) + "->" + this.exp
         + " level " + oldLevel + "->" + this.level
         + " freeSkillPoint=" + this.freeSkillPoints);
@@ -127,6 +135,15 @@ Unit.prototype.die = function()
     this.world.removeUnit(this);
 };
 
+Unit.prototype.getDamage = function()
+{
+    if (this.type == Util.unitType.bullet) {
+        var add = this.owner.getBulletDamageAdd();
+        return this._damage * (1.0 + add);
+    }
+    return this._damage;
+};
+
 Unit.prototype.update = function()
 {
     var oldX = this.x;
@@ -138,7 +155,7 @@ Unit.prototype.update = function()
 
     if (this.hpRegen > 0) {
         var hpRegenTime = (this.world.frame - this.hpRegenFrame) * deltaMS;
-        this.hp += this.hpRegen * hpRegenTime / 1000;
+        this.hp += this.hpRegen * this.maxHp * hpRegenTime / 1000;
         if (this.hp > this.maxHp) {
             this.hp = this.maxHp;
         }
@@ -222,30 +239,78 @@ Unit.prototype.load = function(u)
 
 Unit.prototype.addProp = function(type)
 {
+    var pt = this.world.proto.PropType;
+
     // add prop
-    if (!this.props[type]) {
+    if (this.props[type] === undefined) {
         Util.logError("prop[" + type + "] not found");
-        return;
+        return false;
     }
     ++ this.props[type];
 
-    var value = this.props[type];
-    var add = this.world.cfg.configPropAdd[type][add];
-    Util.logDebug("unit[" + this.id + "] prop[" + type + "]=" + value + " add=" + add);
+    // add value
+    var points = this.props[type];
+    var typeStr = Util.propTypeToString(type, pt);
+    var addValue = this.world.cfg.configPropAdd[typeStr][points];
+    Util.logDebug("unit[" + this.id + "] prop[" + type + "]=" + points + " add=" + addValue);
 
     // hp regen
-    if (type == this.world.proto.PropType.PT_HEALTH_REGEN) {
-        this.hpRegen = this.cfg.hpRegen * (1.0 + add);
+    if (type == pt.PT_HEALTH_REGEN) {
+        this.hpRegen = this.cfg.hpRegen * (1.0 + addValue);
     }
     // max hp
-    else if (type == this.world.proto.PropType.PT_MAX_HEALTH) {
+    else if (type == pt.PT_MAX_HEALTH) {
         var oldMaxHp = this.maxHp;
-        this.maxHp = this.cfg.hp * (1.0 + add);
+        this.maxHp = this.cfg.hp * (1.0 + addValue);
         this.hp = this.hp * this.maxHp / oldMaxHp;
         if (this.hp > this.maxHp) {
             this.hp = this.maxHp;
         }
     }
+    // body damage
+    else if (type == pt.PT_BODY_DAMAGE) {
+        if (this.cfg.damage) {
+            this._damage = this.cfg.damage * (1.0 + addValue);
+        } else {
+            Util.logError("unit[" + this.cfg.alias + "] no damage config");
+        }
+    }
+    // movement speed
+    else if (type == pt.PT_MOVEMENT_SPEED) {
+        this.motion.ivAdd = addValue;
+    }
+
+    return true;
+};
+
+Unit.prototype.getBulletSpeedAdd = function()
+{
+    return this.getPropAdd(this.world.proto.PropType.PT_BULLET_SPEED);
+};
+
+Unit.prototype.getBulletDamageAdd = function()
+{
+    return this.getPropAdd(this.world.proto.PropType.PT_BULLET_DAMAGE);
+};
+
+Unit.prototype.getReloadAdd = function()
+{
+    return this.getPropAdd(this.world.proto.PropType.RELOAD);
+};
+
+Unit.prototype.getBulletPenetrationAdd = function()
+{
+    return this.getPropAdd(this.world.proto.PropType.PT_BULLET_PENETRATION);
+};
+
+Unit.prototype.getPropAdd = function(type)
+{
+    var value = this.props[type];
+    if (value > 0) {
+        var typeStr = Util.propTypeToString(type, this.world.proto.PropType);
+        return this.world.cfg.configPropAdd[typeStr][value];
+    }
+    return 0;
 };
 
 Unit.prototype.toString = function()

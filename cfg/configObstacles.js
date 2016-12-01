@@ -2,8 +2,8 @@ var configObstacles = {
 	"0": {
 		"killExp": 10.0,
 		"density": 1.0,
-		"hp": 20.0,
-		"damage": 2.0,
+		"hp": 100.0,
+		"damage": 10.0,
 		"alias": "triangle",
 		"radius": 20.0,
 		"velocity": {
@@ -18,6 +18,7 @@ var configObstacles = {
 			"ivInit": 3.0,
 			"evDec": 80.0,
 		},
+		"bulletResist": 300.0,
 		"view": {
 			"color": "0xfc7676",
 			"hpbar": {
@@ -37,8 +38,8 @@ var configObstacles = {
 	"1": {
 		"killExp": 20.0,
 		"density": 1.0,
-		"hp": 40.0,
-		"damage": 4.0,
+		"hp": 400.0,
+		"damage": 20.0,
 		"alias": "quad",
 		"radius": 20.0,
 		"velocity": {
@@ -53,6 +54,7 @@ var configObstacles = {
 			"ivInit": 3.0,
 			"evDec": 80.0,
 		},
+		"bulletResist": 600.0,
 		"view": {
 			"color": "0xffe869",
 			"hpbar": {
@@ -72,8 +74,8 @@ var configObstacles = {
 	"2": {
 		"killExp": 40.0,
 		"density": 1.0,
-		"hp": 80.0,
-		"damage": 8.0,
+		"hp": 1000.0,
+		"damage": 180.0,
 		"alias": "pentagon",
 		"radius": 24.0,
 		"velocity": {
@@ -88,6 +90,7 @@ var configObstacles = {
 			"ivInit": 3.0,
 			"evDec": 80.0,
 		},
+		"bulletResist": 2000.0,
 		"view": {
 			"color": "0x768dfc",
 			"hpbar": {

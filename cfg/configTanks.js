@@ -1,8 +1,8 @@
 var configTanks = {
 	"0": {
 		"density": 1.0,
-		"hp": 200.0,
-		"damage": 10.0,
+		"hp": 1800.0,
+		"damage": 450.0,
 		"weapons": {
 			"1": "",
 			"0": "base",
@@ -30,7 +30,8 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
-		"hpRegen": 2.0,
+		"bulletResist": 99999.0,
+		"hpRegen": 0.025,
 		"view": {
 			"body": {
 				"color": "0xf14e54",
@@ -51,8 +52,8 @@ var configTanks = {
 	},
 	"1": {
 		"density": 1.0,
-		"hp": 300.0,
-		"damage": 10.0,
+		"hp": 2000.0,
+		"damage": 500.0,
 		"weapons": {
 			"1": "twin-right",
 			"0": "twin-left",
@@ -80,7 +81,8 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
-		"hpRegen": 3.0,
+		"bulletResist": 99999.0,
+		"hpRegen": 0.025,
 		"view": {
 			"body": {
 				"color": "0xf14e54",
@@ -101,8 +103,8 @@ var configTanks = {
 	},
 	"2": {
 		"density": 1.0,
-		"hp": 400.0,
-		"damage": 10.0,
+		"hp": 2200.0,
+		"damage": 550.0,
 		"weapons": {
 			"1": "quad-right",
 			"0": "quad-up",
@@ -130,7 +132,8 @@ var configTanks = {
 			"ivInit": 0.0,
 			"evDec": 80.0,
 		},
-		"hpRegen": 4.0,
+		"bulletResist": 99999.0,
+		"hpRegen": 0.025,
 		"view": {
 			"body": {
 				"color": "0xf14e54",

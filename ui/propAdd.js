@@ -1,6 +1,7 @@
 (function(){ "use strict";
 
 var ProgressBar = require("../ui/progressBar");
+var Util = require("../modules/util");
 
 var cfg = {
 
@@ -42,7 +43,7 @@ var cfg = {
         },
 
         text: {
-            font: "18px Open Sans",
+            font: "16px Open Sans",
             align: "center",
             weight: "normal",
             fill: "#f0f0f0",
@@ -105,11 +106,7 @@ function addPropBar(container, prop, name)
 
     // click event
     panel.interactive = true;
-    panel.on('click', function() {
-        if (container.ui.visible === true) {
-            container.addProp(prop);
-        }
-    });
+    panel.on('click', function() { container.addProp(prop); });
 }
 
 function PropAddUI(world)
@@ -141,10 +138,24 @@ PropAddUI.prototype = {
 
 PropAddUI.prototype.addProp = function(propType)
 {
-    var pb = this.progressBars[propType];
-    if (pb) {
-        pb.setProgress(pb.getProgress() + 1);
+    if (this.ui.visible !== true) {
+        return;
     }
+    var player = this.world.getSelf();
+    if (!player || !player.tank) {
+        return;
+    }
+    this.world.synchronizer.syncAddProp(propType);
+};
+
+PropAddUI.prototype.onPropAdd = function(propType)
+{
+    var pb = this.progressBars[propType];
+    if (!pb) {
+        Util.logError("invalid prop type=" + propType);
+        return;
+    }
+    pb.setProgress(pb.getProgress() + 1);
 };
 
 PropAddUI.prototype.reset = function()
@@ -156,8 +167,17 @@ PropAddUI.prototype.reset = function()
 
 PropAddUI.prototype.update = function()
 {
-    if (this.world.started === true) {
+    if (this.world.started !== true) {
+        this.ui.visible = false;
+        return;
+    }
+
+    // visible if any free skill points
+    var player = this.world.getSelf();
+    if (player && player.tank && player.tank.freeSkillPoints > 0) {
         this.ui.visible = true;
+    } else {
+        this.ui.visible = false;
     }
 };
 

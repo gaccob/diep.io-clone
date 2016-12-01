@@ -440,8 +440,8 @@ World.prototype.collide = function(unit1, unit2, distRatio)
     Util.logTrace(unit2.toString());
 
     this.simpleCollide(unit1, unit2, distRatio);
-    unit1.takeDamage(unit2.damage, unit2.owner ? unit2.owner : unit2);
-    unit2.takeDamage(unit1.damage, unit1.owner ? unit1.owner : unit1);
+    unit1.takeDamage(unit2);
+    unit2.takeDamage(unit1);
 
     Util.logTrace(unit1.toString());
     Util.logTrace(unit2.toString());

@@ -11,7 +11,12 @@ function Motion(owner, cfg)
     this.forceAngle = 0;
     this.force = false;
 
-    this.iv = new Victor(cfg.ivInit, 0);
+    // from owner's property addition
+    this.ivAdd = 0;
+    if (this.owner.type == Util.unitType.bullet) {
+        this.ivAdd = this.owner.owner.getBulletSpeedAdd();
+    }
+    this.iv = new Victor(cfg.ivInit * (1.0 + this.ivAdd), 0);
     this.ev = new Victor(0, 0);
     this.rv = cfg.rv;
 }
@@ -59,7 +64,7 @@ Motion.prototype.update = function(deltaMS)
     // internal velocity decrese
     ilen = this.iv.length();
     if (ilen > this.cfg.ivMin) {
-        dec = this.cfg.ivDec * deltaMS / 1000;
+        dec = this.cfg.ivDec * (1.0 + this.ivAdd) * deltaMS / 1000;
         ilen = ilen > dec ? (ilen - dec) : 0;
         ilen = ilen < this.cfg.ivMin ? this.cfg.ivMin : ilen;
         this.iv.norm().multiply(new Victor(ilen, ilen));
@@ -67,11 +72,12 @@ Motion.prototype.update = function(deltaMS)
 
     // internal velocity increse
     if (this.force === true) {
-        this.iv.x += this.cfg.ivAcc * Math.cos(this.forceAngle) * deltaMS / 1000;
-        this.iv.y += this.cfg.ivAcc * Math.sin(this.forceAngle) * deltaMS / 1000;
+        this.iv.x += (1.0 + this.ivAdd) * this.cfg.ivAcc * Math.cos(this.forceAngle) * deltaMS / 1000;
+        this.iv.y += (1.0 + this.ivAdd) * this.cfg.ivAcc * Math.sin(this.forceAngle) * deltaMS / 1000;
         ilen = this.iv.length();
-        if (ilen > this.cfg.ivMax) {
-            ilen = this.cfg.ivMax;
+        var ivMax = this.cfg.ivMax * (1.0 + this.ivAdd);
+        if (ilen > ivMax) {
+            ilen = ivMax;
             this.iv.norm().multiply(new Victor(ilen, ilen));
         }
     }

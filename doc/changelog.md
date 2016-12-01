@@ -17,8 +17,9 @@ v0.2
 - use browerify & UglifyJS
 - add npm script to build & run
 - add start UI
-- add leader board
 - lockstep pvp logic
+- add leader board
+- add unit properties
 
 TODO
 =====

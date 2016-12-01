@@ -32,6 +32,9 @@ function Weapon(world, tank, name)
     this.fireAnimFrame = null;
     this.originalX = this.x;
     this.originalY = this.y;
+
+    // reload frame interval
+    this.reloadFrame = this.cfg.reloadFrame;
 }
 
 Weapon.prototype = {
@@ -76,7 +79,8 @@ Weapon.prototype.fireBullet = function(bullet)
 // for server
 Weapon.prototype.fire = function()
 {
-    if (this.world.frame - this.fireFrame >= this.cfg.reloadFrame) {
+    var reloadFrame = this.reloadFrame / (1.0 + this.owner.getReloadAdd());
+    if (this.world.frame - this.fireFrame >= reloadFrame) {
 
         this.fireFrame = this.world.frame;
         this.fireAnimFrame = this.world.frame;

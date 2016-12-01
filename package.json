@@ -6,7 +6,7 @@
     "dependencies": {
         "browserify": "latest",
         "jshint": "latest",
-        "protobufjs": "latest",
+        "protobufjs": "5.0.1",
         "socket.io-client": "latest",
         "socket.io": "latest",
         "uglify-js": "latest",

@@ -83,6 +83,7 @@ enum CommanderType {
     CT_MOVE = 3;
     CT_ROTATE = 4;
     CT_FIRE = 5;
+    CT_ADD_PROP = 6;
 }
 
 message SyncCommander {
@@ -115,6 +116,11 @@ message SyncCommander {
         optional float angle = 1;
     }
     optional Rotate rotate = 14;
+
+    message AddProp {
+        optional int32 propType = 1;
+    }
+    optional AddProp addProp = 15;
 }
 
 message Pkg {
