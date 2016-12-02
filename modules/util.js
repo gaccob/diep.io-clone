@@ -12,7 +12,6 @@ var Util = {
         weapon: 2,
         bullet: 3,
         obstacle: 4,
-        hpbar: 5,
     },
 
     logLevelType: {

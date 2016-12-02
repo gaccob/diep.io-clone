@@ -93,42 +93,6 @@ function drawTank(view, me)
     view.world.view.addChild(view.sprite);
 }
 
-function drawHpBar(view)
-{
-    var graphics = new PIXI.Graphics();
-    graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
-    graphics.beginFill(view.cfg.edge.color);
-    graphics.drawRoundedRect(0, 0, view.cfg.w, view.cfg.h, view.cfg.radius);
-    graphics.endFill();
-
-    view.backSprite = new PIXI.Sprite(graphics.generateTexture());
-    view.backSprite.anchor.x = 0.5;
-    view.backSprite.anchor.y = 0.5;
-
-    graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
-    graphics.beginFill(view.cfg.color);
-    graphics.drawRoundedRect(0, 0, view.cfg.w, view.cfg.h, view.cfg.radius);
-    graphics.endFill();
-
-    view.frontSprite = new PIXI.Sprite(graphics.generateTexture());
-    view.frontSprite.anchor.x = 0.5;
-    view.frontSprite.anchor.y = 0.5;
-
-    view.sprite.addChild(view.backSprite);
-    view.sprite.addChild(view.frontSprite);
-    view.sprite.alpha = view.cfg.alpha;
-
-    var holder = view.owner.owner;
-    var w = 2 * holder.radius;
-    var cfg = holder.cfg.view;
-    view.sprite.x = holder.x + holder.radius * cfg.hpbar.xOffsetRatio;
-    view.sprite.y = holder.y + holder.radius * cfg.hpbar.yOffsetRatio;
-    view.sprite.scale.x = cfg.hpbar.scaleXRatio * w / view.cfg.w;
-    view.sprite.scale.y = cfg.hpbar.scaleYRatio * w / view.cfg.w;
-
-    view.world.view.addChild(view.sprite);
-}
-
 function View(owner)
 {
     this.owner = owner;
@@ -150,8 +114,6 @@ function View(owner)
             }
         }
         drawTank(this, me);
-    } else if (this.owner.type == Util.unitType.hpbar) {
-        drawHpBar(this);
     }
 }
 
@@ -186,14 +148,6 @@ View.prototype.onDie = function()
         || this.owner.type == Util.unitType.tank) {
         this.world.dieSprites.push(this.sprite);
     }
-
-    if (this.owner.type == Util.unitType.hpbar) {
-        if (this.sprite.parent) {
-            this.sprite.parent.removeChild(this.sprite);
-        }
-        this.sprite = null;
-    }
-
     if (this.nameBar) {
         this.nameBar.parent.removeChild(this.nameBar);
         this.nameBar = null;
@@ -214,15 +168,6 @@ View.prototype.update = function()
     if (this.nameBar) {
         this.nameBar.x = this.x - this.nameBar.width / 2;
         this.nameBar.y = this.y - this.owner.radius - this.nameBar.height - this.owner.cfg.namebar.yOffset;
-    }
-};
-
-View.prototype.updateHpbar = function(oldPercent, newPercent)
-{
-    if (this.owner.type == Util.unitType.hpbar) {
-        this.frontSprite.x += this.cfg.w * (1 - oldPercent) / 2;
-        this.frontSprite.width = this.cfg.w * newPercent;
-        this.frontSprite.x -= this.cfg.w * (1 - newPercent) / 2;
     }
 };
 

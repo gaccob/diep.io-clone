@@ -21,12 +21,6 @@ var configObstacles = {
 		"bulletResist": 300.0,
 		"view": {
 			"color": "0xfc7676",
-			"hpbar": {
-				"scaleYRatio": 0.6,
-				"scaleXRatio": 0.6,
-				"yOffsetRatio": 1.4,
-				"xOffsetRatio": 0.0,
-			},
 			"edge": {
 				"color": "0x555555",
 				"w": 2.5,
@@ -57,12 +51,6 @@ var configObstacles = {
 		"bulletResist": 600.0,
 		"view": {
 			"color": "0xffe869",
-			"hpbar": {
-				"scaleYRatio": 0.6,
-				"scaleXRatio": 0.6,
-				"yOffsetRatio": 1.4,
-				"xOffsetRatio": 0.0,
-			},
 			"edge": {
 				"color": "0x555555",
 				"w": 2.5,
@@ -93,12 +81,6 @@ var configObstacles = {
 		"bulletResist": 2000.0,
 		"view": {
 			"color": "0x768dfc",
-			"hpbar": {
-				"scaleYRatio": 0.6,
-				"scaleXRatio": 0.6,
-				"yOffsetRatio": 1.4,
-				"xOffsetRatio": 0.0,
-			},
 			"edge": {
 				"color": "0x555555",
 				"w": 2.5,

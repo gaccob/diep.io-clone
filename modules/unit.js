@@ -1,6 +1,6 @@
 (function(){ "use strict";
 
-var HpBar = require("../modules/hpbar");
+var HpBar = require("../ui/hpbar");
 var Motion = require("../modules/motion");
 var Util = require("../modules/util");
 var View = require("../modules/view");
@@ -59,12 +59,14 @@ Unit.prototype = {
     constructor: Unit,
 };
 
-Unit.prototype.addHpBar = function(name, visible)
+Unit.prototype.addHpBar = function(visible)
 {
-    if (this.hpbar) {
-        delete this.hpbar;
+    if (this.world.isLocal === true) {
+        if (this.hpbar) {
+            delete this.hpbar;
+        }
+        this.hpbar = new HpBar(this.world, this, visible);
     }
-    this.hpbar = new HpBar(this.world, name, this, visible);
 };
 
 Unit.prototype.addNameBar = function(name)
@@ -146,6 +148,10 @@ Unit.prototype.getDamage = function()
 
 Unit.prototype.update = function()
 {
+    if (this.isDead === true) {
+        return;
+    }
+
     var oldX = this.x;
     var oldY = this.y;
 
@@ -166,7 +172,7 @@ Unit.prototype.update = function()
         this.view.update();
     }
 
-    if (this.isDead === false && this.hpbar) {
+    if (this.hpbar) {
         this.hpbar.update(this.hp / this.maxHp);
     }
 };
@@ -331,21 +337,11 @@ Object.defineProperties(Unit.prototype, {
     },
     x: {
         get: function() { return this._x; },
-        set: function(v) {
-            if (this.hpbar) {
-                this.hpbar.x += (v - this._x);
-            }
-            this._x = v;
-        }
+        set: function(v) { this._x = v; }
     },
     y: {
         get: function() { return this._y; },
-        set: function(v) {
-            if (this.hpbar) {
-                this.hpbar.y += (v - this._y);
-            }
-            this._y = v;
-        }
+        set: function(v) { this._y = v; }
     },
 });
 

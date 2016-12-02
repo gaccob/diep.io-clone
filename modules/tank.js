@@ -19,10 +19,7 @@ function Tank(world, cfgName, player)
     }
 
     Unit.call(this, world, Util.unitType.tank, cfg);
-
-    if (this.view) {
-        Unit.prototype.addHpBar.call(this, "base", true);
-    }
+    Unit.prototype.addHpBar.call(this, true);
 }
 
 Tank.prototype = Object.create(Unit.prototype);

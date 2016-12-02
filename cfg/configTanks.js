@@ -38,12 +38,6 @@ var configTanks = {
 				"playerColor": "0x00b2e1",
 				"radius": 22.0,
 			},
-			"hpbar": {
-				"scaleYRatio": 0.6,
-				"scaleXRatio": 0.6,
-				"yOffsetRatio": 1.4,
-				"xOffsetRatio": 0.0,
-			},
 			"edge": {
 				"color": "0x555555",
 				"w": 2.5,
@@ -89,12 +83,6 @@ var configTanks = {
 				"playerColor": "0x00b2e1",
 				"radius": 24.0,
 			},
-			"hpbar": {
-				"scaleYRatio": 0.6,
-				"scaleXRatio": 0.6,
-				"yOffsetRatio": 1.4,
-				"xOffsetRatio": 0.0,
-			},
 			"edge": {
 				"color": "0x555555",
 				"w": 2.5,
@@ -139,12 +127,6 @@ var configTanks = {
 				"color": "0xf14e54",
 				"playerColor": "0x00b2e1",
 				"radius": 24.0,
-			},
-			"hpbar": {
-				"scaleYRatio": 0.6,
-				"scaleXRatio": 0.6,
-				"yOffsetRatio": 1.4,
-				"xOffsetRatio": 0.0,
 			},
 			"edge": {
 				"color": "0x555555",

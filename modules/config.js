@@ -2,7 +2,6 @@
 
 var configBullets = require("../cfg/configBullets");
 var configDieAnimation = require("../cfg/configDieAnimation");
-var configHpbar = require("../cfg/configHpbar");
 var configLevelUp = require("../cfg/configLevelUp");
 var configObstacles = require("../cfg/configObstacles");
 var configPropAdd = require("../cfg/configPropAdd");
@@ -23,11 +22,6 @@ function Config()
     this.configDieAnimation = {};
     for (idx in configDieAnimation) {
         this.configDieAnimation[configDieAnimation[idx].alias] = configDieAnimation[idx];
-    }
-
-    this.configHpbar = {};
-    for (idx in configHpbar) {
-        this.configHpbar[configHpbar[idx].alias] = configHpbar[idx];
     }
 
     this.configObstacles = {};

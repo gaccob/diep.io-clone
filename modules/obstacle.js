@@ -6,10 +6,7 @@ var Util = require("../modules/util");
 function Obstacle(world, name)
 {
     Unit.call(this, world, Util.unitType.obstacle, world.cfg.configObstacles[name]);
-
-    if (this.view) {
-        Unit.prototype.addHpBar.call(this, "base", false);
-    }
+    Unit.prototype.addHpBar.call(this, false);
 }
 
 Obstacle.prototype = Object.create(Unit.prototype);
