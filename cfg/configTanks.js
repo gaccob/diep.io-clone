@@ -10,13 +10,6 @@ var configTanks = {
 			"2": "",
 		},
 		"alias": "base",
-		"namebar": {
-			"yOffset": 15.0,
-			"stroke": "0xf0f0f0",
-			"font": "18px Arail",
-			"strokeThickness": 2.0,
-			"fill": "0x101010",
-		},
 		"radius": 24.0,
 		"velocity": {
 			"ivMax": 160.0,
@@ -55,13 +48,6 @@ var configTanks = {
 			"2": "",
 		},
 		"alias": "twin",
-		"namebar": {
-			"yOffset": 18.0,
-			"stroke": "0xf0f0f0",
-			"font": "19px Arail",
-			"strokeThickness": 2.0,
-			"fill": "0x101010",
-		},
 		"radius": 26.0,
 		"velocity": {
 			"ivMax": 160.0,
@@ -100,13 +86,6 @@ var configTanks = {
 			"2": "quad-down",
 		},
 		"alias": "quad",
-		"namebar": {
-			"yOffset": 18.0,
-			"stroke": "0xf0f0f0",
-			"font": "19px Arail",
-			"strokeThickness": 2.0,
-			"fill": "0x101010",
-		},
 		"radius": 26.0,
 		"velocity": {
 			"ivMax": 160.0,

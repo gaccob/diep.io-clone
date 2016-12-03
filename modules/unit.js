@@ -2,6 +2,7 @@
 
 var HpBar = require("../ui/hpbar");
 var Motion = require("../modules/motion");
+var NameBar = require("../ui/namebar");
 var Util = require("../modules/util");
 var View = require("../modules/view");
 
@@ -53,6 +54,9 @@ function Unit(world, type, cfg)
     this._y = 0;
 
     this._damage = (this.cfg.damage || 0);
+
+    this._hpbar = null;
+    this._namebar = null;
 }
 
 Unit.prototype = {
@@ -62,17 +66,20 @@ Unit.prototype = {
 Unit.prototype.addHpBar = function(visible)
 {
     if (this.world.isLocal === true) {
-        if (this.hpbar) {
-            delete this.hpbar;
+        if (this._hpbar) {
+            delete this._hpbar;
         }
-        this.hpbar = new HpBar(this.world, this, visible);
+        this._hpbar = new HpBar(this.world, this, visible);
     }
 };
 
-Unit.prototype.addNameBar = function(name)
+Unit.prototype.addNameBar = function()
 {
-    if (this.view) {
-        this.view.addNameBar(name);
+    if (this.world.isLocal === true) {
+        if (this._namebar) {
+            delete this._namebar;
+        }
+        this._namebar = new NameBar(this.world, this);
     }
 };
 
@@ -126,8 +133,12 @@ Unit.prototype.die = function()
 {
     this.isDead = true;
 
-    if (this.hpbar) {
-        this.hpbar.die();
+    if (this._hpbar) {
+        this._hpbar.die();
+    }
+
+    if (this._namebar) {
+        this._namebar.die();
     }
 
     if (this.view) {
@@ -172,8 +183,12 @@ Unit.prototype.update = function()
         this.view.update();
     }
 
-    if (this.hpbar) {
-        this.hpbar.update(this.hp / this.maxHp);
+    if (this._hpbar) {
+        this._hpbar.update(this.hp / this.maxHp);
+    }
+
+    if (this._namebar && this.player) {
+        this._namebar.update(this.player.name);
     }
 };
 
@@ -224,10 +239,13 @@ Unit.prototype.load = function(u)
     this.motion.forceAngle = u.motion.forceAngle;
     this.motion.force = u.motion.force;
 
-    if (this.hpbar) {
-        this.hpbar.update(this.hp / this.maxHp);
+    if (this._hpbar) {
+        this._hpbar.update(this.hp / this.maxHp);
     }
 
+    if (this._namebar && this.player) {
+        this._namebar.update(this.player.name);
+    }
     if (this.type == Util.unitType.bullet) {
         this.bornFrame = u.bornFrame;
         var weapon = this.owner.getWeaponByName(u.weaponName);

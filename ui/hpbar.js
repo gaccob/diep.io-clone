@@ -23,7 +23,6 @@ function HpBar(world, owner, display)
     this.owner = owner;
     this.percent = 1;
     this.display = display;
-    this.isDead = false;
 
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(cfg.edge.w, cfg.edge.color);
@@ -64,30 +63,29 @@ HpBar.prototype.die = function()
     if (this.ui.parent) {
         this.ui.parent.removeChild(this.sprite);
     }
+    this.frontSprite = null;
+    this.backSprite = null;
     this.ui = null;
-    this.isDead = true;
 };
 
 HpBar.prototype.update = function(percent)
 {
-    if (this.isDead === true) {
-        return;
-    }
+    if (this.ui) {
+        this.ui.x = this.owner.x + this.owner.radius * cfg.xOffsetRatio;
+        this.ui.y = this.owner.y + this.owner.radius * cfg.yOffsetRatio;
 
-    this.ui.x = this.owner.x + this.owner.radius * cfg.xOffsetRatio;
-    this.ui.y = this.owner.y + this.owner.radius * cfg.yOffsetRatio;
+        if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
+            this.ui.visible = false;
+        } else {
+            this.ui.visible = true;
+        }
 
-    if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
-        this.ui.visible = false;
-    } else {
-        this.ui.visible = true;
-    }
-
-    if (this.percent != percent) {
-        this.frontSprite.x += cfg.w * (1 - this.percent) / 2;
-        this.frontSprite.width = cfg.w * percent;
-        this.frontSprite.x -= cfg.w * (1 - percent) / 2;
-        this.percent = percent;
+        if (this.percent != percent) {
+            this.frontSprite.x += cfg.w * (1 - this.percent) / 2;
+            this.frontSprite.width = cfg.w * percent;
+            this.frontSprite.x -= cfg.w * (1 - percent) / 2;
+            this.percent = percent;
+        }
     }
 };
 

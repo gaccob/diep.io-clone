@@ -20,6 +20,7 @@ function Tank(world, cfgName, player)
 
     Unit.call(this, world, Util.unitType.tank, cfg);
     Unit.prototype.addHpBar.call(this, true);
+    Unit.prototype.addNameBar.call(this);
 }
 
 Tank.prototype = Object.create(Unit.prototype);

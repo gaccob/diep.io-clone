@@ -121,36 +121,12 @@ View.prototype = {
     constructor: View,
 };
 
-View.prototype.addNameBar = function(name)
-{
-    if (!this.owner.cfg.namebar) {
-        Util.logError("unit type=" + this.owner.type + " has no name bar config");
-        return;
-    }
-    if (this.nameBar) {
-        this.nameBar.parent.removeChild(this.nameBar);
-    }
-    var cfg = this.owner.cfg.namebar;
-    this.nameBar = new PIXI.Text(name, {
-        font: cfg.font,
-        fill: Number(cfg.fill),
-        stroke: Number(cfg.stroke),
-        strokeThickness: cfg.strokeThickness,
-        align: 'center'
-    });
-    this.world.view.addChild(this.nameBar);
-};
-
 View.prototype.onDie = function()
 {
     if (this.owner.type == Util.unitType.bullet
         || this.owner.type == Util.unitType.obstacle
         || this.owner.type == Util.unitType.tank) {
         this.world.dieSprites.push(this.sprite);
-    }
-    if (this.nameBar) {
-        this.nameBar.parent.removeChild(this.nameBar);
-        this.nameBar = null;
     }
 };
 
@@ -162,12 +138,6 @@ View.prototype.update = function()
         this.rotation = this.owner.viewRotation;
     } else {
         this.rotation = this.owner.rotation;
-    }
-
-    // name bar no rotation
-    if (this.nameBar) {
-        this.nameBar.x = this.x - this.nameBar.width / 2;
-        this.nameBar.y = this.y - this.owner.radius - this.nameBar.height - this.owner.cfg.namebar.yOffset;
     }
 };
 

@@ -200,9 +200,6 @@ Player.prototype.bindTank = function(tank)
 
     this.tank = tank;
     tank.player = this;
-
-    // name
-    this.tank.addNameBar(this.name);
 };
 
 Player.prototype.update = function()
