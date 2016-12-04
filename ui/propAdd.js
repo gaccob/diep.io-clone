@@ -130,6 +130,8 @@ function PropAddUI(world)
 
     this.ui.visible = false;
     this.world.stage.addChild(this.ui);
+
+    this.lastVisibleFrame = 0;
 }
 
 PropAddUI.prototype = {
@@ -175,9 +177,16 @@ PropAddUI.prototype.update = function()
     // visible if any free skill points
     var player = this.world.getSelf();
     if (player && player.tank && player.tank.freeSkillPoints > 0) {
+        this.y = (this.world.viewH - this.ui.height) - 10;
         this.ui.visible = true;
+        this.lastVisibleFrame = this.world.frame;
     } else {
-        this.ui.visible = false;
+        var delay = 20;
+        if (this.world.frame > this.lastVisibleFrame + delay) {
+            this.ui.visible = false;
+        } else {
+            this.y += this.ui.height / delay;
+        }
     }
 };
 
