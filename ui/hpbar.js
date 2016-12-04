@@ -61,7 +61,7 @@ HpBar.prototype = {
 HpBar.prototype.die = function()
 {
     if (this.ui.parent) {
-        this.ui.parent.removeChild(this.sprite);
+        this.ui.parent.removeChild(this.ui);
     }
     this.frontSprite = null;
     this.backSprite = null;
