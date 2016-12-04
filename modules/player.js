@@ -2,6 +2,7 @@
 
 var Victor = require("victor");
 
+var Control = require("../modules/control");
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
@@ -13,8 +14,6 @@ function Player(world, connid, name, viewW, viewH)
     this.connid = connid;
     this.viewW = viewW;
     this.viewH = viewH;
-
-    this.control = false;
 
     this.controlForceDir = {
         left: 0,
@@ -28,136 +27,117 @@ function Player(world, connid, name, viewW, viewH)
     this.controlRotation = 0;
     this.needSyncRotation = false;
     this.lastSyncRotationFrame = 0;
+
+    // private
+    this._control = null;
 }
 
 Player.prototype = {
     constructor: Player,
 };
 
-Player.prototype.handleKeyDown = function()
+Player.prototype.operMoveUp = function(move)
 {
-    var player = this;
-    document.body.addEventListener('keydown', function(e) {
-        if (player.tank === null) {
-            return;
+    if (!this.tank) {
+        return;
+    }
+    if (move === true) {
+        if (this.controlForceDir.up != 1) {
+            this.controlForceDir.up = 1;
+            this.needSyncForce = true;
         }
-        switch (e.keyCode) {
-            // 'w' or 'W'
-            case 87:
-            case 119:
-                if (player.controlForceDir.up != 1) {
-                    player.controlForceDir.up = 1;
-                    player.needSyncForce = true;
-                }
-                break;
-            // 'd' or 'D'
-            case 68:
-            case 100:
-                if (player.controlForceDir.right != 1) {
-                    player.controlForceDir.right = 1;
-                    player.needSyncForce = true;
-                }
-                break;
-            // 's' or 'S'
-            case 83:
-            case 115:
-                if (player.controlForceDir.down != 1) {
-                    player.controlForceDir.down = 1;
-                    player.needSyncForce = true;
-                }
-                break;
-            // 'a' or 'A'
-            case 65:
-            case 97:
-                if (player.controlForceDir.left != 1) {
-                    player.controlForceDir.left = 1;
-                    player.needSyncForce = true;
-                }
-                break;
+    } else {
+        if (this.controlForceDir.up !== 0) {
+            this.controlForceDir.up = 0;
+            this.needSyncForce = true;
         }
-    }, false);
+    }
 };
 
-Player.prototype.handleKeyUp = function()
+Player.prototype.operMoveRight = function(move)
 {
-    var player = this;
-    document.body.addEventListener('keyup', function(e) {
-        if (player.tank === null) {
-            return;
+    if (!this.tank) {
+        return;
+    }
+    if (move === true) {
+        if (this.controlForceDir.right != 1) {
+            this.controlForceDir.right = 1;
+            this.needSyncForce = true;
         }
-        switch (e.keyCode) {
-            // 'w' or 'W'
-            case 87:
-            case 119:
-                if (player.controlForceDir.up !== 0) {
-                    player.controlForceDir.up = 0;
-                    player.needSyncForce = true;
-                }
-                break;
-            // 'd' or 'D'
-            case 68:
-            case 100:
-                if (player.controlForceDir.right !== 0) {
-                    player.controlForceDir.right = 0;
-                    player.needSyncForce = true;
-                }
-                break;
-            // 's' or 'S'
-            case 83:
-            case 115:
-                if (player.controlForceDir.down !== 0) {
-                    player.controlForceDir.down = 0;
-                    player.needSyncForce = true;
-                }
-                break;
-            // 'a' or 'A'
-            case 65:
-            case 97:
-                if (player.controlForceDir.left !== 0) {
-                    player.controlForceDir.left = 0;
-                    player.needSyncForce = true;
-                }
-                break;
+    } else {
+        if (this.controlForceDir.right !== 0) {
+            this.controlForceDir.right = 0;
+            this.needSyncForce = true;
         }
-    }, false);
+    }
 };
 
-Player.prototype.handleMouseMove = function()
+Player.prototype.operMoveDown = function(move)
 {
-    var player = this;
-    document.body.addEventListener('mousemove', function(e) {
-        var targetPos = new Victor(e.offsetX - player.world.view.x, e.offsetY - player.world.view.y);
-        if (!player.tank) {
-            return;
+    if (!this.tank) {
+        return;
+    }
+    if (move === true) {
+        if (this.controlForceDir.down != 1) {
+            this.controlForceDir.down = 1;
+            this.needSyncForce = true;
         }
-        var dir = targetPos.subtract(new Victor(player.tank.x, player.tank.y));
-        var angle = dir.angle() + Math.PI / 2;
-        if (Math.abs(player.controlRotation - angle) > Util.epsilon) {
-            player.controlRotation = angle;
-            player.needSyncRotation = true;
-            player.tank.viewRotation = angle;
+    } else {
+        if (this.controlForceDir.down !== 0) {
+            this.controlForceDir.down = 0;
+            this.needSyncForce = true;
         }
-    }, false);
+    }
 };
 
-Player.prototype.handleMouseClick = function()
+Player.prototype.operMoveLeft = function(move)
 {
-    var player = this;
-    this.world.view.interactive = true;
-    this.world.view.on('click', function() {
-        if (player.tank !== null) {
-            player.world.synchronizer.syncFire();
+    if (!this.tank) {
+        return;
+    }
+    if (move === true) {
+        if (this.controlForceDir.left != 1) {
+            this.controlForceDir.left = 1;
+            this.needSyncForce = true;
         }
-    });
+    } else {
+        if (this.controlForceDir.left !== 0) {
+            this.controlForceDir.left = 0;
+            this.needSyncForce = true;
+        }
+    }
+};
+
+Player.prototype.operMove = function(x, y)
+{
+    if (!this.tank) {
+        return;
+    }
+    var targetPos = new Victor(x - this.world.view.x, y - this.world.view.y);
+    var dir = targetPos.subtract(new Victor(this.tank.x, this.tank.y));
+    var angle = dir.angle() + Math.PI / 2;
+    if (Math.abs(this.controlRotation - angle) > Util.epsilon) {
+        this.controlRotation = angle;
+        this.needSyncRotation = true;
+        this.tank.viewRotation = angle;
+    }
+};
+
+Player.prototype.operFire = function()
+{
+    if (!this.tank) {
+        return;
+    }
+    this.world.synchronizer.syncFire();
 };
 
 Player.prototype.addControl = function()
 {
-    this.control = true;
-    this.handleKeyDown();
-    this.handleKeyUp();
-    this.handleMouseMove();
-    this.handleMouseClick();
+    this._control = new Control(this.world);
+    this._control.handleKeyDown();
+    this._control.handleKeyUp();
+    this._control.handleMouseMove();
+    this._control.handleMouseClick();
 };
 
 Player.prototype.resetControlDir = function()
@@ -181,7 +161,8 @@ Player.prototype.createTank = function()
 
     this.world.addUnit(tank);
 
-    if (this.world.connid === this.connid && this.control === false) {
+    // local player
+    if (this.world.connid === this.connid && !this._control) {
         this.addControl();
     }
 };
