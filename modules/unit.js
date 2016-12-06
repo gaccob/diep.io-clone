@@ -141,7 +141,8 @@ Unit.prototype.addExp = function(exp)
         this.level = level ++;
     }
 
-    Util.logTrace("unit[" + this.id + "] "
+    Util.logTrace("frame[" + this.world.frame + "]"
+        + " unit[" + this.id + "] "
         + " exp " + (this.exp - exp) + "->" + this.exp
         + " level " + oldLevel + "->" + this.level
         + " freeSkillPoint=" + this.freeSkillPoints);
@@ -294,7 +295,8 @@ Unit.prototype.addProp = function(type)
     var points = this.props[type];
     var typeStr = Util.propTypeToString(type, pt);
     var addValue = this.world.cfg.configPropAdd[typeStr][points];
-    Util.logDebug("unit[" + this.id + "] prop[" + type + "]=" + points + " add=" + addValue);
+    Util.logDebug("frame[" + this.world.frame + "] unit[" + this.id
+        + "] prop[" + type + "]=" + points + " add=" + addValue);
 
     // hp regen
     if (type == pt.PT_HEALTH_REGEN) {

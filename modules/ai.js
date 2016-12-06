@@ -73,7 +73,9 @@ AI.prototype.move = function()
 
     // server generate commander
     if (angle) {
-        Util.logDebug("tank[" + this.owner.player.connid + "] ai move & rotate angle:" + angle);
+        Util.logDebug("frame[" + this.world.frame + "] "
+            + "tank[" + this.owner.player.connid + "] "
+            + "ai move angle:" + angle);
 
         var moveCmd = new this.world.proto.SyncCommander();
         moveCmd.connid = this.owner.player.connid;
