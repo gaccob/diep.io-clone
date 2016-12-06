@@ -28,7 +28,9 @@ Commander.prototype.push = function(frame, commander)
 Commander.prototype.exeJoin = function(commander)
 {
     // update random seed
-    this.world.seed = commander.connid;
+    if (commander.join.ai === false) {
+        this.world.seed = commander.connid;
+    }
 
     // join
     var player = this.world.players[commander.connid];
@@ -43,7 +45,13 @@ Commander.prototype.exeJoin = function(commander)
     if (!player) {
         return false;
     }
+
     player.createTank();
+
+    // server run ai logic
+    if (commander.join.ai === true && this.world.isLocal === false) {
+        player.tank.bindAI();
+    }
     return true;
 };
 

@@ -94,6 +94,7 @@ message SyncCommander {
         optional string name = 1;
         optional uint32 viewW = 2;
         optional uint32 viewH = 3;
+        optional bool ai = 4;
     }
     optional Join join = 10;
 

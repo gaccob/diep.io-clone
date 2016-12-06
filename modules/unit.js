@@ -104,6 +104,24 @@ Unit.prototype.takeDamage = function(caster)
             dest.addExp(this.cfg.killExp || 0);
         }
     }
+
+    if (dest.type === Util.unitType.tank) {
+        dest.setFightStatus();
+    }
+};
+
+Unit.prototype.setFightStatus = function()
+{
+    this.fightFrame = this.world.frame;
+};
+
+Unit.prototype.getFightStatus = function()
+{
+    if (this.fightFrame) {
+        var cfg = this.world.cfg.configWorld;
+        return this.world.frame - this.fightFrame > cfg.frame * 5;
+    }
+    return false;
 };
 
 Unit.prototype.addExp = function(exp)

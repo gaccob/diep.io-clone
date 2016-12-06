@@ -308,6 +308,12 @@
                             "type": "uint32",
                             "name": "viewH",
                             "id": 3
+                        },
+                        {
+                            "rule": "optional",
+                            "type": "bool",
+                            "name": "ai",
+                            "id": 4
                         }
                     ]
                 },

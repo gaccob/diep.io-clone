@@ -6,6 +6,7 @@ var IO = require("socket.io");
 var Path = require("path");
 var Url = require("url");
 
+var AISpawner = require("../modules/aiSpawner");
 var Package = require("../package.json");
 var Recorder = require("../modules/recorder");
 var SDispatcher = require("../modules/sdispatcher");
@@ -56,6 +57,8 @@ function SWorld()
     this.server.listen(Package.app.port);
 
     this.recorder = new Recorder();
+
+    this.aiSpawner = new AISpawner(this);
 }
 
 SWorld.prototype = Object.create(World.prototype);
@@ -76,6 +79,12 @@ SWorld.prototype.init = function()
             world.dispatcher.onDisconnected(client);
         });
     });
+};
+
+SWorld.prototype.updateFrameLogic = function()
+{
+    World.prototype.updateFrameLogic.call(this);
+    this.aiSpawner.update();
 };
 
 SWorld.prototype.update = function()

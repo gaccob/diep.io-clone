@@ -1,5 +1,6 @@
 (function(){ "use strict";
 
+var AI = require("../modules/ai");
 var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
@@ -8,6 +9,7 @@ function Tank(world, cfgName, player)
 {
     this.autoFire = false;
     this.player = player;
+    this.ai = null;
 
     this.weapons = [];
     var cfg = world.cfg.configTanks[cfgName];
@@ -32,6 +34,10 @@ Tank.prototype.update = function()
 
     for (var idx in this.weapons) {
         this.weapons[idx].update(this.autoFire);
+    }
+
+    if (this.ai) {
+        this.ai.update();
     }
 };
 
@@ -65,6 +71,12 @@ Tank.prototype.revertFireStatus = function()
             this.weapons[idx].resetFireDelay();
         }
     }
+};
+
+Tank.prototype.bindAI = function()
+{
+    this.ai = new AI(this.world, this);
+    Util.logDebug("player[" + this.player.connid + "] tank bind AI");
 };
 
 module.exports = Tank;
