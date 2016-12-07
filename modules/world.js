@@ -197,18 +197,19 @@ World.prototype.checkRemoveUnits = function()
         var unit = this.unitsToRemove[i];
         this.removeUnitFromGrid(unit);
 
-        if (unit.type == Util.unitType.bullet) {
+        if (unit.type == Util.unitType.bullet && this.bullets[unit.id]) {
             delete this.bullets[unit.id];
             Util.logDebug("frame[" + this.frame + "] remove bullet:" + unit.id);
         }
 
-        if (unit.type == Util.unitType.obstacle) {
+        if (unit.type == Util.unitType.obstacle && this.obstacles[unit.id]) {
             delete this.obstacles[unit.id];
             -- this.obstacleCount;
-            Util.logDebug("frame[" + this.frame + "] remove obstacle:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] remove obstacle:"
+                + unit.id + " total count=" + this.obstacleCount);
         }
 
-        if (unit.type == Util.unitType.tank) {
+        if (unit.type == Util.unitType.tank && this.tanks[unit.id]) {
             delete this.tanks[unit.id];
             Util.logDebug("frame[" + this.frame + "] remove tank:" + unit.id);
         }
@@ -434,7 +435,9 @@ World.prototype.simpleCollide = function(unit1, unit2, distRatio)
 
 World.prototype.collide = function(unit1, unit2, distRatio)
 {
-    Util.logDebug("frame[" + this.frame + "] unit[" + unit1.id + "] <--> unit[" + unit2.id + "] collide");
+    Util.logDebug("frame[" + this.frame + "] "
+        + "unit[" + unit1.id + "][" + unit1.x + "," + unit1.y + "] "
+        + "unit[" + unit2.id + "][" + unit2.x + "," + unit2.y + "] collide");
 
     Util.logTrace(unit1.toString());
     Util.logTrace(unit2.toString());
