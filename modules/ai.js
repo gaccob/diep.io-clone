@@ -9,7 +9,7 @@ var cfg = {
     moveTurnDistance: 80,
     moveTurnRandomAngle: 0.12,
     moveTowardsHpPercent: 0.5,
-    moveBoringFrame: 120,
+    moveBoringFrame: 60,
 };
 
 function AI(world, owner)
@@ -17,8 +17,8 @@ function AI(world, owner)
     this.world = world;
     this.owner = owner;
 
-    this.lastUpdateMoveFrame = 0;
-    this.lastUpdateFireFrame = 0;
+    this.lastUpdateMoveFrame = -9999;
+    this.lastUpdateFireFrame = -9999;
 
     this.lastMoveFrame = 0;
     this.lastMoveTargetX = 0;
