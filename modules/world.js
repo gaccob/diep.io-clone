@@ -45,6 +45,7 @@ function World(isLocal)
     // connection id <--> player
     this.players = {};
     this.playerCount = 0;
+    this.rankPlayers = [];
 
     // frame cache
     this.unitsToAdd = [];
@@ -240,10 +241,18 @@ World.prototype.dumpUnitsToAdd = function(units)
 
 World.prototype.updatePlayers = function()
 {
+    this.rankPlayers = [];
     for (var i in this.players) {
         var player = this.players[i];
         player.update();
+        if (player.tank) {
+            this.rankPlayers.push(player);
+        }
     }
+    // sort
+    this.rankPlayers.sort(function(p1, p2) {
+        return p1.tank.exp < p2.tank.exp;
+    });
 };
 
 World.prototype.updateTanks = function()

@@ -1,56 +1,68 @@
 (function(){ 'use strict';
 
-var cfg = {
-    id: 'leaderBoardWindow',
-    component: 'Window',
-    header: {
-        id:'leaderBoardHead',
-        position: { x: 0, y: 0 },
-        height: 30,
-        text: 'LeadBoard',
-        font: {
-            size: '22px',
-            family: 'Skranji'
-        }
-    },
-    draggable: false,
-    padding: 4,
-    width: 180,
-    height: 220,
-};
+var Util = require("../modules/util");
 
-var labelCfg = {
-    component: 'Label',
-    font: {
-        size: '20px',
-        font: 'Skranji'
-    },
-    text: '',
+var cfg = {
+    font: "16px Open Sans",
+    align: "left",
+    weight: "normal",
+    fills: [
+        "#f94b3c",
+        "#e38e34",
+        "#eeda3f",
+        "#65737e",
+        "#7d8b96",
+        "#6c7f8c",
+        "#5a7080",
+        "#425d6f",
+    ],
+    selfFill: "#96c938",
     width: 180,
-    height: 35,
-    anchor: { x: 0, y: 0.5 },
-    position: {x: 0, y: 0}
+    updateFrame: 30,
 };
 
 function LeaderBoardUI(world)
 {
     this.world = world;
 
-    this.topCount = 5;
-
-    this.ui = EZGUI.create(cfg, 'metalworks');
-    this.ui.x = this.world.viewW - cfg.width - cfg.padding;
-    this.ui.y = cfg.padding;
-    this.ui.visible = false;
-    this.ui.alpha = 0.75;
-
+    this.topCount = cfg.fills.length;
+    this.lastUpdateFrame = 0;
     this.labels = {};
+    this.expLabels = {};
+    this.exps = {};
 
+    this.ui = new PIXI.Container();
+    this.ui.x = this.world.viewW - cfg.width;
+    this.ui.y = 0;
     this.world.stage.addChild(this.ui);
 }
 
 LeaderBoardUI.prototype = {
     constructor: LeaderBoardUI
+};
+
+LeaderBoardUI.prototype.addLabel = function(player, rank)
+{
+    if (!player || rank < 0 || rank >= this.topCount) {
+        Util.logError("invald player rank=" + rank + 1);
+        return null;
+    }
+    var labelCfg = {
+        fill: cfg.fills[rank],
+        font: cfg.font,
+        fontWeight: cfg.weight,
+        align: cfg.align
+    };
+    var nameLabel = new PIXI.Text(String(Number(rank) + 1) + " " + player.name, labelCfg);
+    var expLabel = new PIXI.Text(String(player.tank.exp), labelCfg);
+    var label = new PIXI.Container();
+    label.addChild(nameLabel);
+    label.addChild(expLabel);
+    expLabel.x = 140;
+
+    this.labels[player.connid] = label;
+    this.ui.addChild(label);
+    return label;
 };
 
 LeaderBoardUI.prototype.update = function()
@@ -60,44 +72,31 @@ LeaderBoardUI.prototype.update = function()
     }
     this.ui.visible = true;
 
-    var idx, label, player;
+    if (this.world.frame < this.lastUpdateFrame + cfg.updateFrame) {
+        return;
+    }
+    this.lastUpdateFrame = this.world.frame;
 
-    // remove out-of-date
-    for (idx in this.labels) {
+    var label;
+    for (var idx in this.labels) {
         label = this.labels[idx];
-        player = this.world.players[idx];
-        if (!player) {
+        if (label) {
             this.ui.removeChild(label);
-            delete this.labels[idx];
-            break;
         }
     }
+    this.labels = [];
 
-    var i = 0;
-    for (idx in this.world.players) {
-        player = this.world.players[idx];
-        label = this.labels[player.connid];
-        if (!label) {
-            if (player === this.world.getSelf()) {
-                labelCfg.font.color = '#f0f0f0';
-            } else {
-                labelCfg.font.color = '#b0b0b0';
-            }
-            label = EZGUI.create(labelCfg, 'metalworks');
-            this.labels[player.connid] = label;
-            this.ui.addChild(label);
-        }
-
-        if (i >= this.topCount) {
-            label.text = '';
+    for (var rank in this.world.rankPlayers) {
+        var player = this.world.rankPlayers[rank];
+        if (!player || !player.tank) {
             continue;
         }
-
-        // TODO: kd
-        label.text = player.name + '  0/0';
-        label.x = 16;
-        label.y = cfg.header.height + i * labelCfg.height + 20;
-        ++ i;
+        label = this.addLabel(player, rank);
+        if (!label) {
+            break;
+        }
+        label.x = 0;
+        label.y = rank * label.height + 10;
     }
 };
 

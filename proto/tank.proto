@@ -28,7 +28,7 @@ message Unit {
     optional uint32 id = 1;
     optional int32 type = 2;
     optional string cfgName = 3;
-    optional int32 hp = 4;
+    optional float hp = 4;
     optional Motion motion = 5;
     optional float rotation = 6;
     optional uint32 ownerid = 7;            // bullets
