@@ -16,8 +16,14 @@ var cfg = {
         "#5a7080",
         "#425d6f",
     ],
-    selfFill: "#96c938",
-    width: 180,
+    selfbg: "#176687",
+    selfbgAlpha: 0.3,
+    selfbgRadius: 8,
+    width: 200,
+    nameWidth: 160,
+    height: 18,
+    paddingX: 12,
+    paddingY: 3,
     updateFrame: 30,
 };
 
@@ -32,7 +38,7 @@ function LeaderBoardUI(world)
     this.exps = {};
 
     this.ui = new PIXI.Container();
-    this.ui.x = this.world.viewW - cfg.width;
+    this.ui.x = this.world.viewW - cfg.width - cfg.paddingX;
     this.ui.y = 0;
     this.world.stage.addChild(this.ui);
 }
@@ -53,12 +59,29 @@ LeaderBoardUI.prototype.addLabel = function(player, rank)
         fontWeight: cfg.weight,
         align: cfg.align
     };
-    var nameLabel = new PIXI.Text(String(Number(rank) + 1) + " " + player.name, labelCfg);
-    var expLabel = new PIXI.Text(String(player.tank.exp), labelCfg);
+
     var label = new PIXI.Container();
+
+    if (player === this.world.getSelf()) {
+        var graphics = new PIXI.Graphics();
+        graphics.beginFill(cfg.selfbg);
+        graphics.drawRoundedRect(0, 0, cfg.width - cfg.paddingX, cfg.height, cfg.selfbgRadius);
+        graphics.endFill();
+        var bgSprite = new PIXI.Sprite(graphics.generateTexture());
+        bgSprite.alpha = cfg.selfbgAlpha;
+        label.addChild(bgSprite);
+    }
+
+    var nameLabel = new PIXI.Text(String(Number(rank) + 1) + "  " + player.name, labelCfg);
+    nameLabel.x = cfg.paddingX;
     label.addChild(nameLabel);
+
+    var expLabel = new PIXI.Text(String(player.tank.exp), labelCfg);
+    expLabel.x = cfg.nameWidth;
     label.addChild(expLabel);
-    expLabel.x = 140;
+
+    label.scale.x = 1;
+    label.scale.y = cfg.height / label.height;
 
     this.labels[player.connid] = label;
     this.ui.addChild(label);
@@ -95,8 +118,8 @@ LeaderBoardUI.prototype.update = function()
         if (!label) {
             break;
         }
-        label.x = 0;
-        label.y = rank * label.height + 10;
+        label.x = cfg.paddingX;
+        label.y = rank * (cfg.height + cfg.paddingY) + cfg.paddingY;
     }
 };
 
