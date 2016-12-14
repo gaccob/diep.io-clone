@@ -44,10 +44,8 @@ Tank.prototype.update = function()
 Tank.prototype.die = function()
 {
     Unit.prototype.die.call(this);
-
     if (this.player) {
-        this.player.tank = null;
-        Util.logDebug("player[" + this.player.connid + "] tank die");
+        this.player.ondie();
     }
 };
 

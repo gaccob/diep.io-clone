@@ -27,7 +27,6 @@
             "alert",
             "console",
             "document",
-            "EZGUI",
             "module",
             "PIXI",
             "require"

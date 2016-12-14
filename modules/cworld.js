@@ -50,6 +50,7 @@ function CWorld()
             antialias: true,
             autoResize: true,
         });
+    this.renderer.view.id = "canvas";
     document.body.appendChild(this.renderer.view);
 
     this.stage = new PIXI.Container();
@@ -60,13 +61,9 @@ function CWorld()
     this.stage.addChild(this.view);
 
     // async load ui window
-    EZGUI.renderer = this.renderer;
-    var world = this;
-    EZGUI.Theme.load(['assets/theme/metalworks-theme.json'], function() {
-        world.startUI = new StartUI(world);
-        world.leaderBoardUI = new LeaderBoardUI(world);
-        world.propAddUI = new PropAddUI(world);
-    });
+    this.startUI = new StartUI(this);
+    this.leaderBoardUI = new LeaderBoardUI(this);
+    this.propAddUI = new PropAddUI(this);
 
     this.dieSprites = [];
 

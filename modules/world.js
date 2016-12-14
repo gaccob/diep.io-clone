@@ -466,8 +466,9 @@ World.prototype.collide = function(unit1, unit2, distRatio)
         }
         if ((player.tank === unit1 && unit1.isDead === true)
             || (player.tank === unit2 && unit2.isDead === true)) {
-            EZGUI.components.startButton.text = "CLICK TO REBORN";
-            EZGUI.components.startNameInput.text = player.name;
+            // TODO: reborn 
+            // EZGUI.components.startButton.text = "CLICK TO REBORN";
+            // EZGUI.components.startNameInput.text = player.name;
             player.resetControlDir();
         }
     }

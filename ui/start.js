@@ -1,72 +1,75 @@
 (function() { 'use strict';
 
-var cfg = {
-    id: "startWindow",
-    component: "Window",
-    padding: 4,
-    position: { x: 10, y: 10 },
-    width: 500,
-    height: 300,
-    layout: [1, 3],
-    children: [
-        {
-            id: "startText",
-            component: "Label",
-            font: {
-                size: "24px",
-                color: "white",
-                family: 'Skranji'
-            },
-            text: "Enter your name:",
-            width: 200,
-            height: 20,
-            position: {x: 130, y: 80 }
-        },
-        {
-            id: "startNameInput",
-            component: "Input",
-            font: {
-                size: "28px",
-                family: 'Arail'
-            },
-            text: "guest",
-            width: 280,
-            height: 50,
-            position: "center"
-        },
-        {
-            id: "startButton",
-            component: "Button",
-            text: "START GAME",
-            width: 240,
-            height: 40,
-            position: "center"
-        }
-    ]
-};
+function initNameInput(startUI)
+{
+    startUI.raw = true;
+
+    startUI.nameInput.style.width = startUI.world.viewW / 2 + 'px';
+    startUI.nameInput.style.height = '30px';
+    startUI.nameInput.value = "input your name and press Enter..";
+    startUI.nameInput.style.color = "gray";
+
+    var nw = parseInt(startUI.nameInput.style.width);
+    var nh = parseInt(startUI.nameInput.style.height);
+    startUI.nameContainer.style.left = (startUI.world.viewW - nw) / 2 + 'px';
+    startUI.nameContainer.style.top = (startUI.world.viewH - nh) / 2 + 'px';
+}
+
+function focusNameInput(startUI)
+{
+    if (startUI.raw === true) {
+        startUI.nameInput.value = "";
+        startUI.nameInput.style.color = "";
+        startUI.raw = false;
+    }
+}
 
 function StartUI(world)
 {
     this.world = world;
+    this.lastHideStatus = false;
 
-    this.ui = EZGUI.create(cfg, 'metalworks');
-    this.ui.x = (world.viewW - cfg.width) / 2;
-    this.ui.y = (world.viewH - cfg.height) / 2;
-    this.ui.visible = true;
+    this.nameContainer = document.createElement("div");
+    this.nameContainer.style.display = 'block';
+    this.nameContainer.style.position = 'absolute';
+    document.body.appendChild(this.nameContainer);
 
-    EZGUI.components.startButton.on('click', function() {
-        var name = EZGUI.components.startNameInput.text.trim();
-        if (name.length > 10) {
+    this.nameInput = document.createElement("input");
+    this.nameInput.style["font-size"] = '20px';
+    this.nameInput.style["font-family"] = 'Verdana,Arial,Sans-serif';
+    this.nameInput.style["padding-left"] = '5px';
+    this.nameInput.style["padding-right"] = '5px';
+    this.nameContainer.appendChild(this.nameInput);
+
+    var startUI = this;
+    initNameInput(startUI);
+
+    this.nameInput.onclick = function() {
+        focusNameInput(startUI);
+    };
+
+    this.nameInput.onkeydown = function(e) {
+        if (e.keyCode != 13) {
+            focusNameInput(startUI);
+            return;
+        }
+
+        var name = startUI.nameInput.value.trim();
+        if (startUI.raw === true) {
+            name = "guest";
+        } else if (name.length === 0) {
+            name = "guest";
+        } else if (name.length > 10) {
             name = name.substring(0, 10);
         }
+
         if (world.inited === false) {
             world.init();
             world.synchronizer.syncStartReq(name, world.viewW, world.viewH);
         } else {
             world.synchronizer.syncReborn(name);
         }
-    });
-    world.stage.addChild(this.ui);
+    };
 }
 
 StartUI.prototype = {
@@ -75,14 +78,28 @@ StartUI.prototype = {
 
 StartUI.prototype.update = function()
 {
+    // hide status
+    var hide = false;
     var player = this.world.getSelf();
-    if (!player || player.die === true) {
-        this.ui.visible = true;
+    if (!player || !player.tank) {
+        hide = false;
     } else {
-        this.ui.visible = false;
+        hide = true;
+    }
+
+    // update when status changed
+    if (hide !== this.lastHideStatus) {
+        if (hide === true) {
+            this.nameContainer.style.left = '-1000px';
+            this.nameContainer.style.top = '-1000px';
+        } else {
+            initNameInput(this);
+        }
+        this.lastHideStatus = hide;
     }
 };
 
 module.exports = StartUI;
 
 })();
+

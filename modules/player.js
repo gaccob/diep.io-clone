@@ -6,27 +6,34 @@ var Control = require("../modules/control");
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
-function Player(world, connid, name, viewW, viewH)
+function initPlayerTankData(player)
 {
-    this.world = world;
-    this.name = name;
-    this.tank = null;
-    this.connid = connid;
-    this.viewW = viewW;
-    this.viewH = viewH;
+    player.tank = null;
 
-    this.controlForceDir = {
+    player.controlForceDir = {
         left: 0,
         right: 0,
         up: 0,
         down: 0,
     };
-    this.needSyncForce = false;
-    this.lastSyncForceFrame = 0;
 
-    this.controlRotation = 0;
-    this.needSyncRotation = false;
-    this.lastSyncRotationFrame = 0;
+    player.needSyncForce = false;
+    player.lastSyncForceFrame = 0;
+
+    player.controlRotation = 0;
+    player.needSyncRotation = false;
+    player.lastSyncRotationFrame = 0;
+}
+
+function Player(world, connid, name, viewW, viewH)
+{
+    this.world = world;
+    this.name = name;
+    this.connid = connid;
+    this.viewW = viewW;
+    this.viewH = viewH;
+
+    initPlayerTankData(this);
 
     // private
     this._control = null;
@@ -183,8 +190,18 @@ Player.prototype.bindTank = function(tank)
     tank.player = this;
 };
 
+Player.prototype.ondie = function()
+{
+    Util.logDebug("player[" + this.connid + "] tank die");
+    initPlayerTankData(this);
+};
+
 Player.prototype.update = function()
 {
+    if (!this.tank) {
+        return;
+    }
+
     var cfg = this.world.cfg.configWorld;
 
     if (this.world.frame > cfg.syncRotationFrame + this.lastSyncRotationFrame) {
