@@ -147,14 +147,6 @@ Player.prototype.addControl = function()
     this._control.handleMouseClick();
 };
 
-Player.prototype.resetControlDir = function()
-{
-    this.controlForceDir.left = 0;
-    this.controlForceDir.right = 0;
-    this.controlForceDir.up = 0;
-    this.controlForceDir.down = 0;
-};
-
 Player.prototype.createTank = function()
 {
     var tank = new Tank(this.world, "base", this);

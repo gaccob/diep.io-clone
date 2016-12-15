@@ -457,21 +457,6 @@ World.prototype.collide = function(unit1, unit2, distRatio)
 
     Util.logTrace(unit1.toString());
     Util.logTrace(unit2.toString());
-
-    // check client player dead
-    if (this.isLocal === true) {
-        var player = this.getSelf();
-        if (!player) {
-            return;
-        }
-        if ((player.tank === unit1 && unit1.isDead === true)
-            || (player.tank === unit2 && unit2.isDead === true)) {
-            // TODO: reborn 
-            // EZGUI.components.startButton.text = "CLICK TO REBORN";
-            // EZGUI.components.startNameInput.text = player.name;
-            player.resetControlDir();
-        }
-    }
 };
 
 World.prototype.updateCollision = function()
