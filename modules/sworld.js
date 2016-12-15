@@ -95,7 +95,7 @@ SWorld.prototype.update = function()
 
     var dateTime = new Date();
     var ms = dateTime.getTime();
-    var updateMS = 1000.0 / this.cfg.configWorld.frame;
+    var updateMS = 1000.0 / Package.app.world.frame;
     while (ms > this.time + updateMS) {
         this.updateFrameLogic();
     }

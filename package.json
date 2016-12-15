@@ -56,7 +56,16 @@
         "port": 9000,
         "proto": "tank.proto.json",
         "maxOnline": 30,
-        "logLevel": 1
+        "logLevel": 1,
+
+        "world": {
+            "frame": 30,
+            "syncRotationFrame": 2,
+            "unitCollideCheckFrame": 15,
+            "syncForceFrame": 2,
+            "maxObstaclesCount": 50,
+            "gridSize": 128
+        }
     }
 }
 

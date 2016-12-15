@@ -8,7 +8,6 @@ var configPropAdd = require("../cfg/configPropAdd");
 var configTanks = require("../cfg/configTanks");
 var configWeapons = require("../cfg/configWeapons");
 var configMap = require("../cfg/configMap");
-var configWorld = require("../cfg/configWorld");
 
 function Config()
 {
@@ -50,7 +49,6 @@ function Config()
     }
 
     this.configMap = configMap[0];
-    this.configWorld = configWorld[0];
 }
 
 module.exports = Config;

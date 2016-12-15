@@ -3,6 +3,7 @@
 var Victor = require("victor");
 
 var Control = require("../modules/control");
+var Package = require("../package.json");
 var Tank = require("../modules/tank");
 var Util = require("../modules/util");
 
@@ -194,9 +195,7 @@ Player.prototype.update = function()
         return;
     }
 
-    var cfg = this.world.cfg.configWorld;
-
-    if (this.world.frame > cfg.syncRotationFrame + this.lastSyncRotationFrame) {
+    if (this.world.frame > Package.app.world.syncRotationFrame + this.lastSyncRotationFrame) {
         if (this.needSyncRotation === true) {
             if (Math.abs(this.controlRotation - this.tank.rotation) > Util.epsilon) {
                 this.world.synchronizer.syncRotate(this.controlRotation);
@@ -206,7 +205,7 @@ Player.prototype.update = function()
         }
     }
 
-    if (this.world.frame > cfg.syncForceFrame + this.lastSyncForceFrame) {
+    if (this.world.frame > Package.app.world.syncForceFrame + this.lastSyncForceFrame) {
         if (this.needSyncForce === true) {
             var dir = Util.getVectorByForceDir(this.controlForceDir);
             if (dir.lengthSq() < Util.epsilon) {

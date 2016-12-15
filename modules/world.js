@@ -27,7 +27,7 @@ function World(isLocal)
     this.spawnRegion.y = this.h * (1.0 - this.cfg.configMap.obstacleRegion.hRatio) / 2;
     this.spawnRegion.h = this.h * this.cfg.configMap.obstacleRegion.hRatio;
 
-    this.gridSize = this.cfg.configWorld.gridSize;
+    this.gridSize = Package.app.world.gridSize;
     this.gridW = Math.floor(this.w / this.gridSize) + 1;
     this.gridH = Math.floor(this.h / this.gridSize) + 1;
     this.grids = [];
@@ -271,7 +271,7 @@ World.prototype.updateObstacles = function()
         this.obstacles[i].update();
     }
 
-    if (this.obstacleCount < this.cfg.configWorld.maxObstaclesCount) {
+    if (this.obstacleCount < Package.app.world.maxObstaclesCount) {
         var names = ["triangle", "triangle", "quad", "pentagon"];
         var name = names[Math.floor((this.random() * names.length))];
         obstacle = new Obstacle(this, name);
@@ -470,7 +470,7 @@ World.prototype.updateCollision = function()
 
                 // avoid multi-collision
                 if (unit.collideFrame) {
-                    if (this.frame - unit.collideFrame < this.cfg.configWorld.unitCollideCheckFrame) {
+                    if (this.frame - unit.collideFrame < Package.app.world.unitCollideCheckFrame) {
                         continue;
                     }
                 }
@@ -511,7 +511,7 @@ World.prototype.updateFrameLogic = function()
     }
 
     this.frame ++;
-    this.time += 1000.0 / this.cfg.configWorld.frame;
+    this.time += 1000.0 / Package.app.world.frame;
 
     this.commander.execute();
 

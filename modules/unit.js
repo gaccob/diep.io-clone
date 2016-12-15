@@ -3,6 +3,7 @@
 var HpBar = require("../ui/hpbar");
 var Motion = require("../modules/motion");
 var NameBar = require("../ui/namebar");
+var Package = require("../package.json");
 var Util = require("../modules/util");
 var View = require("../modules/view");
 
@@ -118,8 +119,7 @@ Unit.prototype.setFightStatus = function()
 Unit.prototype.getFightStatus = function()
 {
     if (this.fightFrame) {
-        var cfg = this.world.cfg.configWorld;
-        return this.world.frame - this.fightFrame > cfg.frame * 5;
+        return this.world.frame - this.fightFrame > Package.app.world.frame * 5;
     }
     return false;
 };
@@ -185,7 +185,7 @@ Unit.prototype.update = function()
     var oldX = this.x;
     var oldY = this.y;
 
-    var deltaMS = 1000.0 / this.world.cfg.configWorld.frame;
+    var deltaMS = 1000.0 / Package.app.world.frame;
     this.motion.update(deltaMS);
     this.world.updateUnitGrid(this, {x: oldX, y: oldY});
 
