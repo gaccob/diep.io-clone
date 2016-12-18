@@ -65,6 +65,27 @@
             "syncForceFrame": 2,
             "maxObstaclesCount": 50,
             "gridSize": 128
+        },
+
+        "map": {
+            "h": 2048,
+            "w": 2048,
+            "color": "0x808080",
+            "gridColor": "0xa0a0a0",
+            "gridEdge": 1,
+            "gridViewSize": 32,
+            "obstacleRegion": {
+                "color": "0xcdcdcd",
+                "wRatio": 0.92,
+                "hRatio": 0.92
+            }
+        },
+
+        "dieAnimation": {
+            "scaleIncrease": 0.1,
+            "alphaStart": 0.4,
+            "alphaEnd": 0.1,
+            "alphaDecrease": 0.1
         }
     }
 }

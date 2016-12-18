@@ -62,8 +62,8 @@ AI.prototype.move = function()
             this.lastMoveTargetX, this.lastMoveTargetY) < Util.epsilon);
         var boring = (this.world.frame - this.lastMoveFrame > cfg.moveBoringFrame);
         if (close === true || boring === true) {
-            this.lastMoveTargetPosX = Math.random() * this.world.cfg.configMap.w;
-            this.lastMoveTargetPosY = Math.random() * this.world.cfg.configMap.h;
+            this.lastMoveTargetPosX = Math.random() * this.world.w;
+            this.lastMoveTargetPosY = Math.random() * this.world.h;
             this.lastMoveFrame = this.world.frame;
             var dir = new Victor(this.lastMoveTargetPosX - this.owner.x,
                                  this.lastMoveTargetPosY - this.owner.y);

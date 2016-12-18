@@ -14,7 +14,7 @@ var StartUI = require("../ui/start");
 
 function getWorldBackground(world)
 {
-    var cfg = world.cfg.configMap;
+    var cfg = Package.app.map;
     var graphics = new PIXI.Graphics();
 
     // background spawn region
@@ -24,12 +24,12 @@ function getWorldBackground(world)
     graphics.endFill();
 
     // background grids
-    graphics.lineStyle(cfg.view.grid.edge, cfg.view.grid.color);
-    for (var x = cfg.view.grid.size; x < world.w; x += cfg.view.grid.size) {
+    graphics.lineStyle(cfg.gridEdge, Number(cfg.gridColor));
+    for (var x = cfg.gridViewSize; x < world.w; x += cfg.gridViewSize) {
         graphics.moveTo(x, 0);
         graphics.lineTo(x, world.h);
     }
-    for (var y = cfg.view.grid.size; y < world.h; y += cfg.view.grid.size) {
+    for (var y = cfg.gridViewSize; y < world.h; y += cfg.gridViewSize) {
         graphics.moveTo(0, y);
         graphics.lineTo(world.w, y);
     }
@@ -46,7 +46,7 @@ function CWorld()
     this.viewH = document.documentElement.clientHeight - 10;
     this.renderer = new PIXI.CanvasRenderer(
         this.viewW, this.viewH, {
-            backgroundColor: Number(this.cfg.configMap.color),
+            backgroundColor: Number(Package.app.map.color),
             antialias: true,
             autoResize: true,
         });
@@ -118,7 +118,7 @@ CWorld.prototype.updateCamera = function()
 
 CWorld.prototype.updateDieAnimations = function()
 {
-    var cfg = this.cfg.configDieAnimation.base;
+    var cfg = Package.app.dieAnimation;
     for (var i in this.dieSprites) {
         var sprite = this.dieSprites[i];
         if (sprite.alpha > cfg.alphaStart) {

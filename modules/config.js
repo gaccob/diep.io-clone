@@ -1,13 +1,11 @@
 (function(){ "use strict";
 
 var configBullets = require("../cfg/configBullets");
-var configDieAnimation = require("../cfg/configDieAnimation");
 var configLevelUp = require("../cfg/configLevelUp");
 var configObstacles = require("../cfg/configObstacles");
 var configPropAdd = require("../cfg/configPropAdd");
 var configTanks = require("../cfg/configTanks");
 var configWeapons = require("../cfg/configWeapons");
-var configMap = require("../cfg/configMap");
 
 function Config()
 {
@@ -16,11 +14,6 @@ function Config()
     this.configBullets = {};
     for (idx in configBullets) {
         this.configBullets[configBullets[idx].alias] = configBullets[idx];
-    }
-
-    this.configDieAnimation = {};
-    for (idx in configDieAnimation) {
-        this.configDieAnimation[configDieAnimation[idx].alias] = configDieAnimation[idx];
     }
 
     this.configObstacles = {};
@@ -47,8 +40,6 @@ function Config()
     for (idx in configLevelUp) {
         this.configLevelUp[configLevelUp[idx].level] = configLevelUp[idx];
     }
-
-    this.configMap = configMap[0];
 }
 
 module.exports = Config;

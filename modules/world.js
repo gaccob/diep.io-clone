@@ -18,14 +18,14 @@ function World(isLocal)
     this.unitBaseId = 0;
     this.cfg = new Config();
 
-    this.w = this.cfg.configMap.w;
-    this.h = this.cfg.configMap.h;
+    this.w = Package.app.map.w;
+    this.h = Package.app.map.h;
 
     this.spawnRegion = {};
-    this.spawnRegion.x = this.w * (1.0 - this.cfg.configMap.obstacleRegion.wRatio) / 2;
-    this.spawnRegion.w = this.w * this.cfg.configMap.obstacleRegion.wRatio;
-    this.spawnRegion.y = this.h * (1.0 - this.cfg.configMap.obstacleRegion.hRatio) / 2;
-    this.spawnRegion.h = this.h * this.cfg.configMap.obstacleRegion.hRatio;
+    this.spawnRegion.x = this.w * (1.0 - Package.app.map.obstacleRegion.wRatio) / 2;
+    this.spawnRegion.w = this.w * Package.app.map.obstacleRegion.wRatio;
+    this.spawnRegion.y = this.h * (1.0 - Package.app.map.obstacleRegion.hRatio) / 2;
+    this.spawnRegion.h = this.h * Package.app.map.obstacleRegion.hRatio;
 
     this.gridSize = Package.app.world.gridSize;
     this.gridW = Math.floor(this.w / this.gridSize) + 1;
