@@ -18,14 +18,14 @@ function World(isLocal)
     this.unitBaseId = 0;
     this.cfg = new Config();
 
-    this.w = Package.app.map.w;
-    this.h = Package.app.map.h;
+    this.w = Package.app.world.w;
+    this.h = Package.app.world.h;
 
     this.spawnRegion = {};
-    this.spawnRegion.x = this.w * (1.0 - Package.app.map.obstacleRegion.wRatio) / 2;
-    this.spawnRegion.w = this.w * Package.app.map.obstacleRegion.wRatio;
-    this.spawnRegion.y = this.h * (1.0 - Package.app.map.obstacleRegion.hRatio) / 2;
-    this.spawnRegion.h = this.h * Package.app.map.obstacleRegion.hRatio;
+    this.spawnRegion.x = this.w * (1.0 - Package.app.world.obstacleRegion.wRatio) / 2;
+    this.spawnRegion.w = this.w * Package.app.world.obstacleRegion.wRatio;
+    this.spawnRegion.y = this.h * (1.0 - Package.app.world.obstacleRegion.hRatio) / 2;
+    this.spawnRegion.h = this.h * Package.app.world.obstacleRegion.hRatio;
 
     this.gridSize = Package.app.world.gridSize;
     this.gridW = Math.floor(this.w / this.gridSize) + 1;
@@ -271,7 +271,7 @@ World.prototype.updateObstacles = function()
         this.obstacles[i].update();
     }
 
-    if (this.obstacleCount < Package.app.world.maxObstaclesCount) {
+    if (this.obstacleCount < Package.app.world.obstacleMaxCount) {
         var names = ["triangle", "triangle", "quad", "pentagon"];
         var name = names[Math.floor((this.random() * names.length))];
         obstacle = new Obstacle(this, name);

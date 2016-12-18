@@ -14,7 +14,7 @@ var StartUI = require("../ui/start");
 
 function getWorldBackground(world)
 {
-    var cfg = Package.app.map;
+    var cfg = Package.app.world;
     var graphics = new PIXI.Graphics();
 
     // background spawn region
@@ -46,7 +46,7 @@ function CWorld()
     this.viewH = document.documentElement.clientHeight - 10;
     this.renderer = new PIXI.CanvasRenderer(
         this.viewW, this.viewH, {
-            backgroundColor: Number(Package.app.map.color),
+            backgroundColor: Number(Package.app.world.color),
             antialias: true,
             autoResize: true,
         });

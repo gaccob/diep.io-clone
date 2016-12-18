@@ -55,7 +55,9 @@
         "domain": "tank.gaccob.com",
         "port": 9000,
         "proto": "tank.proto.json",
+
         "maxOnline": 30,
+
         "logLevel": 1,
 
         "world": {
@@ -63,17 +65,19 @@
             "syncRotationFrame": 2,
             "unitCollideCheckFrame": 15,
             "syncForceFrame": 2,
-            "maxObstaclesCount": 50,
-            "gridSize": 128
-        },
 
-        "map": {
             "h": 2048,
             "w": 2048,
+            "cw": 800,
+            "ch": 600,
+
             "color": "0x808080",
+            "gridSize": 128,
+            "gridViewSize": 32,
             "gridColor": "0xa0a0a0",
             "gridEdge": 1,
-            "gridViewSize": 32,
+
+            "obstacleMaxCount": 50,
             "obstacleRegion": {
                 "color": "0xcdcdcd",
                 "wRatio": 0.92,
