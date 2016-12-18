@@ -19,7 +19,7 @@ var cfg = {
     selfbg: "#176687",
     selfbgAlpha: 0.3,
     selfbgRadius: 8,
-    width: 200,
+    width: 220,
     nameWidth: 160,
     height: 18,
     paddingX: 12,
