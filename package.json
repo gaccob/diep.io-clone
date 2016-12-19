@@ -29,7 +29,8 @@
             "document",
             "module",
             "PIXI",
-            "require"
+            "require",
+            "window"
          ]
     },
 
@@ -68,8 +69,8 @@
 
             "h": 2048,
             "w": 2048,
-            "cw": 800,
-            "ch": 600,
+            "cw": 1280,
+            "ch": 768,
 
             "color": "0x808080",
             "gridSize": 128,

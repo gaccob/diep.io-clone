@@ -35,20 +35,55 @@ function getWorldBackground(world)
     return graphics;
 }
 
+function adaptView(mainView)
+{
+    var canvas = document.getElementById("canvas");
+    var wRatio = mainView.w / mainView.world.cw;
+    var hRatio = mainView.h / mainView.world.ch;
+    if (wRatio < hRatio) {
+        mainView.world.stage.scale.x = wRatio;
+        mainView.world.stage.scale.y = wRatio;
+        canvas.style.top = (mainView.h - mainView.world.ch * wRatio) / 2 + 'px';
+        canvas.height = mainView.world.ch * wRatio;
+    } else {
+        mainView.world.stage.scale.x = hRatio;
+        mainView.world.stage.scale.y = hRatio;
+        canvas.style.left = (mainView.w - mainView.world.cw * hRatio) / 2 + 'px';
+        canvas.width = mainView.world.cw * hRatio;
+    }
+}
+
 function MainView(world)
 {
     this.world = world;
 
-    var wRatio = document.documentElement.clientWidth / this.world.cw;
-    var hRatio = document.documentElement.clientHeight / this.world.ch;
-    if (wRatio < hRatio) {
-        world.stage.scale.x = wRatio;
-        world.stage.scale.y = wRatio;
-    } else {
-        world.stage.scale.x = hRatio;
-        world.stage.scale.y = hRatio;
-    }
+    this.w = document.documentElement.clientWidth;
+    this.h = document.documentElement.clientHeight - 10;
 
+    // renderer
+    this.renderer = new PIXI.CanvasRenderer(this.w, this.h, {
+        antialias: true,
+        roundPixels: false 
+    });
+    this.renderer.view.id = "canvas";
+    document.body.appendChild(this.renderer.view);
+
+    // canvas
+    var canvas = document.getElementById("canvas");
+    canvas.style.position = "absolute";
+    canvas.style.display = "block";
+
+    // view adapt
+    adaptView(this);
+    var _this = this;
+    window.addEventListener('resize', function() {
+        _this.w = document.documentElement.clientWidth;
+        _this.h = document.documentElement.clientHeight - 10;
+        _this.renderer.resize(_this.w, _this.h);
+        adaptView(_this);
+    });
+
+    // view
     this.view = new PIXI.Container();
     this.view.addChild(getWorldBackground(world));
     world.stage.addChild(this.view);
@@ -73,6 +108,9 @@ MainView.prototype.update = function()
     y = Util.clamp(y, viewCenterY, this.world.h - viewCenterY);
     this.view.x = viewCenterX - x;
     this.view.y = viewCenterY - y;
+
+    // world stage
+    this.renderer.render(this.world.stage);
 };
 
 MainView.prototype.handleMouseClick = function()

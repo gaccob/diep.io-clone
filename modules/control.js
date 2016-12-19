@@ -12,7 +12,9 @@ Control.prototype = {
 Control.prototype.handleKeyDown = function()
 {
     var world = this.world;
+    document.body.style['ime-mode'] = 'disabled';
     document.body.addEventListener('keydown', function(e) {
+        console.log("key pressed:" + e.keyCode);
         var player = world.getSelf();
         if (!player) {
             return;

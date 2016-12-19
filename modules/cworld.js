@@ -17,13 +17,6 @@ function CWorld()
 {
     World.call(this, true);
 
-    // renderer
-    this.renderer = new PIXI.CanvasRenderer(document.documentElement.clientWidth,
-                                            document.documentElement.clientHeight,
-                                            { antialias: true, roundPixels: true });
-    this.renderer.view.id = "canvas";
-    document.body.appendChild(this.renderer.view);
-
     // stage
     this.stage = new PIXI.Container();
 
@@ -56,9 +49,6 @@ CWorld.prototype.getSelf = function()
 
 CWorld.prototype.updateView = function()
 {
-    if (this.mainView) {
-        this.mainView.update();
-    }
     if (this.startUI) {
         this.startUI.update();
     }
@@ -67,6 +57,9 @@ CWorld.prototype.updateView = function()
     }
     if (this.propAddUI) {
         this.propAddUI.update();
+    }
+    if (this.mainView) {
+        this.mainView.update();
     }
 };
 
@@ -135,7 +128,6 @@ CWorld.prototype.update = function()
 
     // view
     this.updateView();
-    this.renderer.render(this.stage);
 };
 
 module.exports = CWorld;
