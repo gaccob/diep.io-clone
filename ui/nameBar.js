@@ -30,7 +30,7 @@ NameBar.prototype.update = function(content)
             strokeThickness: cfg.strokeThickness,
             align: 'center'
         });
-        this.world.view.addChild(this.ui);
+        this.world.mainView.addChild(this.ui);
     }
 
     if (this.ui) {

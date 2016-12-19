@@ -4,15 +4,18 @@ function initNameInput(startUI)
 {
     startUI.raw = true;
 
-    startUI.nameInput.style.width = startUI.world.viewW / 2 + 'px';
+    var w = document.documentElement.clientWidth;
+    var h = document.documentElement.clientHeight;
+
+    startUI.nameInput.style.width = w / 2 + 'px';
     startUI.nameInput.style.height = '30px';
     startUI.nameInput.value = "input your name and press Enter..";
     startUI.nameInput.style.color = "gray";
 
     var nw = parseInt(startUI.nameInput.style.width);
     var nh = parseInt(startUI.nameInput.style.height);
-    startUI.nameContainer.style.left = (startUI.world.viewW - nw) / 2 + 'px';
-    startUI.nameContainer.style.top = (startUI.world.viewH - nh) / 2 + 'px';
+    startUI.nameContainer.style.left = (w - nw) / 2 + 'px';
+    startUI.nameContainer.style.top = (h - nh) / 2 + 'px';
 }
 
 function focusNameInput(startUI)
@@ -65,7 +68,7 @@ function StartUI(world)
 
         if (world.inited === false) {
             world.init();
-            world.synchronizer.syncStartReq(name, world.viewW, world.viewH);
+            world.synchronizer.syncStartReq(name);
         } else {
             world.synchronizer.syncReborn(name);
         }

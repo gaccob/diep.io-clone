@@ -299,21 +299,9 @@
                         },
                         {
                             "rule": "optional",
-                            "type": "uint32",
-                            "name": "viewW",
-                            "id": 2
-                        },
-                        {
-                            "rule": "optional",
-                            "type": "uint32",
-                            "name": "viewH",
-                            "id": 3
-                        },
-                        {
-                            "rule": "optional",
                             "type": "bool",
                             "name": "ai",
-                            "id": 4
+                            "id": 2
                         }
                     ]
                 },

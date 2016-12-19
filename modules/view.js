@@ -23,7 +23,7 @@ function drawBullet(view)
     bodySprite.anchor.y = 0.5;
     view.sprite.addChild(bodySprite);
 
-    view.world.view.addChild(view.sprite);
+    view.world.mainView.addChild(view.sprite);
 }
 
 function drawObstacle(view)
@@ -48,7 +48,7 @@ function drawObstacle(view)
     bodySprite.pivot.y = view.cfg.radius + view.cfg.edge.w;
     view.sprite.addChild(bodySprite);
 
-    view.world.view.addChild(view.sprite);
+    view.world.mainView.addChild(view.sprite);
 }
 
 function drawWeapon(view)
@@ -90,7 +90,7 @@ function drawTank(view, me)
     bodySprite.anchor.y = 0.5;
     view.sprite.addChild(bodySprite);
 
-    view.world.view.addChild(view.sprite);
+    view.world.mainView.addChild(view.sprite);
 }
 
 function View(owner)

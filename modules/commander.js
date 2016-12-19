@@ -38,10 +38,7 @@ Commander.prototype.exeJoin = function(commander)
         Util.logError("player[" + commander.connid + "] already existed");
         return false;
     }
-    player = this.world.addPlayer(commander.connid,
-                                  commander.join.name,
-                                  commander.join.viewW,
-                                  commander.join.viewH);
+    player = this.world.addPlayer(commander.connid, commander.join.name);
     if (!player) {
         return false;
     }

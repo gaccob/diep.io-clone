@@ -8,59 +8,27 @@ var CDispatcher = require("../modules/cdispatcher");
 var World = require("../modules/world");
 var Util = require("../modules/util");
 
+var MainView = require("../ui/main");
 var LeaderBoardUI = require("../ui/leaderBoard");
 var PropAddUI = require("../ui/propAdd");
 var StartUI = require("../ui/start");
-
-function getWorldBackground(world)
-{
-    var cfg = Package.app.world;
-    var graphics = new PIXI.Graphics();
-
-    // background spawn region
-    graphics.beginFill(cfg.obstacleRegion.color);
-    graphics.drawRect(world.spawnRegion.x, world.spawnRegion.y,
-        world.spawnRegion.w, world.spawnRegion.h);
-    graphics.endFill();
-
-    // background grids
-    graphics.lineStyle(cfg.gridEdge, Number(cfg.gridColor));
-    for (var x = cfg.gridViewSize; x < world.w; x += cfg.gridViewSize) {
-        graphics.moveTo(x, 0);
-        graphics.lineTo(x, world.h);
-    }
-    for (var y = cfg.gridViewSize; y < world.h; y += cfg.gridViewSize) {
-        graphics.moveTo(0, y);
-        graphics.lineTo(world.w, y);
-    }
-
-    return graphics;
-}
 
 function CWorld()
 {
     World.call(this, true);
 
     // renderer
-    this.viewW = document.documentElement.clientWidth;
-    this.viewH = document.documentElement.clientHeight - 10;
-    this.renderer = new PIXI.CanvasRenderer(
-        this.viewW, this.viewH, {
-            backgroundColor: Number(Package.app.world.color),
-            antialias: true,
-            autoResize: true,
-        });
+    this.renderer = new PIXI.CanvasRenderer(document.documentElement.clientWidth,
+                                            document.documentElement.clientHeight,
+                                            { antialias: true, roundPixels: true });
     this.renderer.view.id = "canvas";
     document.body.appendChild(this.renderer.view);
 
+    // stage
     this.stage = new PIXI.Container();
 
-    // main view
-    this.view = new PIXI.Container();
-    this.view.addChild(getWorldBackground(this));
-    this.stage.addChild(this.view);
-
     // async load ui window
+    this.mainView = new MainView(this);
     this.startUI = new StartUI(this);
     this.leaderBoardUI = new LeaderBoardUI(this);
     this.propAddUI = new PropAddUI(this);
@@ -86,8 +54,11 @@ CWorld.prototype.getSelf = function()
     return this.connid ?  this.players[this.connid] : null;
 };
 
-CWorld.prototype.updateUI = function()
+CWorld.prototype.updateView = function()
 {
+    if (this.mainView) {
+        this.mainView.update();
+    }
     if (this.startUI) {
         this.startUI.update();
     }
@@ -97,23 +68,6 @@ CWorld.prototype.updateUI = function()
     if (this.propAddUI) {
         this.propAddUI.update();
     }
-};
-
-CWorld.prototype.updateCamera = function()
-{
-    var player = this.getSelf();
-    if (!player) {
-        return;
-    }
-
-    var x = player.x;
-    var y = player.y;
-    var viewCenterX = this.viewW / 2;
-    var viewCenterY = this.viewH / 2;
-    x = Util.clamp(x, viewCenterX, this.w - viewCenterX);
-    y = Util.clamp(y, viewCenterY, this.h - viewCenterY);
-    this.view.x = viewCenterX - x;
-    this.view.y = viewCenterY - y;
 };
 
 CWorld.prototype.updateDieAnimations = function()
@@ -180,8 +134,7 @@ CWorld.prototype.update = function()
     }
 
     // view
-    this.updateCamera();
-    this.updateUI();
+    this.updateView();
     this.renderer.render(this.stage);
 };
 

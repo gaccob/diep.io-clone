@@ -38,7 +38,7 @@ function LeaderBoardUI(world)
     this.exps = {};
 
     this.ui = new PIXI.Container();
-    this.ui.x = this.world.viewW - cfg.width - cfg.paddingX;
+    this.ui.x = this.world.cw - cfg.width - cfg.paddingX;
     this.ui.y = 0;
     this.world.stage.addChild(this.ui);
 }

@@ -99,8 +99,6 @@ function AISpawner(world)
         commander.connid = "ai-" + i;
         commander.join = new this.world.proto.SyncCommander.Join();
         commander.join.name = getRandomAIName();
-        commander.join.viewW = 800;
-        commander.join.viewH = 600;
         commander.join.ai = true;
         this.world.commander.push(this.world.frame + 1, commander);
     }

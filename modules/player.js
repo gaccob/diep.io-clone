@@ -26,13 +26,11 @@ function initPlayerTankData(player)
     player.lastSyncRotationFrame = 0;
 }
 
-function Player(world, connid, name, viewW, viewH)
+function Player(world, connid, name)
 {
     this.world = world;
     this.name = name;
     this.connid = connid;
-    this.viewW = viewW;
-    this.viewH = viewH;
 
     initPlayerTankData(this);
 
@@ -121,7 +119,7 @@ Player.prototype.operMove = function(x, y)
     if (!this.tank) {
         return;
     }
-    var targetPos = new Victor(x - this.world.view.x, y - this.world.view.y);
+    var targetPos = this.world.mainView.getWorldPosition(x, y);
     var dir = targetPos.subtract(new Victor(this.tank.x, this.tank.y));
     var angle = dir.angle() + Math.PI / 2;
     if (Math.abs(this.controlRotation - angle) > Util.epsilon) {
@@ -154,10 +152,10 @@ Player.prototype.createTank = function()
 
     this.bindTank(tank);
 
-    var px = (this.world.w - this.viewW) / 2;
-    var py = (this.world.h - this.viewH) / 2;
-    tank.x = this.world.randomBetween(0, px) + this.viewW / 2;
-    tank.y = this.world.randomBetween(0, py) + this.viewH / 2;
+    var px = (this.world.w - this.world.cw) / 2;
+    var py = (this.world.h - this.world.ch) / 2;
+    tank.x = px + this.world.randomBetween(0, this.world.cw);
+    tank.y = py + this.world.randomBetween(0, this.world.ch);
 
     this.world.addUnit(tank);
 
@@ -224,8 +222,6 @@ Player.prototype.dump = function()
     var p = new this.world.proto.Player();
     p.connid = this.connid;
     p.name = this.name;
-    p.vw = this.viewW;
-    p.vh = this.viewH;
     if (this.tank) {
         p.id = this.tank.id;
         p.die = false;
@@ -238,8 +234,6 @@ Player.prototype.dump = function()
 Player.prototype.load = function(p)
 {
     this.name = p.name;
-    this.viewW = p.vw;
-    this.viewH = p.vH;
 
     // player die
     if (p.die === true) {

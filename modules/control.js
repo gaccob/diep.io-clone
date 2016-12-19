@@ -101,14 +101,9 @@ Control.prototype.handleMouseMove = function()
 
 Control.prototype.handleMouseClick = function()
 {
-    var world = this.world;
-    world.view.interactive = true;
-    world.view.on('click', function() {
-        var player = world.getSelf();
-        if (player) {
-            player.operFire();
-        }
-    });
+    if (this.world.mainView) {
+        this.world.mainView.handleMouseClick();
+    }
 };
 
 

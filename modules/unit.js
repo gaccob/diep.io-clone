@@ -2,7 +2,7 @@
 
 var HpBar = require("../ui/hpbar");
 var Motion = require("../modules/motion");
-var NameBar = require("../ui/namebar");
+var NameBar = require("../ui/nameBar");
 var Package = require("../package.json");
 var Util = require("../modules/util");
 var View = require("../modules/view");

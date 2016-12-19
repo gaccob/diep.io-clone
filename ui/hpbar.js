@@ -51,7 +51,7 @@ function HpBar(world, owner, display)
     this.ui.scale.x = cfg.scaleXRatio * w / cfg.w;
     this.ui.scale.y = cfg.scaleYRatio * w / cfg.w;
 
-    this.world.view.addChild(this.ui);
+    this.world.mainView.addChild(this.ui);
 }
 
 HpBar.prototype = {

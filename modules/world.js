@@ -21,6 +21,10 @@ function World(isLocal)
     this.w = Package.app.world.w;
     this.h = Package.app.world.h;
 
+    // cient width & height (in view)
+    this.cw = Package.app.world.cw;
+    this.ch = Package.app.world.ch;
+
     this.spawnRegion = {};
     this.spawnRegion.x = this.w * (1.0 - Package.app.world.obstacleRegion.wRatio) / 2;
     this.spawnRegion.w = this.w * Package.app.world.obstacleRegion.wRatio;
@@ -108,9 +112,9 @@ World.prototype.randomBetween = function(min, max)
     return Math.floor(this.random() * (max - min) + min);
 };
 
-World.prototype.addPlayer = function(connid, name, viewW, viewH)
+World.prototype.addPlayer = function(connid, name)
 {
-    var player = new Player(this, connid, name, viewW, viewH);
+    var player = new Player(this, connid, name);
     this.players[connid] = player;
     this.playerCount ++;
     Util.logDebug("frame[" + this.frame + "] add player:" + connid);

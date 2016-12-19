@@ -125,8 +125,8 @@ function PropAddUI(world)
     addPropBar(this, pt.PT_RELOAD, "Reload");
     addPropBar(this, pt.PT_MOVEMENT_SPEED, "Speed");
 
-    this.x = (this.world.viewW - this.ui.width) / 2;
-    this.y = (this.world.viewH - this.ui.height) - 10;
+    this.x = (this.world.cw - this.ui.width) / 2;
+    this.y = (this.world.ch - this.ui.height) - 10;
 
     this.ui.visible = false;
     this.world.stage.addChild(this.ui);
@@ -177,7 +177,7 @@ PropAddUI.prototype.update = function()
     // visible if any free skill points
     var player = this.world.getSelf();
     if (player && player.tank && player.tank.freeSkillPoints > 0) {
-        this.y = (this.world.viewH - this.ui.height) - 10;
+        this.y = (this.world.ch - this.ui.height) - 10;
         this.ui.visible = true;
         this.lastVisibleFrame = this.world.frame;
     } else {

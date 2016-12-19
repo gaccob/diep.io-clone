@@ -51,8 +51,6 @@ SDispatcher.prototype.onStartReq = function(client, pkg)
     commander.connid = client.id;
     commander.join = new this.world.proto.SyncCommander.Join();
     commander.join.name = pkg.syncStartReq.name;
-    commander.join.viewW = pkg.syncStartReq.viewW;
-    commander.join.viewH = pkg.syncStartReq.viewH;
     commander.join.ai = false;
     this.world.commander.push(this.world.frame + 1, commander);
 };

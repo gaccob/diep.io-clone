@@ -43,12 +43,10 @@ Synchronizer.prototype.sendPkg = function(socket, body, cmd, result)
     }
 };
 
-Synchronizer.prototype.syncStartReq = function(name, viewW, viewH)
+Synchronizer.prototype.syncStartReq = function(name)
 {
     var req = new this.world.proto.SyncStartReq();
     req.name = name;
-    req.viewH = viewH;
-    req.viewW = viewW;
     this.sendPkg(this.world.socket, req, this.cmd.SYNC_START_REQ);
 };
 
