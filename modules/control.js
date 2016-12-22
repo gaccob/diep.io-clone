@@ -49,8 +49,8 @@ Control.prototype.handleKeyDown = function()
             case 54:
             case 55:
             case 56:
-                if (world.propAddUI) {
-                    world.propAddUI.addProp(e.keyCode - 48);
+                if (world.propAddView) {
+                    world.propAddView.addProp(e.keyCode - 48);
                 }
                 break;
         }

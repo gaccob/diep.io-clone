@@ -1,11 +1,12 @@
 (function(){ "use strict";
 
-var HpBar = require("../ui/hpbar");
+var HpBarView = require("../view/hpBarView");
+var NameView = require("../view/nameView");
+var ObjectView = require("../view/objectView");
+
 var Motion = require("../modules/motion");
-var NameBar = require("../ui/nameBar");
 var Package = require("../package.json");
 var Util = require("../modules/util");
-var View = require("../modules/view");
 
 function Unit(world, type, cfg)
 {
@@ -16,9 +17,14 @@ function Unit(world, type, cfg)
     this.type = type;
     this.cfg = cfg;
     this.motion = new Motion(this, this.cfg.velocity);
+
+    // view
     if (world.isLocal === true) {
-        this.view = new View(this);
+        this.view = new ObjectView(this);
+        this.hpBarView = null;
+        this.nameView = null;
     }
+
     this.rotation = 0;
     this.viewRotation = null;
     this.bulletResist = (this.cfg.bulletResist || 0);
@@ -55,32 +61,29 @@ function Unit(world, type, cfg)
     this._y = 0;
 
     this._damage = (this.cfg.damage || 0);
-
-    this._hpbar = null;
-    this._namebar = null;
 }
 
 Unit.prototype = {
     constructor: Unit,
 };
 
-Unit.prototype.addHpBar = function(visible)
+Unit.prototype.addHpBarView = function(visible)
 {
     if (this.world.isLocal === true) {
-        if (this._hpbar) {
-            delete this._hpbar;
+        if (this.hpBarView) {
+            delete this.hpBarView;
         }
-        this._hpbar = new HpBar(this.world, this, visible);
+        this.hpBarView = new HpBarView(this.world, this, visible);
     }
 };
 
-Unit.prototype.addNameBar = function()
+Unit.prototype.addNameView = function()
 {
     if (this.world.isLocal === true) {
-        if (this._namebar) {
-            delete this._namebar;
+        if (this.nameView) {
+            delete this.nameView;
         }
-        this._namebar = new NameBar(this.world, this);
+        this.nameView = new NameView(this.world, this);
     }
 };
 
@@ -152,12 +155,12 @@ Unit.prototype.die = function()
 {
     this.isDead = true;
 
-    if (this._hpbar) {
-        this._hpbar.die();
+    if (this.hpBarView) {
+        this.hpBarView.die();
     }
 
-    if (this._namebar) {
-        this._namebar.die();
+    if (this.nameView) {
+        this.nameView.die();
     }
 
     if (this.view) {
@@ -201,13 +204,11 @@ Unit.prototype.update = function()
     if (this.view) {
         this.view.update();
     }
-
-    if (this._hpbar) {
-        this._hpbar.update(this.hp / this.maxHp);
+    if (this.hpBarView) {
+        this.hpBarView.update(this.hp / this.maxHp);
     }
-
-    if (this._namebar && this.player) {
-        this._namebar.update(this.player.name);
+    if (this.nameView && this.player) {
+        this.nameView.update(this.player.name);
     }
 };
 
@@ -258,12 +259,12 @@ Unit.prototype.load = function(u)
     this.motion.forceAngle = u.motion.forceAngle;
     this.motion.force = u.motion.force;
 
-    if (this._hpbar) {
-        this._hpbar.update(this.hp / this.maxHp);
+    if (this.hpBarView) {
+        this.hpBarView.update(this.hp / this.maxHp);
     }
 
-    if (this._namebar && this.player) {
-        this._namebar.update(this.player.name);
+    if (this.nameView && this.player) {
+        this.nameView.update(this.player.name);
     }
     if (this.type == Util.unitType.bullet) {
         this.bornFrame = u.bornFrame;

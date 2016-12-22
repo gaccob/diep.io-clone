@@ -3,7 +3,7 @@
 var Victor = require("victor");
 var Bullet = require("../modules/bullet");
 var Util = require("../modules/util");
-var View = require("../modules/view");
+var ObjectView = require("../view/objectView");
 
 function Weapon(world, tank, name)
 {
@@ -16,7 +16,7 @@ function Weapon(world, tank, name)
     this.fireFrame = world.frame + this.cfg.shootDelayFrame;
 
     if (this.world.isLocal === true) {
-        this.view = new View(this);
+        this.view = new ObjectView(this);
     }
 
     this.offset = new Victor(0, - this.cfg.shootOffset);

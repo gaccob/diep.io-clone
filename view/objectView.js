@@ -93,7 +93,7 @@ function drawTank(view, me)
     view.world.mainView.addChild(view.sprite);
 }
 
-function View(owner)
+function ObjectView(owner)
 {
     this.owner = owner;
     this.cfg = this.owner.cfg.view;
@@ -117,11 +117,11 @@ function View(owner)
     }
 }
 
-View.prototype = {
-    constructor: View,
+ObjectView.prototype = {
+    constructor: ObjectView,
 };
 
-View.prototype.onDie = function()
+ObjectView.prototype.onDie = function()
 {
     if (this.owner.type == Util.unitType.bullet
         || this.owner.type == Util.unitType.obstacle
@@ -130,7 +130,7 @@ View.prototype.onDie = function()
     }
 };
 
-View.prototype.update = function()
+ObjectView.prototype.update = function()
 {
     this.x = this.owner.x;
     this.y = this.owner.y;
@@ -141,7 +141,7 @@ View.prototype.update = function()
     }
 };
 
-Object.defineProperties(View.prototype, {
+Object.defineProperties(ObjectView.prototype, {
     x: {
         get: function() { return this.sprite.x; },
         set: function(v) { this.sprite.x = v; }
@@ -170,6 +170,6 @@ Object.defineProperties(View.prototype, {
     },
 });
 
-module.exports = View;
+module.exports = ObjectView;
 
 })();

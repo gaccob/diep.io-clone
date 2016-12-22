@@ -17,7 +17,7 @@ var cfg = {
     },
 };
 
-function HpBar(world, owner, display)
+function HpBarView(world, owner, display)
 {
     this.world = world;
     this.owner = owner;
@@ -41,43 +41,43 @@ function HpBar(world, owner, display)
     this.frontSprite.anchor.x = 0.5;
     this.frontSprite.anchor.y = 0.5;
 
-    this.ui = new PIXI.Container();
-    this.ui.addChild(this.backSprite);
-    this.ui.addChild(this.frontSprite);
-    this.ui.alpha = cfg.alpha;
+    this.view = new PIXI.Container();
+    this.view.addChild(this.backSprite);
+    this.view.addChild(this.frontSprite);
+    this.view.alpha = cfg.alpha;
 
     var holder = this.owner;
     var w = 2 * holder.radius;
-    this.ui.scale.x = cfg.scaleXRatio * w / cfg.w;
-    this.ui.scale.y = cfg.scaleYRatio * w / cfg.w;
+    this.view.scale.x = cfg.scaleXRatio * w / cfg.w;
+    this.view.scale.y = cfg.scaleYRatio * w / cfg.w;
 
-    this.world.mainView.addChild(this.ui);
+    this.world.mainView.addChild(this.view);
 }
 
-HpBar.prototype = {
-    constructor: HpBar,
+HpBarView.prototype = {
+    constructor: HpBarView,
 };
 
-HpBar.prototype.die = function()
+HpBarView.prototype.die = function()
 {
-    if (this.ui && this.ui.parent) {
-        this.ui.parent.removeChild(this.ui);
+    if (this.view && this.view.parent) {
+        this.view.parent.removeChild(this.view);
     }
     this.frontSprite = null;
     this.backSprite = null;
-    this.ui = null;
+    this.view = null;
 };
 
-HpBar.prototype.update = function(percent)
+HpBarView.prototype.update = function(percent)
 {
-    if (this.ui) {
-        this.ui.x = this.owner.x + this.owner.radius * cfg.xOffsetRatio;
-        this.ui.y = this.owner.y + this.owner.radius * cfg.yOffsetRatio;
+    if (this.view) {
+        this.view.x = this.owner.x + this.owner.radius * cfg.xOffsetRatio;
+        this.view.y = this.owner.y + this.owner.radius * cfg.yOffsetRatio;
 
         if (Math.abs(percent - 1) < 1e-6 && this.display === false) {
-            this.ui.visible = false;
+            this.view.visible = false;
         } else {
-            this.ui.visible = true;
+            this.view.visible = true;
         }
 
         if (this.percent != percent) {
@@ -89,6 +89,7 @@ HpBar.prototype.update = function(percent)
     }
 };
 
-module.exports = HpBar;
+module.exports = HpBarView;
 
 })();
+

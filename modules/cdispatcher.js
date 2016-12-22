@@ -53,9 +53,6 @@ CDispatcher.prototype.onStartRes = function(message)
         return;
     }
 
-    // start UI
-    this.world.startUI.visible = false;
-
     // world
     this.world.start();
     this.world.frame = message.frame;

@@ -1,33 +1,36 @@
 (function() { 'use strict';
 
-function initNameInput(startUI)
+function setNameInputCenter(startView)
 {
-    startUI.raw = true;
-
     var w = document.documentElement.clientWidth;
     var h = document.documentElement.clientHeight;
-
-    startUI.nameInput.style.width = w / 2 + 'px';
-    startUI.nameInput.style.height = '30px';
-    startUI.nameInput.value = "input your name and press Enter..";
-    startUI.nameInput.style.color = "gray";
-
-    var nw = parseInt(startUI.nameInput.style.width);
-    var nh = parseInt(startUI.nameInput.style.height);
-    startUI.nameContainer.style.left = (w - nw) / 2 + 'px';
-    startUI.nameContainer.style.top = (h - nh) / 2 + 'px';
+    var nw = parseInt(startView.nameInput.style.width);
+    var nh = parseInt(startView.nameInput.style.height);
+    startView.nameContainer.style.left = (w - nw) / 2 + 'px';
+    startView.nameContainer.style.top = (h - nh) / 2 + 'px';
 }
 
-function focusNameInput(startUI)
+function initNameInput(startView)
 {
-    if (startUI.raw === true) {
-        startUI.nameInput.value = "";
-        startUI.nameInput.style.color = "";
-        startUI.raw = false;
+    startView.raw = true;
+    var w = document.documentElement.clientWidth;
+    startView.nameInput.style.width = w / 2 + 'px';
+    startView.nameInput.style.height = '30px';
+    startView.nameInput.value = "input your name and press Enter..";
+    startView.nameInput.style.color = "gray";
+    setNameInputCenter(startView);
+}
+
+function focusNameInput(startView)
+{
+    if (startView.raw === true) {
+        startView.nameInput.value = "";
+        startView.nameInput.style.color = "";
+        startView.raw = false;
     }
 }
 
-function StartUI(world)
+function StartView(world)
 {
     this.world = world;
     this.lastHideStatus = false;
@@ -44,21 +47,21 @@ function StartUI(world)
     this.nameInput.style["padding-right"] = '5px';
     this.nameContainer.appendChild(this.nameInput);
 
-    var startUI = this;
-    initNameInput(startUI);
+    var startView = this;
+    initNameInput(startView);
 
     this.nameInput.onclick = function() {
-        focusNameInput(startUI);
+        focusNameInput(startView);
     };
 
     this.nameInput.onkeydown = function(e) {
         if (e.keyCode != 13) {
-            focusNameInput(startUI);
+            focusNameInput(startView);
             return;
         }
 
-        var name = startUI.nameInput.value.trim();
-        if (startUI.raw === true) {
+        var name = startView.nameInput.value.trim();
+        if (startView.raw === true) {
             name = "guest";
         } else if (name.length === 0) {
             name = "guest";
@@ -66,20 +69,23 @@ function StartUI(world)
             name = name.substring(0, 10);
         }
 
-        if (world.inited === false) {
-            world.init();
-            world.synchronizer.syncStartReq(name);
-        } else {
-            world.synchronizer.syncReborn(name);
-        }
+        world.onStartNameInput(name);
     };
+
+    // view adapt
+    var _this = this;
+    window.addEventListener('resize', function() {
+        if (_this.lastHideStatus === false) {
+            setNameInputCenter(_this);
+        }
+    });
 }
 
-StartUI.prototype = {
-    constructor: StartUI
+StartView.prototype = {
+    constructor: StartView
 };
 
-StartUI.prototype.update = function()
+StartView.prototype.update = function()
 {
     // hide status
     var hide = false;
@@ -102,7 +108,7 @@ StartUI.prototype.update = function()
     }
 };
 
-module.exports = StartUI;
+module.exports = StartView;
 
 })();
 

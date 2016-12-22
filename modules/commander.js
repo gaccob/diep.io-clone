@@ -141,8 +141,8 @@ Commander.prototype.exeAddProp = function(commander)
         return false;
     }
     -- player.tank.freeSkillPoints;
-    if (this.world.propAddUI) {
-        this.world.propAddUI.onPropAdd(pt);
+    if (this.world.propAddView) {
+        this.world.propAddView.onPropAdd(pt);
     }
     return true;
 };

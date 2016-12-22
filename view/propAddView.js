@@ -1,6 +1,6 @@
 (function(){ "use strict";
 
-var ProgressBar = require("../ui/progressBar");
+var ProgressView = require("../view/progressView");
 var Util = require("../modules/util");
 
 var cfg = {
@@ -35,7 +35,7 @@ var cfg = {
             alpha: 0.8,
         },
 
-        progressBar: {
+        progressView: {
             x: 10,
             y: 30,
             height: 12,
@@ -72,13 +72,13 @@ function addPropBar(container, prop, name)
     bgSprite.alpha = cfg.panel.bg.alpha;
     panel.addChild(bgSprite);
 
-    var progressBar = new ProgressBar(cfg.points, frontColor);
-    progressBar.setWidth(cfg.panel.progressBar.width);
-    progressBar.setHeight(cfg.panel.progressBar.height);
-    progressBar.x = cfg.panel.progressBar.x;
-    progressBar.y = cfg.panel.progressBar.y;
-    panel.addChild(progressBar.sprite);
-    container.progressBars[prop] = progressBar;
+    var progressView = new ProgressView(cfg.points, frontColor);
+    progressView.setWidth(cfg.panel.progressView.width);
+    progressView.setHeight(cfg.panel.progressView.height);
+    progressView.x = cfg.panel.progressView.x;
+    progressView.y = cfg.panel.progressView.y;
+    panel.addChild(progressView.view);
+    container.progressViews[prop] = progressView;
 
     var text = new PIXI.Text(name + " [" + prop + "]", {
         fill: cfg.panel.text.fill,
@@ -102,18 +102,18 @@ function addPropBar(container, prop, name)
         panel.x = cfg.panel.padding + (prop - 1 - col) * (cfg.panel.bg.width + cfg.panel.padding);
         panel.y = cfg.panel.padding + cfg.panel.bg.height + cfg.panel.padding;
     }
-    container.ui.addChild(panel);
+    container.view.addChild(panel);
 
     // click event
     panel.interactive = true;
     panel.on('click', function() { container.addProp(prop); });
 }
 
-function PropAddUI(world)
+function PropAddView(world)
 {
     this.world = world;
-    this.ui = new PIXI.Container();
-    this.progressBars = {};
+    this.view = new PIXI.Container();
+    this.progressViews = {};
 
     var pt = this.world.proto.PropType;
     addPropBar(this, pt.PT_HEALTH_REGEN, "HP Regen");
@@ -125,22 +125,22 @@ function PropAddUI(world)
     addPropBar(this, pt.PT_RELOAD, "Reload");
     addPropBar(this, pt.PT_MOVEMENT_SPEED, "Speed");
 
-    this.x = (this.world.cw - this.ui.width) / 2;
-    this.y = (this.world.ch - this.ui.height) - 10;
+    this.x = (this.world.cw - this.view.width) / 2;
+    this.y = (this.world.ch - this.view.height) - 10;
 
-    this.ui.visible = false;
-    this.world.stage.addChild(this.ui);
+    this.view.visible = false;
+    this.world.stage.addChild(this.view);
 
     this.lastVisibleFrame = 0;
 }
 
-PropAddUI.prototype = {
-    constructor: PropAddUI
+PropAddView.prototype = {
+    constructor: PropAddView
 };
 
-PropAddUI.prototype.addProp = function(propType)
+PropAddView.prototype.addProp = function(propType)
 {
-    if (this.ui.visible !== true) {
+    if (this.view.visible !== true) {
         return;
     }
     var player = this.world.getSelf();
@@ -150,9 +150,9 @@ PropAddUI.prototype.addProp = function(propType)
     this.world.synchronizer.syncAddProp(propType);
 };
 
-PropAddUI.prototype.onPropAdd = function(propType)
+PropAddView.prototype.onPropAdd = function(propType)
 {
-    var pb = this.progressBars[propType];
+    var pb = this.progressViews[propType];
     if (!pb) {
         Util.logError("invalid prop type=" + propType);
         return;
@@ -160,47 +160,47 @@ PropAddUI.prototype.onPropAdd = function(propType)
     pb.setProgress(pb.getProgress() + 1);
 };
 
-PropAddUI.prototype.reset = function()
+PropAddView.prototype.reset = function()
 {
-    for (var i in this.progressBars) {
-        this.progressBars[i].setProgress(0);
+    for (var i in this.progressViews) {
+        this.progressViews[i].setProgress(0);
     }
 };
 
-PropAddUI.prototype.update = function()
+PropAddView.prototype.update = function()
 {
     if (this.world.started !== true) {
-        this.ui.visible = false;
+        this.view.visible = false;
         return;
     }
 
     // visible if any free skill points
     var player = this.world.getSelf();
     if (player && player.tank && player.tank.freeSkillPoints > 0) {
-        this.y = (this.world.ch - this.ui.height) - 10;
-        this.ui.visible = true;
+        this.y = (this.world.ch - this.view.height) - 10;
+        this.view.visible = true;
         this.lastVisibleFrame = this.world.frame;
     } else {
         var delay = 20;
         if (this.world.frame > this.lastVisibleFrame + delay) {
-            this.ui.visible = false;
+            this.view.visible = false;
         } else {
-            this.y += this.ui.height / delay;
+            this.y += this.view.height / delay;
         }
     }
 };
 
-Object.defineProperties(PropAddUI.prototype, {
+Object.defineProperties(PropAddView.prototype, {
     x: {
-        get: function() { return this.ui.x; },
-        set: function(v) { this.ui.x = v; }
+        get: function() { return this.view.x; },
+        set: function(v) { this.view.x = v; }
     },
     y: {
-        get: function() { return this.ui.y; },
-        set: function(v) { this.ui.y = v; }
+        get: function() { return this.view.y; },
+        set: function(v) { this.view.y = v; }
     },
 });
 
-module.exports = PropAddUI;
+module.exports = PropAddView;
 
 })();

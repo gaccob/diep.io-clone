@@ -27,7 +27,7 @@ var cfg = {
     updateFrame: 30,
 };
 
-function LeaderBoardUI(world)
+function TopView(world)
 {
     this.world = world;
 
@@ -37,17 +37,17 @@ function LeaderBoardUI(world)
     this.expLabels = {};
     this.exps = {};
 
-    this.ui = new PIXI.Container();
-    this.ui.x = this.world.cw - cfg.width - cfg.paddingX;
-    this.ui.y = 0;
-    this.world.stage.addChild(this.ui);
+    this.view = new PIXI.Container();
+    this.view.x = this.world.cw - cfg.width - cfg.paddingX;
+    this.view.y = 0;
+    this.world.stage.addChild(this.view);
 }
 
-LeaderBoardUI.prototype = {
-    constructor: LeaderBoardUI
+TopView.prototype = {
+    constructor: TopView
 };
 
-LeaderBoardUI.prototype.addLabel = function(player, rank)
+TopView.prototype.addLabel = function(player, rank)
 {
     if (!player || rank < 0 || rank >= this.topCount) {
         Util.logError("invald player rank=" + rank + 1);
@@ -84,16 +84,16 @@ LeaderBoardUI.prototype.addLabel = function(player, rank)
     label.scale.y = cfg.height / label.height;
 
     this.labels[player.connid] = label;
-    this.ui.addChild(label);
+    this.view.addChild(label);
     return label;
 };
 
-LeaderBoardUI.prototype.update = function()
+TopView.prototype.update = function()
 {
     if (this.world.playerCount <= 0) {
         return;
     }
-    this.ui.visible = true;
+    this.view.visible = true;
 
     if (this.world.frame < this.lastUpdateFrame + cfg.updateFrame) {
         return;
@@ -104,7 +104,7 @@ LeaderBoardUI.prototype.update = function()
     for (var idx in this.labels) {
         label = this.labels[idx];
         if (label) {
-            this.ui.removeChild(label);
+            this.view.removeChild(label);
         }
     }
     this.labels = [];
@@ -123,7 +123,7 @@ LeaderBoardUI.prototype.update = function()
     }
 };
 
-module.exports = LeaderBoardUI;
+module.exports = TopView;
 
 })();
 

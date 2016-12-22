@@ -63,7 +63,7 @@ function MainView(world)
     // renderer
     this.renderer = new PIXI.CanvasRenderer(this.w, this.h, {
         antialias: true,
-        roundPixels: false 
+        roundPixels: false
     });
     this.renderer.view.id = "canvas";
     document.body.appendChild(this.renderer.view);

@@ -8,10 +8,10 @@ var CDispatcher = require("../modules/cdispatcher");
 var World = require("../modules/world");
 var Util = require("../modules/util");
 
-var MainView = require("../ui/main");
-var LeaderBoardUI = require("../ui/leaderBoard");
-var PropAddUI = require("../ui/propAdd");
-var StartUI = require("../ui/start");
+var MainView = require("../view/mainView");
+var TopView = require("../view/topView");
+var PropAddView = require("../view/propAddView");
+var StartView = require("../view/startView");
 
 function CWorld()
 {
@@ -20,11 +20,11 @@ function CWorld()
     // stage
     this.stage = new PIXI.Container();
 
-    // async load ui window
+    // async load view
     this.mainView = new MainView(this);
-    this.startUI = new StartUI(this);
-    this.leaderBoardUI = new LeaderBoardUI(this);
-    this.propAddUI = new PropAddUI(this);
+    this.startView = new StartView(this);
+    this.topView = new TopView(this);
+    this.propAddView = new PropAddView(this);
 
     this.dieSprites = [];
 
@@ -49,14 +49,14 @@ CWorld.prototype.getSelf = function()
 
 CWorld.prototype.updateView = function()
 {
-    if (this.startUI) {
-        this.startUI.update();
+    if (this.startView) {
+        this.startView.update();
     }
-    if (this.leaderBoardUI) {
-        this.leaderBoardUI.update();
+    if (this.topView) {
+        this.topView.update();
     }
-    if (this.propAddUI) {
-        this.propAddUI.update();
+    if (this.propAddView) {
+        this.propAddView.update();
     }
     if (this.mainView) {
         this.mainView.update();
@@ -128,6 +128,16 @@ CWorld.prototype.update = function()
 
     // view
     this.updateView();
+};
+
+CWorld.prototype.onStartNameInput = function(name)
+{
+    if (this.inited === false) {
+        this.init();
+        this.synchronizer.syncStartReq(name);
+    } else {
+        this.synchronizer.syncReborn(name);
+    }
 };
 
 module.exports = CWorld;

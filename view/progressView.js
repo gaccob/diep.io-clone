@@ -8,7 +8,7 @@ var cfg = {
     height: 20,
 };
 
-function ProgressBar(node, frontColor)
+function ProgressView(node, frontColor)
 {
     this.node = node;
     this.frontColor = frontColor;
@@ -23,24 +23,24 @@ function ProgressBar(node, frontColor)
         graphics.moveTo(i * cfg.width / node, cfg.stroke / 2);
         graphics.lineTo(i * cfg.width / node, cfg.height);
     }
-    this.sprite = new PIXI.Container();
+    this.view = new PIXI.Container();
 
     this.bgSprite = new PIXI.Sprite(graphics.generateTexture());
-    this.sprite.addChild(this.bgSprite);
+    this.view.addChild(this.bgSprite);
 
     this.frontSprites = [];
 }
 
-ProgressBar.prototype = {
-    constructor: ProgressBar
+ProgressView.prototype = {
+    constructor: ProgressView
 };
 
-ProgressBar.prototype.getProgress = function()
+ProgressView.prototype.getProgress = function()
 {
     return this.frontSprites.length;
 };
 
-ProgressBar.prototype.setProgress = function(progress)
+ProgressView.prototype.setProgress = function(progress)
 {
     if (progress < 0) {
         progress = 0;
@@ -61,7 +61,7 @@ ProgressBar.prototype.setProgress = function(progress)
     }
 };
 
-ProgressBar.prototype.addNode = function(index)
+ProgressView.prototype.addNode = function(index)
 {
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(cfg.stroke, cfg.bgColor);
@@ -69,40 +69,39 @@ ProgressBar.prototype.addNode = function(index)
     graphics.drawRect(cfg.stroke/2, cfg.stroke/2, cfg.width / this.node, cfg.height);
     graphics.endFill();
     var sprite = new PIXI.Sprite(graphics.generateTexture());
-
     this.frontSprites.push(sprite);
-    this.sprite.addChild(sprite);
+    this.view.addChild(sprite);
     sprite.x = index * cfg.width / this.node;
     sprite.y = 0;
 };
 
-ProgressBar.prototype.removeNode = function(index)
+ProgressView.prototype.removeNode = function(index)
 {
-    this.sprite.removeChild(this.frontSprites[index]);
+    this.view.removeChild(this.frontSprites[index]);
 };
 
-ProgressBar.prototype.setWidth = function(w)
+ProgressView.prototype.setWidth = function(w)
 {
-    this.sprite.scale.x = w / this.sprite.width;
+    this.view.scale.x = w / this.view.width;
 };
 
-ProgressBar.prototype.setHeight = function(h)
+ProgressView.prototype.setHeight = function(h)
 {
-    this.sprite.scale.y = h / this.sprite.height;
+    this.view.scale.y = h / this.view.height;
 };
 
-Object.defineProperties(ProgressBar.prototype, {
+Object.defineProperties(ProgressView.prototype, {
     x: {
-        get: function() { return this.sprite.x; },
-        set: function(v) { this.sprite.x = v; }
+        get: function() { return this.view.x; },
+        set: function(v) { this.view.x = v; }
     },
     y: {
-        get: function() { return this.sprite.y; },
-        set: function(v) { this.sprite.y = v; }
+        get: function() { return this.view.y; },
+        set: function(v) { this.view.y = v; }
     },
 });
 
-module.exports = ProgressBar;
+module.exports = ProgressView;
 
 })();
 
