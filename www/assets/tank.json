@@ -1,0 +1,252 @@
+{"frames": [
+
+{
+	"filename": "101_base.png",
+	"frame": {"x":0,"y":136,"w":101,"h":136},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":136},
+	"sourceSize": {"w":101,"h":136}
+},
+{
+	"filename": "102_machine_gun.png",
+	"frame": {"x":202,"y":136,"w":101,"h":136},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":136},
+	"sourceSize": {"w":101,"h":136}
+},
+{
+	"filename": "103_flank_guard.png",
+	"frame": {"x":420,"y":286,"w":101,"h":160},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":160},
+	"sourceSize": {"w":101,"h":160}
+},
+{
+	"filename": "104_twin_shot.png",
+	"frame": {"x":101,"y":136,"w":101,"h":136},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":136},
+	"sourceSize": {"w":101,"h":136}
+},
+{
+	"filename": "105_sniper.png",
+	"frame": {"x":0,"y":286,"w":101,"h":151},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":151},
+	"sourceSize": {"w":101,"h":151}
+},
+{
+	"filename": "106_destoryer.png",
+	"frame": {"x":303,"y":136,"w":101,"h":136},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":136},
+	"sourceSize": {"w":101,"h":136}
+},
+{
+	"filename": "107_sprayer.png",
+	"frame": {"x":771,"y":136,"w":101,"h":150},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":150},
+	"sourceSize": {"w":101,"h":150}
+},
+{
+	"filename": "108_triangle.png",
+	"frame": {"x":790,"y":286,"w":101,"h":166},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":166},
+	"sourceSize": {"w":101,"h":166}
+},
+{
+	"filename": "109_quad.png",
+	"frame": {"x":101,"y":452,"w":171,"h":171},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":171,"h":171},
+	"sourceSize": {"w":171,"h":171}
+},
+{
+	"filename": "110_twin_flank.png",
+	"frame": {"x":521,"y":286,"w":101,"h":160},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":160},
+	"sourceSize": {"w":101,"h":160}
+},
+{
+	"filename": "111_triple_shot.png",
+	"frame": {"x":732,"y":0,"w":140,"h":136},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":140,"h":136},
+	"sourceSize": {"w":140,"h":136}
+},
+{
+	"filename": "112_assasin.png",
+	"frame": {"x":0,"y":452,"w":101,"h":170},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":170},
+	"sourceSize": {"w":101,"h":170}
+},
+{
+	"filename": "113_overseer.png",
+	"frame": {"x":0,"y":0,"w":101,"h":131},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":131},
+	"sourceSize": {"w":101,"h":131}
+},
+{
+	"filename": "114_destroyer_2.png",
+	"frame": {"x":404,"y":136,"w":101,"h":138},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":138},
+	"sourceSize": {"w":101,"h":138}
+},
+{
+	"filename": "115_sprayer_2.png",
+	"frame": {"x":101,"y":286,"w":101,"h":151},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":151},
+	"sourceSize": {"w":101,"h":151}
+},
+{
+	"filename": "116_triangle_2.png",
+	"frame": {"x":373,"y":452,"w":121,"h":182},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":121,"h":182},
+	"sourceSize": {"w":121,"h":182}
+},
+{
+	"filename": "117_octo_tank.png",
+	"frame": {"x":622,"y":286,"w":168,"h":163},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":168,"h":163},
+	"sourceSize": {"w":168,"h":163}
+},
+{
+	"filename": "118_tripet.png",
+	"frame": {"x":505,"y":136,"w":101,"h":145},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":145},
+	"sourceSize": {"w":101,"h":145}
+},
+{
+	"filename": "119_penta_shot.png",
+	"frame": {"x":303,"y":286,"w":117,"h":156},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":117,"h":156},
+	"sourceSize": {"w":117,"h":156}
+},
+{
+	"filename": "120_ranger.png",
+	"frame": {"x":272,"y":452,"w":101,"h":175},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":175},
+	"sourceSize": {"w":101,"h":175}
+},
+{
+	"filename": "121_overload.png",
+	"frame": {"x":101,"y":0,"w":132,"h":133},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":132,"h":133},
+	"sourceSize": {"w":132,"h":133}
+},
+{
+	"filename": "122_necromanc.png",
+	"frame": {"x":637,"y":0,"w":95,"h":135},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":95,"h":135},
+	"sourceSize": {"w":95,"h":135}
+},
+{
+	"filename": "123_triple_flank.png",
+	"frame": {"x":645,"y":452,"w":212,"h":182},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":212,"h":182},
+	"sourceSize": {"w":212,"h":182}
+},
+{
+	"filename": "124_trapper.png",
+	"frame": {"x":536,"y":0,"w":101,"h":135},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":135},
+	"sourceSize": {"w":101,"h":135}
+},
+{
+	"filename": "125_tri_trapper.png",
+	"frame": {"x":606,"y":136,"w":165,"h":149},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":165,"h":149},
+	"sourceSize": {"w":165,"h":149}
+},
+{
+	"filename": "126_gunner_trapper.png",
+	"frame": {"x":202,"y":286,"w":101,"h":153},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":153},
+	"sourceSize": {"w":101,"h":153}
+},
+{
+	"filename": "127_mega_trapper.png",
+	"frame": {"x":334,"y":0,"w":101,"h":134},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":134},
+	"sourceSize": {"w":101,"h":134}
+},
+{
+	"filename": "128_gunner.png",
+	"frame": {"x":435,"y":0,"w":101,"h":134},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":134},
+	"sourceSize": {"w":101,"h":134}
+},
+{
+	"filename": "129_gunner_2.png",
+	"frame": {"x":233,"y":0,"w":101,"h":134},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":101,"h":134},
+	"sourceSize": {"w":101,"h":134}
+},
+{
+	"filename": "130_fighter.png",
+	"frame": {"x":494,"y":452,"w":151,"h":182},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":151,"h":182},
+	"sourceSize": {"w":151,"h":182}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "tank.png",
+	"format": "RGBA8888",
+	"size": {"w":891,"h":634},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:525b449096b46c064bf1cf0cfc1f3e8f:51e9a282c88d08fc6640075fe3fa4c92:e5746570371ae3e0565b6e20f5a72ab3$"
+}
+}

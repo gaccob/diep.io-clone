@@ -18,6 +18,7 @@ v0.2
 - add npm script to build & run
 - lockstep pvp logic
 - add unit properties
+- view & module
 
 TODO
 =====

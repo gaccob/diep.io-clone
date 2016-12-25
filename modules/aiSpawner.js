@@ -1,7 +1,5 @@
 (function(){ "use strict";
 
-// TODO:
-
 var aiName = [
      "尐尐孩",
      "笑.破红尘",
