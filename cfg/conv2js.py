@@ -1,4 +1,4 @@
-import sys,getopt
+import math,sys,getopt
 import xlrd
 
 ##################################################################
@@ -12,7 +12,10 @@ def output_cell(output, shift, dict, sheet, row):
         else:
             val = sheet.cell(row, v).value
             if type(val) == type(1) or type(val) == type(1.1):
-                output.append("\t" * shift + "\"" + k + "\": " + str(val) + ",")
+                if math.fabs(val - int(val)) < 1e-6:
+                    output.append("\t" * shift + "\"" + k + "\": " + str(int(val)) + ",")
+                else:
+                    output.append("\t" * shift + "\"" + k + "\": " + str(val) + ",")
             else:
                 output.append("\t" * shift + "\"" + k + "\": \"" + val + "\",")
 
