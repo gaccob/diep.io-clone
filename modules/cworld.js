@@ -17,6 +17,14 @@ function CWorld()
 {
     World.call(this, true);
 
+    // resource loader
+    this.loader = new PIXI.loaders.Loader();
+    this.loader.add('tank', 'assets/tank.json');
+    this.loader.once('complete', function(){
+        Util.logDebug("tank resource loaded");
+    });
+    this.loader.load();
+
     // stage
     this.stage = new PIXI.Container();
 

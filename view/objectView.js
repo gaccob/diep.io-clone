@@ -51,45 +51,16 @@ function drawObstacle(view)
     view.world.mainView.addChild(view.sprite);
 }
 
-function drawWeapon(view)
+function drawTank(view)
 {
-    var graphics = new PIXI.Graphics();
-    graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
-    graphics.beginFill(view.cfg.color);
-    graphics.drawRect(0, 0, view.cfg.w, view.cfg.h);
-    graphics.endFill();
-
-    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-    graphics.destroy();
-    bodySprite.anchor.x = 0.5;
-    bodySprite.anchor.y = 1.0;
-    view.sprite.addChild(bodySprite);
-}
-
-function drawTank(view, me)
-{
-    for (var idx in view.owner.weapons) {
-        var weapon = view.owner.weapons[idx];
-        view.sprite.addChild(weapon.view.sprite);
-    }
-
-    var graphics = new PIXI.Graphics();
-    graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
-
-    if (me === true) {
-        graphics.beginFill(view.cfg.body.playerColor);
-    } else {
-        graphics.beginFill(view.cfg.body.color);
-    }
-    graphics.drawCircle(0, 0, view.cfg.body.radius);
-    graphics.endFill();
-
-    var bodySprite = new PIXI.Sprite(graphics.generateTexture());
-    graphics.destroy();
-    bodySprite.anchor.x = 0.5;
-    bodySprite.anchor.y = 0.5;
-    view.sprite.addChild(bodySprite);
-
+    var tank = view.owner;
+    var spriteName = tank.cfg.sprite;
+    var sprite = new PIXI.Sprite(PIXI.Texture.fromFrame(spriteName + '.png'));
+    sprite.scale.x = 0.5;
+    sprite.scale.y = 0.5;
+    sprite.anchor.x = 0.5;
+    sprite.anchor.y = 0.625;
+    view.sprite.addChild(sprite);
     view.world.mainView.addChild(view.sprite);
 }
 
@@ -104,8 +75,6 @@ function ObjectView(owner)
         drawBullet(this);
     } else if (this.owner.type == Util.unitType.obstacle) {
         drawObstacle(this);
-    } else if (this.owner.type == Util.unitType.weapon) {
-        drawWeapon(this);
     } else if (this.owner.type == Util.unitType.tank) {
         var me = false;
         if (this.owner.player) {
@@ -113,6 +82,7 @@ function ObjectView(owner)
                 me = true;
             }
         }
+        // TODO: me
         drawTank(this, me);
     }
 }

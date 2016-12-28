@@ -23,12 +23,12 @@ function Config()
 
     this.configTanks = {};
     for (idx in configTanks) {
-        this.configTanks[configTanks[idx].alias] = configTanks[idx];
+        this.configTanks[configTanks[idx].id] = configTanks[idx];
     }
 
     this.configWeapons = {};
     for (idx in configWeapons) {
-        this.configWeapons[configWeapons[idx].alias] = configWeapons[idx];
+        this.configWeapons[configWeapons[idx].id] = configWeapons[idx];
     }
 
     this.configPropAdd = {};

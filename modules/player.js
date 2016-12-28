@@ -148,7 +148,7 @@ Player.prototype.addControl = function()
 
 Player.prototype.createTank = function()
 {
-    var tank = new Tank(this.world, "base", this);
+    var tank = new Tank(this.world, Package.app.world.initTank, this);
 
     this.bindTank(tank);
 

@@ -1,40 +1,34 @@
 (function(){ "use strict";
 
 var Victor = require("victor");
-var Bullet = require("../modules/bullet");
-var Util = require("../modules/util");
-var ObjectView = require("../view/objectView");
 
-function Weapon(world, tank, name)
+var Bullet = require("../modules/bullet");
+var Package = require("../package.json");
+var Util = require("../modules/util");
+
+function Weapon(world, tank, id)
 {
     this.world = world;
-    this.name = name;
+    this.id = id;
     this.type = Util.unitType.weapon;
 
     this.owner = tank;
-    this.cfg = world.cfg.configWeapons[name];
-    this.fireFrame = world.frame + this.cfg.shootDelayFrame;
+    this.cfg = world.cfg.configWeapons[id];
 
-    if (this.world.isLocal === true) {
-        this.view = new ObjectView(this);
-    }
+    var frameSeconds = 1.0 / Package.app.world.frame;
+    this.fireFrame = world.frame + this.cfg.shootDelaySeconds / frameSeconds;
 
     this.offset = new Victor(0, - this.cfg.shootOffset);
     this.offset.rotateDeg(this.cfg.degree)
-               .add(new Victor(this.cfg.x, this.cfg.y));
+               .add(new Victor(this.cfg.baseOffsetX, this.cfg.baseOffsetY));
 
     // rotation & position
     this.rotation = this.cfg.degree * Math.PI / 180;
-    this.x = this.cfg.x;
-    this.y = this.cfg.y;
-
-    // fire animation
-    this.fireAnimFrame = null;
-    this.originalX = this.x;
-    this.originalY = this.y;
+    this.x = this.cfg.baseOffsetX;
+    this.y = this.cfg.baseOffsetY;
 
     // reload frame interval
-    this.reloadFrame = this.cfg.reloadFrame;
+    this.reloadFrame = this.cfg.reloadSeconds / frameSeconds;
 }
 
 Weapon.prototype = {
@@ -43,28 +37,14 @@ Weapon.prototype = {
 
 Weapon.prototype.resetFireDelay = function()
 {
-    this.fireFrame = this.world.frame + this.cfg.shootDelayFrame;
+    var frameSeconds = 1.0 / Package.app.world.frame;
+    this.fireFrame = this.world.frame + this.cfg.shootDelaySeconds / frameSeconds;
 };
 
 Weapon.prototype.update = function(fire)
 {
     if (fire === true) {
         this.fire();
-    }
-
-    if (this.fireAnimFrame) {
-        var frame = this.world.frame - this.fireAnimFrame;
-        if (frame > this.cfg.fireAnimFrame) {
-            this.fireAnimFrame = null;
-        } else {
-            var delta = Math.abs(frame / this.cfg.fireAnimFrame * 2 - 1) * this.cfg.fireAnimDistance;
-            this.x = this.originalX + Math.cos(this.rotation + Math.PI / 2) * delta;
-            this.y = this.originalY + Math.sin(this.rotation + Math.PI / 2) * delta;
-        }
-    }
-
-    if (this.view) {
-        this.view.update();
     }
 };
 
@@ -73,7 +53,6 @@ Weapon.prototype.update = function(fire)
 Weapon.prototype.fireBullet = function(bullet)
 {
     this.fireFrame = this.world.frame;
-    this.fireAnimFrame = this.world.frame;
 };
 
 // for server
@@ -83,7 +62,6 @@ Weapon.prototype.fire = function()
     if (this.world.frame - this.fireFrame >= reloadFrame) {
 
         this.fireFrame = this.world.frame;
-        this.fireAnimFrame = this.world.frame;
 
         var pos = this.offset.clone();
         pos.rotate(this.owner.rotation);
@@ -96,7 +74,7 @@ Weapon.prototype.fire = function()
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
         var bulletAngle = angle + (this.world.random() * disturb - disturb / 2);
 
-        var bullet = new Bullet(this.world, this.cfg.bullet, this.owner, this.name);
+        var bullet = new Bullet(this.world, this.cfg.bullet, this.owner, this.id);
         bullet.x = pos.x;
         bullet.y = pos.y;
         bullet.motion.setIvAngle(bulletAngle);

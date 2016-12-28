@@ -427,14 +427,14 @@ World.prototype.elasticCollide = function(unit1, unit2)
     unit2.motion.ev.y += v2y;
 };
 
-World.prototype.simpleCollide = function(unit1, unit2, distRatio)
+World.prototype.simpleCollide = function(unit1, unit2)
 {
     var dir = new Victor(unit1.x - unit2.x, unit1.y - unit2.y);
     dir.norm();
     var v1 = unit1.motion.v;
     var v2 = unit2.motion.v;
-    var spring1 = unit2.cfg.velocity.springBase + (1.0 - distRatio) * unit2.cfg.velocity.springAdd;
-    var spring2 = unit1.cfg.velocity.springBase + (1.0 - distRatio) * unit1.cfg.velocity.springAdd;
+    var spring1 = unit2.cfg.velocity.spring - unit1.cfg.velocity.springResist;
+    var spring2 = unit1.cfg.velocity.spring - unit2.cfg.velocity.springResist;
 
     Util.logTrace(unit1.motion.toString());
     Util.logTrace(unit2.motion.toString());
@@ -446,7 +446,7 @@ World.prototype.simpleCollide = function(unit1, unit2, distRatio)
     Util.logTrace(unit2.motion.toString());
 };
 
-World.prototype.collide = function(unit1, unit2, distRatio)
+World.prototype.collide = function(unit1, unit2)
 {
     Util.logDebug("frame[" + this.frame + "] "
         + "unit[" + unit1.id + "][" + unit1.x + "," + unit1.y + "] "
@@ -455,7 +455,7 @@ World.prototype.collide = function(unit1, unit2, distRatio)
     Util.logTrace(unit1.toString());
     Util.logTrace(unit2.toString());
 
-    this.simpleCollide(unit1, unit2, distRatio);
+    this.simpleCollide(unit1, unit2);
     unit1.takeDamage(unit2);
     unit2.takeDamage(unit1);
 
@@ -499,7 +499,7 @@ World.prototype.updateCollision = function()
                     if (dist2 < distR * distR) {
                         unit.collideFrame = this.frame;
                         target.collideFrame = this.frame;
-                        this.collide(unit, target, dist2 / (distR * distR));
+                        this.collide(unit, target);
                     }
                 }
                 unit.collideCheckFrame = this.frame;

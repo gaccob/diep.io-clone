@@ -217,13 +217,18 @@ Unit.prototype.dump = function()
     var u = new this.world.proto.Unit();
     u.id = this.id;
     u.type = this.type;
-    u.cfgName = this.cfg.alias;
+    if (this.cfg.alias) {
+        u.cfgName = this.cfg.alias;
+    }
+    if (this.cfg.id) {
+        u.cfgId = this.cfg.id;
+    }
     u.hp = this.hp;
 
     if (this.type == Util.unitType.bullet) {
         u.ownerid = this.owner.id;
         u.bornFrame = Math.floor(this.bornFrame);
-        u.weaponName = this.weaponName;
+        u.weaponId = this.weaponId;
     }
 
     if (this.type == Util.unitType.tank) {
@@ -268,7 +273,7 @@ Unit.prototype.load = function(u)
     }
     if (this.type == Util.unitType.bullet) {
         this.bornFrame = u.bornFrame;
-        var weapon = this.owner.getWeaponByName(u.weaponName);
+        var weapon = this.owner.getWeaponById(u.weaponId);
         weapon.fireBullet(this);
     }
 
@@ -290,12 +295,19 @@ Unit.prototype.addProp = function(type)
         Util.logError("prop[" + type + "] not found");
         return false;
     }
-    ++ this.props[type];
 
-    // add value
+    // check add value
     var points = this.props[type];
     var typeStr = Util.propTypeToString(type, pt);
-    var addValue = this.world.cfg.configPropAdd[typeStr][points];
+    var addValue = this.world.cfg.configPropAdd[typeStr][points + 1];
+    if (addValue === undefined) {
+        Util.logError("prop[" + type + "] points=" + (points + 1) + " invalid ignore");
+        return true;
+    }
+
+    // add value
+    ++ this.props[type];
+    points = this.props[type];
     Util.logDebug("frame[" + this.world.frame + "] unit[" + this.id
         + "] prop[" + type + "]=" + points + " add=" + addValue);
 

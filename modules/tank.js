@@ -5,14 +5,14 @@ var Weapon = require("../modules/weapon");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Tank(world, cfgName, player)
+function Tank(world, cfgId, player)
 {
     this.autoFire = false;
     this.player = player;
     this.ai = null;
 
     this.weapons = [];
-    var cfg = world.cfg.configTanks[cfgName];
+    var cfg = world.cfg.configTanks[cfgId];
     for (var idx in cfg.weapons) {
         if (cfg.weapons[idx] !== "") {
             var weapon = new Weapon(world, this, cfg.weapons[idx]);
@@ -49,10 +49,10 @@ Tank.prototype.die = function()
     }
 };
 
-Tank.prototype.getWeaponByName = function(name)
+Tank.prototype.getWeaponById = function(id)
 {
     for (var idx in this.weapons) {
-        if (this.weapons[idx].name === name) {
+        if (this.weapons[idx].id === id) {
             return this.weapons[idx];
         }
     }

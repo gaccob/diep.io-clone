@@ -1,12 +1,13 @@
 (function(){ "use strict";
 
+var Package = require("../package.json");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Bullet(world, cfgName, owner, weaponName)
+function Bullet(world, cfgName, owner, weaponId)
 {
     this.owner = owner;
-    this.weaponName = weaponName;
+    this.weaponId = weaponId;
     this.bornFrame = world.frame;
 
     Unit.call(this, world, Util.unitType.bullet, world.cfg.configBullets[cfgName]);
@@ -17,7 +18,8 @@ Bullet.prototype.constructor = Bullet;
 
 Bullet.prototype.outOfDate = function()
 {
-    if (this.world.frame > this.bornFrame + this.cfg.durationFrame) {
+    var frameSeconds = 1.0 / Package.app.world.frame;
+    if (this.world.frame > this.bornFrame + this.cfg.lifeSeconds / frameSeconds) {
         return true;
     }
     return false;

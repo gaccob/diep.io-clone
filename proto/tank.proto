@@ -28,15 +28,16 @@ message Unit {
     optional uint32 id = 1;
     optional int32 type = 2;
     optional string cfgName = 3;
-    optional float hp = 4;
-    optional Motion motion = 5;
-    optional float rotation = 6;
-    optional uint32 ownerid = 7;            // bullets
-    optional uint32 bornFrame = 8;          // bullets
-    optional string weaponName = 9;         // bullets
-    optional string playerConnid = 10;      // tank
-    optional bool autoFire = 11;            // tank
-    repeated uint32 weaponFireFrame = 12;   // tank
+    optional int32 cfgId = 4;
+    optional float hp = 5;
+    optional Motion motion = 6;
+    optional float rotation = 7;
+    optional uint32 ownerid = 8;            // bullets
+    optional uint32 bornFrame = 9;          // bullets
+    optional int32 weaponId = 10;            // bullets
+    optional string playerConnid = 11;      // tank
+    optional bool autoFire = 12;            // tank
+    repeated uint32 weaponFireFrame = 13;   // tank
 }
 
 message Player {
@@ -45,8 +46,6 @@ message Player {
     optional string name = 3;
     optional uint64 score = 4;
     optional bool die = 5;
-    optional int32 vw = 6;
-    optional int32 vh = 7;
 }
 
 message SyncStartReq {

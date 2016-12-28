@@ -76,57 +76,63 @@
                 },
                 {
                     "rule": "optional",
+                    "type": "int32",
+                    "name": "cfgId",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
                     "type": "float",
                     "name": "hp",
-                    "id": 4
+                    "id": 5
                 },
                 {
                     "rule": "optional",
                     "type": "Motion",
                     "name": "motion",
-                    "id": 5
+                    "id": 6
                 },
                 {
                     "rule": "optional",
                     "type": "float",
                     "name": "rotation",
-                    "id": 6
-                },
-                {
-                    "rule": "optional",
-                    "type": "uint32",
-                    "name": "ownerid",
                     "id": 7
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "bornFrame",
+                    "name": "ownerid",
                     "id": 8
                 },
                 {
                     "rule": "optional",
-                    "type": "string",
-                    "name": "weaponName",
+                    "type": "uint32",
+                    "name": "bornFrame",
                     "id": 9
+                },
+                {
+                    "rule": "optional",
+                    "type": "int32",
+                    "name": "weaponId",
+                    "id": 10
                 },
                 {
                     "rule": "optional",
                     "type": "string",
                     "name": "playerConnid",
-                    "id": 10
+                    "id": 11
                 },
                 {
                     "rule": "optional",
                     "type": "bool",
                     "name": "autoFire",
-                    "id": 11
+                    "id": 12
                 },
                 {
                     "rule": "repeated",
                     "type": "uint32",
                     "name": "weaponFireFrame",
-                    "id": 12
+                    "id": 13
                 }
             ]
         },
@@ -162,18 +168,6 @@
                     "type": "bool",
                     "name": "die",
                     "id": 5
-                },
-                {
-                    "rule": "optional",
-                    "type": "int32",
-                    "name": "vw",
-                    "id": 6
-                },
-                {
-                    "rule": "optional",
-                    "type": "int32",
-                    "name": "vh",
-                    "id": 7
                 }
             ]
         },

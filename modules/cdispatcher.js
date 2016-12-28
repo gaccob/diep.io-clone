@@ -25,7 +25,7 @@ CDispatcher.prototype.createUnit = function(u)
 
     switch (u.type) {
         case Util.unitType.tank:
-            unit = new Tank(this.world, u.cfgName);
+            unit = new Tank(this.world, u.cfgId);
             break;
 
         case Util.unitType.bullet:
@@ -82,10 +82,7 @@ CDispatcher.prototype.onStartRes = function(message)
 
     for (i in res.players) {
         var netPlayer = res.players[i];
-        var player = this.world.addPlayer(netPlayer.connid,
-                                          netPlayer.name,
-                                          netPlayer.vw,
-                                          netPlayer.vh);
+        var player = this.world.addPlayer(netPlayer.connid, netPlayer.name);
         if (player) {
             player.load(netPlayer);
         }
