@@ -193,7 +193,7 @@ Player.prototype.update = function()
         return;
     }
 
-    if (this.world.frame > Package.app.world.syncRotationFrame + this.lastSyncRotationFrame) {
+    if (this.world.frame - this.lastSyncRotationFrame > Package.app.world.clientSyncRotationIntervalFrames) {
         if (this.needSyncRotation === true) {
             if (Math.abs(this.controlRotation - this.tank.rotation) > Util.epsilon) {
                 this.world.synchronizer.syncRotate(this.controlRotation);
@@ -203,7 +203,7 @@ Player.prototype.update = function()
         }
     }
 
-    if (this.world.frame > Package.app.world.syncForceFrame + this.lastSyncForceFrame) {
+    if (this.world.frame - this.lastSyncForceFrame > Package.app.world.clientSyncForceIntervalFrames) {
         if (this.needSyncForce === true) {
             var dir = Util.getVectorByForceDir(this.controlForceDir);
             if (dir.lengthSq() < Util.epsilon) {

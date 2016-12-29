@@ -57,15 +57,13 @@
         "port": 9000,
         "proto": "tank.proto.json",
 
-        "maxOnline": 30,
-
         "logLevel": 1,
 
         "world": {
             "frame": 30,
-            "syncRotationFrame": 2,
-            "unitCollideCheckFrame": 15,
-            "syncForceFrame": 2,
+            "unitCollideCheckIntervalFrames": 15,
+            "clientSyncRotationIntervalFrames": 2,
+            "clientSyncForceIntervalFrames": 2,
 
             "h": 2048,
             "w": 2048,
@@ -78,6 +76,7 @@
             "gridColor": "0xa0a0a0",
             "gridEdge": 1,
 
+            "maxOnline": 30,
             "initTank": 101,
 
             "obstacleMaxCount": 50,

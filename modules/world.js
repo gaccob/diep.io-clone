@@ -474,7 +474,7 @@ World.prototype.updateCollision = function()
 
                 // avoid multi-collision
                 if (unit.collideFrame) {
-                    if (this.frame - unit.collideFrame < Package.app.world.unitCollideCheckFrame) {
+                    if (this.frame - unit.collideFrame < Package.app.world.unitCollideCheckIntervalFrames) {
                         continue;
                     }
                 }

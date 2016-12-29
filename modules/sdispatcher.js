@@ -39,7 +39,7 @@ SDispatcher.prototype.onStartReq = function(client, pkg)
         Util.logError("player[" + client.id + "] already existed");
         return sync.syncStartRes(client, err.EC_EXISTED, client.id);
     }
-    if (this.world.playerCount > Package.app.maxOnline) {
+    if (this.world.playerCount > Package.app.world.maxOnline) {
         Util.logError("world full player count=" + this.world.playerCount);
         return sync.syncStartRes(client, err.EC_FULL, client.id);
     }
