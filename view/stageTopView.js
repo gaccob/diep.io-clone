@@ -27,7 +27,7 @@ var cfg = {
     updateFrame: 30,
 };
 
-function TopView(world)
+function StageTopView(world)
 {
     this.world = world;
 
@@ -43,11 +43,11 @@ function TopView(world)
     this.world.stage.addChild(this.view);
 }
 
-TopView.prototype = {
-    constructor: TopView
+StageTopView.prototype = {
+    constructor: StageTopView
 };
 
-TopView.prototype.addLabel = function(player, rank)
+StageTopView.prototype.addLabel = function(player, rank)
 {
     if (!player || rank < 0 || rank >= this.topCount) {
         Util.logError("invald player rank=" + rank + 1);
@@ -88,7 +88,7 @@ TopView.prototype.addLabel = function(player, rank)
     return label;
 };
 
-TopView.prototype.update = function()
+StageTopView.prototype.update = function()
 {
     if (this.world.playerCount <= 0) {
         return;
@@ -123,7 +123,7 @@ TopView.prototype.update = function()
     }
 };
 
-module.exports = TopView;
+module.exports = StageTopView;
 
 })();
 

@@ -1,8 +1,8 @@
 (function(){ "use strict";
 
-var HpBarView = require("../view/hpBarView");
-var NameView = require("../view/nameView");
-var ObjectView = require("../view/objectView");
+var WorldHpbarView = require("../view/worldHpbarView");
+var WorldNameView = require("../view/worldNameView");
+var WorldObjectView = require("../view/worldObjectView");
 
 var Motion = require("../modules/motion");
 var Package = require("../package.json");
@@ -20,9 +20,9 @@ function Unit(world, type, cfg)
 
     // view
     if (world.isLocal === true) {
-        this.view = new ObjectView(this);
-        this.hpBarView = null;
-        this.nameView = null;
+        this.worldView = new WorldObjectView(this);
+        this.worldHpbarView = null;
+        this.worldNameView = null;
     }
 
     this.rotation = 0;
@@ -67,23 +67,23 @@ Unit.prototype = {
     constructor: Unit,
 };
 
-Unit.prototype.addHpBarView = function(visible)
+Unit.prototype.addHpbarView = function(visible)
 {
     if (this.world.isLocal === true) {
-        if (this.hpBarView) {
-            delete this.hpBarView;
+        if (this.worldHpbarView) {
+            delete this.worldHpbarView;
         }
-        this.hpBarView = new HpBarView(this.world, this, visible);
+        this.worldHpbarView = new WorldHpbarView(this.world, this, visible);
     }
 };
 
 Unit.prototype.addNameView = function()
 {
     if (this.world.isLocal === true) {
-        if (this.nameView) {
-            delete this.nameView;
+        if (this.worldNameView) {
+            delete this.worldNameView;
         }
-        this.nameView = new NameView(this.world, this);
+        this.worldNameView = new WorldNameView(this.world, this);
     }
 };
 
@@ -155,16 +155,16 @@ Unit.prototype.die = function()
 {
     this.isDead = true;
 
-    if (this.hpBarView) {
-        this.hpBarView.die();
+    if (this.worldHpbarView) {
+        this.worldHpbarView.die();
     }
 
-    if (this.nameView) {
-        this.nameView.die();
+    if (this.worldNameView) {
+        this.worldNameView.die();
     }
 
-    if (this.view) {
-        this.view.onDie();
+    if (this.worldView) {
+        this.worldView.onDie();
     }
 
     this.world.removeUnit(this);
@@ -201,14 +201,14 @@ Unit.prototype.update = function()
         this.hpRegenFrame = this.world.frame;
     }
 
-    if (this.view) {
-        this.view.update();
+    if (this.worldView) {
+        this.worldView.update();
     }
-    if (this.hpBarView) {
-        this.hpBarView.update(this.hp / this.maxHp);
+    if (this.worldHpbarView) {
+        this.worldHpbarView.update(this.hp / this.maxHp);
     }
-    if (this.nameView && this.player) {
-        this.nameView.update(this.player.name);
+    if (this.worldNameView && this.player) {
+        this.worldNameView.update(this.player.name);
     }
 };
 
@@ -259,12 +259,12 @@ Unit.prototype.load = function(u)
     this.motion.forceAngle = u.motion.forceAngle;
     this.motion.force = u.motion.force;
 
-    if (this.hpBarView) {
-        this.hpBarView.update(this.hp / this.maxHp);
+    if (this.worldHpbarView) {
+        this.worldHpbarView.update(this.hp / this.maxHp);
     }
 
-    if (this.nameView && this.player) {
-        this.nameView.update(this.player.name);
+    if (this.worldNameView && this.player) {
+        this.worldNameView.update(this.player.name);
     }
     if (this.type == Util.unitType.bullet) {
         this.bornFrame = u.bornFrame;

@@ -21,7 +21,7 @@ function Tank(world, cfgId, player)
     }
 
     Unit.call(this, world, Util.unitType.tank, cfg);
-    Unit.prototype.addHpBarView.call(this, true);
+    Unit.prototype.addHpbarView.call(this, true);
     Unit.prototype.addNameView.call(this);
 }
 

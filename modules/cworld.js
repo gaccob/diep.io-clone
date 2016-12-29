@@ -8,11 +8,11 @@ var CDispatcher = require("../modules/cdispatcher");
 var World = require("../modules/world");
 var Util = require("../modules/util");
 
-var MainView = require("../view/mainView");
-var TopView = require("../view/topView");
-var PropAddView = require("../view/propAddView");
 var StartView = require("../view/startView");
-var StatisView = require("../view/statisView");
+var StageWorldView = require("../view/stageWorldView");
+var StageStatisView = require("../view/stageStatisView");
+var StageTopView = require("../view/stageTopView");
+var StagePropView = require("../view/stagePropView");
 
 function CWorld()
 {
@@ -30,11 +30,11 @@ function CWorld()
     this.stage = new PIXI.Container();
 
     // async load view
-    this.mainView = new MainView(this);
+    this.stageWorldView = new StageWorldView(this);
+    this.stageStatisView = new StageStatisView(this);
+    this.stageTopView = new StageTopView(this);
+    this.stagePropView = new StagePropView(this);
     this.startView = new StartView(this);
-    this.statisView = new StatisView(this);
-    this.topView = new TopView(this);
-    this.propAddView = new PropAddView(this);
 
     this.dieSprites = [];
 
@@ -64,21 +64,11 @@ CWorld.prototype.getSelf = function()
 
 CWorld.prototype.updateView = function()
 {
-    if (this.startView) {
-        this.startView.update();
-    }
-    if (this.topView) {
-        this.topView.update();
-    }
-    if (this.propAddView) {
-        this.propAddView.update();
-    }
-    if (this.statisView) {
-        this.statisView.update();
-    }
-    if (this.mainView) {
-        this.mainView.update();
-    }
+    this.startView.update();
+    this.stagePropView.update();
+    this.stageTopView.update();
+    this.stageStatisView.update();
+    this.stageWorldView.update();
 };
 
 CWorld.prototype.updateDieAnimations = function()

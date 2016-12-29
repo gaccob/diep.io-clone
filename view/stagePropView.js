@@ -109,7 +109,7 @@ function addPropBar(container, prop, name)
     panel.on('click', function() { container.addProp(prop); });
 }
 
-function PropAddView(world)
+function StagePropView(world)
 {
     this.world = world;
     this.view = new PIXI.Container();
@@ -134,11 +134,11 @@ function PropAddView(world)
     this.lastVisibleFrame = 0;
 }
 
-PropAddView.prototype = {
-    constructor: PropAddView
+StagePropView.prototype = {
+    constructor: StagePropView
 };
 
-PropAddView.prototype.addProp = function(propType)
+StagePropView.prototype.addProp = function(propType)
 {
     if (this.view.visible !== true) {
         return;
@@ -150,7 +150,7 @@ PropAddView.prototype.addProp = function(propType)
     this.world.synchronizer.syncAddProp(propType);
 };
 
-PropAddView.prototype.onPropAdd = function(propType)
+StagePropView.prototype.onPropAdd = function(propType)
 {
     var pb = this.progressViews[propType];
     if (!pb) {
@@ -160,14 +160,14 @@ PropAddView.prototype.onPropAdd = function(propType)
     pb.setProgress(pb.getProgress() + 1);
 };
 
-PropAddView.prototype.reset = function()
+StagePropView.prototype.reset = function()
 {
     for (var i in this.progressViews) {
         this.progressViews[i].setProgress(0);
     }
 };
 
-PropAddView.prototype.update = function()
+StagePropView.prototype.update = function()
 {
     if (this.world.started !== true) {
         this.view.visible = false;
@@ -190,7 +190,7 @@ PropAddView.prototype.update = function()
     }
 };
 
-Object.defineProperties(PropAddView.prototype, {
+Object.defineProperties(StagePropView.prototype, {
     x: {
         get: function() { return this.view.x; },
         set: function(v) { this.view.x = v; }
@@ -201,6 +201,6 @@ Object.defineProperties(PropAddView.prototype, {
     },
 });
 
-module.exports = PropAddView;
+module.exports = StagePropView;
 
 })();

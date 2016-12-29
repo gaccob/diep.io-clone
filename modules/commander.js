@@ -141,8 +141,10 @@ Commander.prototype.exeAddProp = function(commander)
         return false;
     }
     -- player.tank.freeSkillPoints;
-    if (this.world.propAddView) {
-        this.world.propAddView.onPropAdd(pt);
+    if (this.world.stagePropView) {
+        if (player === this.world.getSelf()) {
+            this.world.stagePropView.onPropAdd(pt);
+        }
     }
     return true;
 };

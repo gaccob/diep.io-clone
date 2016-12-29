@@ -49,8 +49,8 @@ Control.prototype.handleKeyDown = function()
             case 54:
             case 55:
             case 56:
-                if (world.propAddView) {
-                    world.propAddView.addProp(e.keyCode - 48);
+                if (world.stagePropView) {
+                    world.stagePropView.addProp(e.keyCode - 48);
                 }
                 break;
         }
@@ -103,8 +103,8 @@ Control.prototype.handleMouseMove = function()
 
 Control.prototype.handleMouseClick = function()
 {
-    if (this.world.mainView) {
-        this.world.mainView.handleMouseClick();
+    if (this.world.stageWorldView) {
+        this.world.stageWorldView.handleMouseClick();
     }
 };
 

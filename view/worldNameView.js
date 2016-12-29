@@ -8,18 +8,18 @@ var cfg = {
     fill: 0x101010,
 };
 
-function NameView(world, owner)
+function WorldNameView(world, owner)
 {
     this.world = world;
     this.owner = owner;
     this.content = null;
 }
 
-NameView.prototype = {
-    constructor: NameView,
+WorldNameView.prototype = {
+    constructor: WorldNameView,
 };
 
-NameView.prototype.update = function(content)
+WorldNameView.prototype.update = function(content)
 {
     if (this.content !== content) {
         this.die();
@@ -30,7 +30,7 @@ NameView.prototype.update = function(content)
             strokeThickness: cfg.strokeThickness,
             align: 'center'
         });
-        this.world.mainView.addChild(this.view);
+        this.world.stageWorldView.addChild(this.view);
     }
 
     if (this.view) {
@@ -39,7 +39,7 @@ NameView.prototype.update = function(content)
     }
 };
 
-NameView.prototype.die = function()
+WorldNameView.prototype.die = function()
 {
     if (this.view) {
         this.view.parent.removeChild(this.view);
@@ -47,6 +47,6 @@ NameView.prototype.die = function()
     }
 };
 
-module.exports = NameView;
+module.exports = WorldNameView;
 
 })();

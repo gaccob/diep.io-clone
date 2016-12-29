@@ -35,25 +35,25 @@ function getWorldBackground(world)
     return graphics;
 }
 
-function adaptView(mainView)
+function adaptView(_this)
 {
     var canvas = document.getElementById("canvas");
-    var wRatio = mainView.w / mainView.world.cw;
-    var hRatio = mainView.h / mainView.world.ch;
+    var wRatio = _this.w / _this.world.cw;
+    var hRatio = _this.h / _this.world.ch;
     if (wRatio < hRatio) {
-        mainView.world.stage.scale.x = wRatio;
-        mainView.world.stage.scale.y = wRatio;
-        canvas.style.top = (mainView.h - mainView.world.ch * wRatio) / 2 + 'px';
-        canvas.height = mainView.world.ch * wRatio;
+        _this.world.stage.scale.x = wRatio;
+        _this.world.stage.scale.y = wRatio;
+        canvas.style.top = (_this.h - _this.world.ch * wRatio) / 2 + 'px';
+        canvas.height = _this.world.ch * wRatio;
     } else {
-        mainView.world.stage.scale.x = hRatio;
-        mainView.world.stage.scale.y = hRatio;
-        canvas.style.left = (mainView.w - mainView.world.cw * hRatio) / 2 + 'px';
-        canvas.width = mainView.world.cw * hRatio;
+        _this.world.stage.scale.x = hRatio;
+        _this.world.stage.scale.y = hRatio;
+        canvas.style.left = (_this.w - _this.world.cw * hRatio) / 2 + 'px';
+        canvas.width = _this.world.cw * hRatio;
     }
 }
 
-function MainView(world)
+function StageWorldView(world)
 {
     this.world = world;
 
@@ -74,8 +74,8 @@ function MainView(world)
     canvas.style.display = "block";
 
     // view adapt
-    adaptView(this);
     var _this = this;
+    adaptView(_this);
     window.addEventListener('resize', function() {
         _this.w = document.documentElement.clientWidth;
         _this.h = document.documentElement.clientHeight - 10;
@@ -89,11 +89,11 @@ function MainView(world)
     world.stage.addChild(this.view);
 }
 
-MainView.prototype = {
-    constructor: MainView,
+StageWorldView.prototype = {
+    constructor: StageWorldView,
 };
 
-MainView.prototype.update = function()
+StageWorldView.prototype.update = function()
 {
     // update camera
     var player = this.world.getSelf();
@@ -113,7 +113,7 @@ MainView.prototype.update = function()
     this.renderer.render(this.world.stage);
 };
 
-MainView.prototype.handleMouseClick = function()
+StageWorldView.prototype.handleMouseClick = function()
 {
     var world = this.world;
     this.view.interactive = true;
@@ -125,18 +125,18 @@ MainView.prototype.handleMouseClick = function()
     });
 };
 
-MainView.prototype.addChild = function(sprite)
+StageWorldView.prototype.addChild = function(sprite)
 {
     this.view.addChild(sprite);
 };
 
-MainView.prototype.getWorldPosition = function(screenX, screenY)
+StageWorldView.prototype.getWorldPosition = function(screenX, screenY)
 {
     var x = screenX / this.world.stage.scale.x;
     var y = screenY / this.world.stage.scale.y;
     return new Victor(x - this.view.x, y - this.view.y);
 };
 
-module.exports = MainView;
+module.exports = StageWorldView;
 
 })();

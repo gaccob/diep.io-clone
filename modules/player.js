@@ -116,10 +116,10 @@ Player.prototype.operMoveLeft = function(move)
 
 Player.prototype.operMove = function(x, y)
 {
-    if (!this.tank) {
+    if (!this.tank || ! this.world.stageWorldView) {
         return;
     }
-    var targetPos = this.world.mainView.getWorldPosition(x, y);
+    var targetPos = this.world.stageWorldView.getWorldPosition(x, y);
     var dir = targetPos.subtract(new Victor(this.tank.x, this.tank.y));
     var angle = dir.angle() + Math.PI / 2;
     if (Math.abs(this.controlRotation - angle) > Util.epsilon) {

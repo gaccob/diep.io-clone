@@ -17,7 +17,7 @@ var cfg = {
     },
 };
 
-function HpBarView(world, owner, display)
+function WorldHpbarView(world, owner, display)
 {
     this.world = world;
     this.owner = owner;
@@ -51,14 +51,14 @@ function HpBarView(world, owner, display)
     this.view.scale.x = cfg.scaleXRatio * w / cfg.w;
     this.view.scale.y = cfg.scaleYRatio * w / cfg.w;
 
-    this.world.mainView.addChild(this.view);
+    this.world.stageWorldView.addChild(this.view);
 }
 
-HpBarView.prototype = {
-    constructor: HpBarView,
+WorldHpbarView.prototype = {
+    constructor: WorldHpbarView,
 };
 
-HpBarView.prototype.die = function()
+WorldHpbarView.prototype.die = function()
 {
     if (this.view && this.view.parent) {
         this.view.parent.removeChild(this.view);
@@ -68,7 +68,7 @@ HpBarView.prototype.die = function()
     this.view = null;
 };
 
-HpBarView.prototype.update = function(percent)
+WorldHpbarView.prototype.update = function(percent)
 {
     if (this.view) {
         this.view.x = this.owner.x + this.owner.radius * cfg.xOffsetRatio;
@@ -89,7 +89,7 @@ HpBarView.prototype.update = function(percent)
     }
 };
 
-module.exports = HpBarView;
+module.exports = WorldHpbarView;
 
 })();
 

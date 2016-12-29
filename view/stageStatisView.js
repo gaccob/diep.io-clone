@@ -1,16 +1,16 @@
 (function() { "use strict";
 
-function StatisView(world)
+function StageStatisView(world)
 {
     this.world = world;
     this.view = null;
 }
 
-StatisView.prototype = {
-    constructor: StatisView
+StageStatisView.prototype = {
+    constructor: StageStatisView
 };
 
-StatisView.prototype.update = function()
+StageStatisView.prototype.update = function()
 {
     var content = "FPS:" + this.world.fps + " Frame:" + this.world.frame;
     if (!this.view) {
@@ -27,6 +27,6 @@ StatisView.prototype.update = function()
     }
 };
 
-module.exports = StatisView;
+module.exports = StageStatisView;
 
 })();

@@ -23,7 +23,7 @@ function drawBullet(view)
     bodySprite.anchor.y = 0.5;
     view.sprite.addChild(bodySprite);
 
-    view.world.mainView.addChild(view.sprite);
+    view.world.stageWorldView.addChild(view.sprite);
 }
 
 function drawObstacle(view)
@@ -48,7 +48,7 @@ function drawObstacle(view)
     bodySprite.pivot.y = view.cfg.radius + view.cfg.edge.w;
     view.sprite.addChild(bodySprite);
 
-    view.world.mainView.addChild(view.sprite);
+    view.world.stageWorldView.addChild(view.sprite);
 }
 
 function drawTank(view)
@@ -64,10 +64,10 @@ function drawTank(view)
     sprite.anchor.y = cfg.pivot.y;
 
     view.sprite.addChild(sprite);
-    view.world.mainView.addChild(view.sprite);
+    view.world.stageWorldView.addChild(view.sprite);
 }
 
-function ObjectView(owner)
+function WorldObjectView(owner)
 {
     this.owner = owner;
     this.cfg = this.owner.cfg.view;
@@ -90,11 +90,11 @@ function ObjectView(owner)
     }
 }
 
-ObjectView.prototype = {
-    constructor: ObjectView,
+WorldObjectView.prototype = {
+    constructor: WorldObjectView,
 };
 
-ObjectView.prototype.onDie = function()
+WorldObjectView.prototype.onDie = function()
 {
     if (this.owner.type == Util.unitType.bullet
         || this.owner.type == Util.unitType.obstacle
@@ -103,7 +103,7 @@ ObjectView.prototype.onDie = function()
     }
 };
 
-ObjectView.prototype.update = function()
+WorldObjectView.prototype.update = function()
 {
     this.x = this.owner.x;
     this.y = this.owner.y;
@@ -114,7 +114,7 @@ ObjectView.prototype.update = function()
     }
 };
 
-Object.defineProperties(ObjectView.prototype, {
+Object.defineProperties(WorldObjectView.prototype, {
     x: {
         get: function() { return this.sprite.x; },
         set: function(v) { this.sprite.x = v; }
@@ -143,6 +143,6 @@ Object.defineProperties(ObjectView.prototype, {
     },
 });
 
-module.exports = ObjectView;
+module.exports = WorldObjectView;
 
 })();
