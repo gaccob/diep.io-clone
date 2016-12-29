@@ -7,7 +7,7 @@ var Util = require("../modules/util");
 
 function Tank(world, cfgId, player)
 {
-    this.autoFire = false;
+    this.autoFire = true;
     this.player = player;
     this.ai = null;
 
