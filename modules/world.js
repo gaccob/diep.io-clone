@@ -276,9 +276,9 @@ World.prototype.updateObstacles = function()
     }
 
     if (this.obstacleCount < Package.app.world.obstacleMaxCount) {
-        var names = ["triangle", "triangle", "quad", "pentagon"];
-        var name = names[Math.floor((this.random() * names.length))];
-        obstacle = new Obstacle(this, name);
+        var ids = [301, 301, 302, 303];
+        var id = ids[Math.floor((this.random() * ids.length))];
+        obstacle = new Obstacle(this, id);
 
         obstacle.x = this.randomBetween(this.spawnRegion.x, this.spawnRegion.x + this.spawnRegion.w);
         obstacle.y = this.randomBetween(this.spawnRegion.y, this.spawnRegion.y + this.spawnRegion.h);
@@ -427,14 +427,14 @@ World.prototype.elasticCollide = function(unit1, unit2)
     unit2.motion.ev.y += v2y;
 };
 
-World.prototype.simpleCollide = function(unit1, unit2)
+World.prototype.simpleCollide = function(unit1, unit2, distRatio)
 {
     var dir = new Victor(unit1.x - unit2.x, unit1.y - unit2.y);
     dir.norm();
     var v1 = unit1.motion.v;
     var v2 = unit2.motion.v;
-    var spring1 = unit2.cfg.velocity.spring - unit1.cfg.velocity.springResist;
-    var spring2 = unit1.cfg.velocity.spring - unit2.cfg.velocity.springResist;
+    var spring1 = unit2.cfg.velocity.springBase + (1.0 - distRatio) * unit2.cfg.velocity.springAdd;
+    var spring2 = unit1.cfg.velocity.springBase + (1.0 - distRatio) * unit1.cfg.velocity.springAdd;
 
     Util.logTrace(unit1.motion.toString());
     Util.logTrace(unit2.motion.toString());
@@ -446,7 +446,7 @@ World.prototype.simpleCollide = function(unit1, unit2)
     Util.logTrace(unit2.motion.toString());
 };
 
-World.prototype.collide = function(unit1, unit2)
+World.prototype.collide = function(unit1, unit2, distRatio)
 {
     Util.logDebug("frame[" + this.frame + "] "
         + "unit[" + unit1.id + "][" + unit1.x + "," + unit1.y + "] "
@@ -455,7 +455,7 @@ World.prototype.collide = function(unit1, unit2)
     Util.logTrace(unit1.toString());
     Util.logTrace(unit2.toString());
 
-    this.simpleCollide(unit1, unit2);
+    this.simpleCollide(unit1, unit2, distRatio);
     unit1.takeDamage(unit2);
     unit2.takeDamage(unit1);
 
@@ -499,7 +499,7 @@ World.prototype.updateCollision = function()
                     if (dist2 < distR * distR) {
                         unit.collideFrame = this.frame;
                         target.collideFrame = this.frame;
-                        this.collide(unit, target);
+                        this.collide(unit, target, dist2 / (distR * distR));
                     }
                 }
                 unit.collideCheckFrame = this.frame;

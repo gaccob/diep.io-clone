@@ -29,11 +29,11 @@ CDispatcher.prototype.createUnit = function(u)
             break;
 
         case Util.unitType.bullet:
-            unit = new Bullet(this.world, u.cfgName, this.world.findUnit(u.ownerid), u.weaponName);
+            unit = new Bullet(this.world, u.cfgId, this.world.findUnit(u.ownerid), u.weaponName);
             break;
 
         case Util.unitType.obstacle:
-            unit = new Obstacle(this.world, u.cfgName);
+            unit = new Obstacle(this.world, u.cfgId);
             break;
 
         default:

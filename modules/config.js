@@ -6,6 +6,7 @@ var configObstacles = require("../cfg/configObstacles");
 var configPropAdd = require("../cfg/configPropAdd");
 var configTanks = require("../cfg/configTanks");
 var configWeapons = require("../cfg/configWeapons");
+var configTanksView = require("../www/assets/tank.json");
 
 function Config()
 {
@@ -13,18 +14,20 @@ function Config()
 
     this.configBullets = {};
     for (idx in configBullets) {
-        this.configBullets[configBullets[idx].alias] = configBullets[idx];
+        this.configBullets[configBullets[idx].id] = configBullets[idx];
     }
 
     this.configObstacles = {};
     for (idx in configObstacles) {
-        this.configObstacles[configObstacles[idx].alias] = configObstacles[idx];
+        this.configObstacles[configObstacles[idx].id] = configObstacles[idx];
     }
 
     this.configTanks = {};
     for (idx in configTanks) {
         this.configTanks[configTanks[idx].id] = configTanks[idx];
     }
+
+    this.configTanksView = configTanksView.frames;
 
     this.configWeapons = {};
     for (idx in configWeapons) {

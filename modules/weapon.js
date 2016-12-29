@@ -6,14 +6,13 @@ var Bullet = require("../modules/bullet");
 var Package = require("../package.json");
 var Util = require("../modules/util");
 
-function Weapon(world, tank, id)
+function Weapon(world, tank, cfgId, idx)
 {
     this.world = world;
-    this.id = id;
     this.type = Util.unitType.weapon;
-
     this.owner = tank;
-    this.cfg = world.cfg.configWeapons[id];
+    this.cfg = world.cfg.configWeapons[cfgId];
+    this.idx = idx;
 
     var frameSeconds = 1.0 / Package.app.world.frame;
     this.fireFrame = world.frame + this.cfg.shootDelaySeconds / frameSeconds;
@@ -74,7 +73,7 @@ Weapon.prototype.fire = function()
         var disturb = this.cfg.disturbDeg * Math.PI / 180;
         var bulletAngle = angle + (this.world.random() * disturb - disturb / 2);
 
-        var bullet = new Bullet(this.world, this.cfg.bullet, this.owner, this.id);
+        var bullet = new Bullet(this.world, this.cfg.bullet, this.owner, this.idx);
         bullet.x = pos.x;
         bullet.y = pos.y;
         bullet.motion.setIvAngle(bulletAngle);

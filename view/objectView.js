@@ -54,12 +54,15 @@ function drawObstacle(view)
 function drawTank(view)
 {
     var tank = view.owner;
-    var spriteName = tank.cfg.sprite;
-    var sprite = new PIXI.Sprite(PIXI.Texture.fromFrame(spriteName + '.png'));
+    var spriteName = tank.cfg.sprite + '.png';
+    var sprite = new PIXI.Sprite(PIXI.Texture.fromFrame(spriteName));
     sprite.scale.x = 0.5;
     sprite.scale.y = 0.5;
-    sprite.anchor.x = 0.5;
-    sprite.anchor.y = 0.625;
+
+    var cfg = view.world.cfg.configTanksView[spriteName];
+    sprite.anchor.x = cfg.pivot.x;
+    sprite.anchor.y = cfg.pivot.y;
+
     view.sprite.addChild(sprite);
     view.world.mainView.addChild(view.sprite);
 }

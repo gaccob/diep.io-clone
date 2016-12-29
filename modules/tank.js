@@ -15,7 +15,7 @@ function Tank(world, cfgId, player)
     var cfg = world.cfg.configTanks[cfgId];
     for (var idx in cfg.weapons) {
         if (cfg.weapons[idx] !== "") {
-            var weapon = new Weapon(world, this, cfg.weapons[idx]);
+            var weapon = new Weapon(world, this, cfg.weapons[idx], idx);
             this.weapons.push(weapon);
         }
     }
@@ -49,11 +49,11 @@ Tank.prototype.die = function()
     }
 };
 
-Tank.prototype.getWeaponById = function(id)
+Tank.prototype.getWeaponByIdx = function(idx)
 {
-    for (var idx in this.weapons) {
-        if (this.weapons[idx].id === id) {
-            return this.weapons[idx];
+    for (var i in this.weapons) {
+        if (this.weapons[i].idx === idx) {
+            return this.weapons[i];
         }
     }
     return null;

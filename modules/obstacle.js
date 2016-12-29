@@ -3,9 +3,9 @@
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Obstacle(world, name)
+function Obstacle(world, cfgId)
 {
-    Unit.call(this, world, Util.unitType.obstacle, world.cfg.configObstacles[name]);
+    Unit.call(this, world, Util.unitType.obstacle, world.cfg.configObstacles[cfgId]);
     Unit.prototype.addHpBarView.call(this, false);
 }
 

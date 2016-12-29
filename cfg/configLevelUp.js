@@ -20,7 +20,7 @@ var configLevelUp = {
 		"level": 4,
 	},
 	"4": {
-		"skillPoint": 1,
+		"skillPoint": "",
 		"exp": 70,
 		"level": 5,
 	},
@@ -70,7 +70,7 @@ var configLevelUp = {
 		"level": 14,
 	},
 	"14": {
-		"skillPoint": 1,
+		"skillPoint": "",
 		"exp": 500,
 		"level": 15,
 	},
@@ -145,7 +145,7 @@ var configLevelUp = {
 		"level": 29,
 	},
 	"29": {
-		"skillPoint": 1,
+		"skillPoint": "",
 		"exp": 1800,
 		"level": 30,
 	},

@@ -217,18 +217,13 @@ Unit.prototype.dump = function()
     var u = new this.world.proto.Unit();
     u.id = this.id;
     u.type = this.type;
-    if (this.cfg.alias) {
-        u.cfgName = this.cfg.alias;
-    }
-    if (this.cfg.id) {
-        u.cfgId = this.cfg.id;
-    }
+    u.cfgId = this.cfg.id;
     u.hp = this.hp;
 
     if (this.type == Util.unitType.bullet) {
         u.ownerid = this.owner.id;
         u.bornFrame = Math.floor(this.bornFrame);
-        u.weaponId = this.weaponId;
+        u.weaponIdx = this.weaponIdx;
     }
 
     if (this.type == Util.unitType.tank) {
@@ -273,7 +268,7 @@ Unit.prototype.load = function(u)
     }
     if (this.type == Util.unitType.bullet) {
         this.bornFrame = u.bornFrame;
-        var weapon = this.owner.getWeaponById(u.weaponId);
+        var weapon = this.owner.getWeaponByIdx(u.weaponIdx);
         weapon.fireBullet(this);
     }
 

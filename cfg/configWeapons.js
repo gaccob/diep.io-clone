@@ -2,7 +2,7 @@ var configWeapons = {
 	"0": {
 		"disturbDeg": 9,
 		"reloadSeconds": 1.5,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -14,7 +14,7 @@ var configWeapons = {
 	"1": {
 		"disturbDeg": 12,
 		"reloadSeconds": 2.3,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -26,7 +26,7 @@ var configWeapons = {
 	"2": {
 		"disturbDeg": 9,
 		"reloadSeconds": 1.85,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40,
 		"baseOffsetY": 0,
@@ -38,7 +38,7 @@ var configWeapons = {
 	"3": {
 		"disturbDeg": 9,
 		"reloadSeconds": 1.85,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 180,
 		"shootOffset": 40,
 		"baseOffsetY": 0,
@@ -50,7 +50,7 @@ var configWeapons = {
 	"4": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.18,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40,
 		"baseOffsetY": 0,
@@ -62,7 +62,7 @@ var configWeapons = {
 	"5": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.18,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40,
 		"baseOffsetY": 0,
@@ -74,7 +74,7 @@ var configWeapons = {
 	"6": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.77,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 47,
 		"baseOffsetY": 0,
@@ -86,7 +86,7 @@ var configWeapons = {
 	"7": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.5,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40,
 		"baseOffsetY": 0,
@@ -98,7 +98,7 @@ var configWeapons = {
 	"8": {
 		"disturbDeg": 15,
 		"reloadSeconds": 1.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": 0,
@@ -110,7 +110,7 @@ var configWeapons = {
 	"9": {
 		"disturbDeg": 15,
 		"reloadSeconds": 1.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.25,
 		"baseOffsetY": 0,
@@ -122,7 +122,7 @@ var configWeapons = {
 	"10": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 43,
 		"baseOffsetY": 0,
@@ -134,7 +134,7 @@ var configWeapons = {
 	"11": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.47,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 164,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -146,7 +146,7 @@ var configWeapons = {
 	"12": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.47,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -164,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -158,7 +158,7 @@ var configWeapons = {
 	"13": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.4,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.75,
 		"baseOffsetY": 0,
@@ -170,7 +170,7 @@ var configWeapons = {
 	"14": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.4,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 90,
 		"shootOffset": 40.75,
 		"baseOffsetY": 0,
@@ -182,7 +182,7 @@ var configWeapons = {
 	"15": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.4,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 180,
 		"shootOffset": 40.75,
 		"baseOffsetY": 0,
@@ -194,7 +194,7 @@ var configWeapons = {
 	"16": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.4,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 270,
 		"shootOffset": 40.75,
 		"baseOffsetY": 0,
@@ -206,7 +206,7 @@ var configWeapons = {
 	"17": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -218,7 +218,7 @@ var configWeapons = {
 	"18": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 180,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -230,7 +230,7 @@ var configWeapons = {
 	"19": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -242,7 +242,7 @@ var configWeapons = {
 	"20": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 180,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -254,7 +254,7 @@ var configWeapons = {
 	"21": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.21,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.45,
 		"baseOffsetY": 0,
@@ -266,7 +266,7 @@ var configWeapons = {
 	"22": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.21,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 28,
 		"shootOffset": 39.625,
 		"baseOffsetY": 0,
@@ -278,7 +278,7 @@ var configWeapons = {
 	"23": {
 		"disturbDeg": 6,
 		"reloadSeconds": 1.21,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -28,
 		"shootOffset": 39.625,
 		"baseOffsetY": 0,
@@ -290,7 +290,7 @@ var configWeapons = {
 	"24": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.6,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 47,
 		"baseOffsetY": 0,
@@ -302,7 +302,7 @@ var configWeapons = {
 	"25": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.53,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.75,
 		"baseOffsetY": 0,
@@ -314,7 +314,7 @@ var configWeapons = {
 	"26": {
 		"disturbDeg": 15,
 		"reloadSeconds": 1.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": 0,
@@ -326,7 +326,7 @@ var configWeapons = {
 	"27": {
 		"disturbDeg": 15,
 		"reloadSeconds": 1.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.25,
 		"baseOffsetY": 0,
@@ -338,7 +338,7 @@ var configWeapons = {
 	"28": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 43.375,
 		"baseOffsetY": 0,
@@ -350,7 +350,7 @@ var configWeapons = {
 	"29": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 136,
 		"shootOffset": 35,
 		"baseOffsetY": 0,
@@ -362,7 +362,7 @@ var configWeapons = {
 	"30": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -136,
 		"shootOffset": 35,
 		"baseOffsetY": 0,
@@ -374,7 +374,7 @@ var configWeapons = {
 	"31": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 136,
 		"shootOffset": 38.35,
 		"baseOffsetY": -2.5,
@@ -386,7 +386,7 @@ var configWeapons = {
 	"32": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.8,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -136,
 		"shootOffset": 38.35,
 		"baseOffsetY": -2.5,
@@ -398,7 +398,7 @@ var configWeapons = {
 	"33": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -410,7 +410,7 @@ var configWeapons = {
 	"34": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 45,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -422,7 +422,7 @@ var configWeapons = {
 	"35": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 90,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -434,7 +434,7 @@ var configWeapons = {
 	"36": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 135,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -446,7 +446,7 @@ var configWeapons = {
 	"37": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 180,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -458,7 +458,7 @@ var configWeapons = {
 	"38": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 225,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -470,7 +470,7 @@ var configWeapons = {
 	"39": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 270,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -482,7 +482,7 @@ var configWeapons = {
 	"40": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.86,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 315,
 		"shootOffset": 40.5,
 		"baseOffsetY": 0,
@@ -494,7 +494,7 @@ var configWeapons = {
 	"41": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.45,
 		"baseOffsetY": 0,
@@ -506,7 +506,7 @@ var configWeapons = {
 	"42": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 37.95,
 		"baseOffsetY": 0,
@@ -518,7 +518,7 @@ var configWeapons = {
 	"43": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 37.95,
 		"baseOffsetY": 0,
@@ -530,7 +530,7 @@ var configWeapons = {
 	"44": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.81,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 42.5,
 		"baseOffsetY": 0,
@@ -542,7 +542,7 @@ var configWeapons = {
 	"45": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.81,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -22,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -554,7 +554,7 @@ var configWeapons = {
 	"46": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.81,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 22,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -566,7 +566,7 @@ var configWeapons = {
 	"47": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.81,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -32,
 		"shootOffset": 37.5,
 		"baseOffsetY": -4.5,
@@ -578,7 +578,7 @@ var configWeapons = {
 	"48": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.81,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 32,
 		"shootOffset": 37.5,
 		"baseOffsetY": -4.5,
@@ -590,7 +590,7 @@ var configWeapons = {
 	"49": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.6,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 44.625,
 		"baseOffsetY": 0,
@@ -602,7 +602,7 @@ var configWeapons = {
 	"50": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.95,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.45,
 		"baseOffsetY": 0,
@@ -614,7 +614,7 @@ var configWeapons = {
 	"51": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.95,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 40.45,
 		"baseOffsetY": 0,
@@ -626,7 +626,7 @@ var configWeapons = {
 	"52": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.95,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 137,
 		"shootOffset": 40.45,
 		"baseOffsetY": -2.5,
@@ -638,7 +638,7 @@ var configWeapons = {
 	"53": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.95,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 137,
 		"shootOffset": 40.45,
 		"baseOffsetY": 3.5,
@@ -650,7 +650,7 @@ var configWeapons = {
 	"54": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.95,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -137,
 		"shootOffset": 40.45,
 		"baseOffsetY": 3.5,
@@ -662,7 +662,7 @@ var configWeapons = {
 	"55": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.95,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -137,
 		"shootOffset": 40.45,
 		"baseOffsetY": -2.5,
@@ -674,7 +674,7 @@ var configWeapons = {
 	"56": {
 		"disturbDeg": 3,
 		"reloadSeconds": 0.97,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 44.2,
 		"baseOffsetY": 0,
@@ -686,7 +686,7 @@ var configWeapons = {
 	"57": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.72,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 42.95,
 		"baseOffsetY": 0,
@@ -698,7 +698,7 @@ var configWeapons = {
 	"58": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.72,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 130,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -710,7 +710,7 @@ var configWeapons = {
 	"59": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.72,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -130,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -722,7 +722,7 @@ var configWeapons = {
 	"60": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.62,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 42.95,
 		"baseOffsetY": 0,
@@ -734,7 +734,7 @@ var configWeapons = {
 	"61": {
 		"disturbDeg": 0,
 		"reloadSeconds": 1.64,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -180,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -746,7 +746,7 @@ var configWeapons = {
 	"62": {
 		"disturbDeg": 0,
 		"reloadSeconds": 1.64,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 180,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -758,7 +758,7 @@ var configWeapons = {
 	"63": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.62,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 9,
 		"shootOffset": 44.2,
 		"baseOffsetY": 0,
@@ -770,7 +770,7 @@ var configWeapons = {
 	"64": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.97,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": 0,
@@ -782,7 +782,7 @@ var configWeapons = {
 	"65": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.97,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": 0,
@@ -794,7 +794,7 @@ var configWeapons = {
 	"66": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.97,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": -3,
@@ -806,7 +806,7 @@ var configWeapons = {
 	"67": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.97,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": -3,
@@ -818,7 +818,7 @@ var configWeapons = {
 	"68": {
 		"disturbDeg": 0,
 		"reloadSeconds": 1.1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 43.5,
 		"baseOffsetY": 0,
@@ -830,7 +830,7 @@ var configWeapons = {
 	"69": {
 		"disturbDeg": 0,
 		"reloadSeconds": 1.1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 43.5,
 		"baseOffsetY": 0,
@@ -842,7 +842,7 @@ var configWeapons = {
 	"70": {
 		"disturbDeg": 0,
 		"reloadSeconds": 1.1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": -3,
@@ -854,7 +854,7 @@ var configWeapons = {
 	"71": {
 		"disturbDeg": 0,
 		"reloadSeconds": 1.1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 38.75,
 		"baseOffsetY": -3,
@@ -866,7 +866,7 @@ var configWeapons = {
 	"72": {
 		"disturbDeg": 3,
 		"reloadSeconds": 1,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 0,
 		"shootOffset": 42.95,
 		"baseOffsetY": 0,
@@ -878,7 +878,7 @@ var configWeapons = {
 	"73": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.55,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 156,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -890,7 +890,7 @@ var configWeapons = {
 	"74": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.55,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -156,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -902,7 +902,7 @@ var configWeapons = {
 	"75": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.55,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": 90,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,
@@ -914,7 +914,7 @@ var configWeapons = {
 	"76": {
 		"disturbDeg": 0,
 		"reloadSeconds": 0.55,
-		"bullet": "normal",
+		"bullet": 2010,
 		"degree": -90,
 		"shootOffset": 37.5,
 		"baseOffsetY": 0,

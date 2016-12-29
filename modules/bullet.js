@@ -4,13 +4,13 @@ var Package = require("../package.json");
 var Unit = require("../modules/unit");
 var Util = require("../modules/util");
 
-function Bullet(world, cfgName, owner, weaponId)
+function Bullet(world, cfgId, owner, weaponIdx)
 {
     this.owner = owner;
-    this.weaponId = weaponId;
+    this.weaponIdx = weaponIdx;
     this.bornFrame = world.frame;
 
-    Unit.call(this, world, Util.unitType.bullet, world.cfg.configBullets[cfgName]);
+    Unit.call(this, world, Util.unitType.bullet, world.cfg.configBullets[cfgId]);
 }
 
 Bullet.prototype = Object.create(Unit.prototype);
