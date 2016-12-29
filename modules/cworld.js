@@ -12,6 +12,7 @@ var MainView = require("../view/mainView");
 var TopView = require("../view/topView");
 var PropAddView = require("../view/propAddView");
 var StartView = require("../view/startView");
+var StatisView = require("../view/statisView");
 
 function CWorld()
 {
@@ -31,6 +32,7 @@ function CWorld()
     // async load view
     this.mainView = new MainView(this);
     this.startView = new StartView(this);
+    this.statisView = new StatisView(this);
     this.topView = new TopView(this);
     this.propAddView = new PropAddView(this);
 
@@ -45,6 +47,11 @@ function CWorld()
 
     // self
     this.connid = null;
+
+    // for fps statistic
+    this.localTime = (new Date()).getTime();
+    this.fps = 0;
+    this.fpsAccumulate = 0;
 }
 
 CWorld.prototype = Object.create(World.prototype);
@@ -65,6 +72,9 @@ CWorld.prototype.updateView = function()
     }
     if (this.propAddView) {
         this.propAddView.update();
+    }
+    if (this.statisView) {
+        this.statisView.update();
     }
     if (this.mainView) {
         this.mainView.update();
@@ -129,13 +139,23 @@ CWorld.prototype.finish = function()
 CWorld.prototype.update = function()
 {
     // lock-step execute
-    if (this.started === true && this.step > 0) {
+    while (this.started === true && this.step > 0) {
         -- this.step;
         this.updateFrameLogic();
     }
 
     // view
     this.updateView();
+
+    // fps statistic
+    var localTime = (new Date()).getTime();
+    if (localTime > this.localTime + 1000) {
+        this.localTime = localTime;
+        this.fps = this.fpsAccumulate;
+        this.fpsAccumulate = 0;
+    } else {
+        ++ this.fpsAccumulate;
+    }
 };
 
 CWorld.prototype.onStartNameInput = function(name)
