@@ -21,7 +21,7 @@ StageStatisView.prototype.update = function()
         });
         this.world.stage.addChild(this.view);
         this.view.x = 10;
-        this.view.y = this.world.ch - 10;
+        this.view.y = this.world.ch - this.view.height - 5;
     } else {
         this.view.text = content;
     }

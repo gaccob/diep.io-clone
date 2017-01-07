@@ -21,6 +21,10 @@ function Unit(world, type, cfg)
     // view
     if (world.isLocal === true) {
         this.worldView = new WorldObjectView(this);
+        var player = (this.owner ? this.owner.player : this.player);
+        if (player && player.connid == this.world.connid) {
+            this.worldView.setSelf();
+        }
         this.worldHpbarView = null;
         this.worldNameView = null;
     }

@@ -1,39 +1,8 @@
 (function(){ "use strict";
 
-var Victor = require("victor");
-
 var Package = require("../package.json");
+var Victor = require("victor");
 var Util = require("../modules/util");
-
-function getWorldBackground(world)
-{
-    var cfg = Package.app.world;
-    var graphics = new PIXI.Graphics();
-
-    // background
-    graphics.beginFill(cfg.color);
-    graphics.drawRect(0, 0, world.w, world.h);
-    graphics.endFill();
-
-    // background spawn region
-    graphics.beginFill(cfg.obstacleRegion.color);
-    graphics.drawRect(world.spawnRegion.x, world.spawnRegion.y,
-        world.spawnRegion.w, world.spawnRegion.h);
-    graphics.endFill();
-
-    // background grids
-    graphics.lineStyle(cfg.gridEdge, Number(cfg.gridColor));
-    for (var x = cfg.gridViewSize; x < world.w; x += cfg.gridViewSize) {
-        graphics.moveTo(x, 0);
-        graphics.lineTo(x, world.h);
-    }
-    for (var y = cfg.gridViewSize; y < world.h; y += cfg.gridViewSize) {
-        graphics.moveTo(0, y);
-        graphics.lineTo(world.w, y);
-    }
-
-    return graphics;
-}
 
 function adaptView(_this)
 {
@@ -85,7 +54,15 @@ function StageWorldView(world)
 
     // view
     this.view = new PIXI.Container();
-    this.view.addChild(getWorldBackground(world));
+
+    // background
+    PIXI.loader.add('map', Package.app.world.map)
+               .load(function(loader, resources) {
+                    _this.map = resources.map;
+                    _this.view.addChild(_this.map.tiledMap);
+               });
+
+    // stage view
     world.stage.addChild(this.view);
 }
 

@@ -179,7 +179,7 @@ World.prototype.checkAddUnits = function()
 
         if (unit.type == Util.unitType.bullet) {
             this.bullets[unit.id] = unit;
-            Util.logDebug("frame[" + this.frame + "] add bullet:" + unit.id);
+            Util.logDebug("frame[" + this.frame + "] add bullet:" + unit.id + " owner=" + unit.owner.id);
         }
 
         if (unit.type == Util.unitType.obstacle) {

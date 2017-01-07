@@ -7,13 +7,7 @@ function drawBullet(view)
 {
     var graphics = new PIXI.Graphics();
     graphics.lineStyle(view.cfg.edge.w, view.cfg.edge.color);
-
-    var player = view.world.getSelf();
-    if (player && player.tank === view.owner.owner) {
-        graphics.beginFill(view.cfg.body.playerColor);
-    } else {
-        graphics.beginFill(view.cfg.body.color);
-    }
+    graphics.beginFill(view.cfg.body.color);
     graphics.drawCircle(0, 0, view.cfg.body.radius);
     graphics.endFill();
 
@@ -79,14 +73,7 @@ function WorldObjectView(owner)
     } else if (this.owner.type == Util.unitType.obstacle) {
         drawObstacle(this);
     } else if (this.owner.type == Util.unitType.tank) {
-        var me = false;
-        if (this.owner.player) {
-            if (this.owner.player.connid === this.world.connid) {
-                me = true;
-            }
-        }
-        // TODO: me
-        drawTank(this, me);
+        drawTank(this);
     }
 }
 
@@ -112,6 +99,14 @@ WorldObjectView.prototype.update = function()
     } else {
         this.rotation = this.owner.rotation;
     }
+};
+
+// self red->blue, blue->red
+WorldObjectView.prototype.setSelf = function()
+{
+    var filter = new PIXI.filters.ColorMatrixFilter();
+    filter.toBGR(true);
+    this.sprite.filters = [filter];
 };
 
 Object.defineProperties(WorldObjectView.prototype, {

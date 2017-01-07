@@ -19,6 +19,7 @@ v0.2
 - lockstep pvp logic
 - add unit properties
 - view & module
+- add tiled map
 
 TODO
 =====
