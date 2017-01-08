@@ -1,11 +1,12 @@
 (function(){ "use strict";
 
 var Protobuf = require("protobufjs");
-var SeedRandom = require("../extern/seedrandom");
+var SeedRandom = require("seedrandom");
 var Victor = require("victor");
 
 var Config = require("../modules/config");
 var Commander = require("../modules/commander");
+var Map = require("../modules/map");
 var Obstacle = require("../modules/obstacle");
 var Package = require("../package.json");
 var Player = require("../modules/player");
@@ -24,6 +25,8 @@ function World(isLocal)
     // cient width & height (in view)
     this.cw = Package.app.world.cw;
     this.ch = Package.app.world.ch;
+
+    this.map = new Map();
 
     this.spawnRegion = {};
     this.spawnRegion.x = this.w * (1.0 - Package.app.world.obstacleRegion.wRatio) / 2;

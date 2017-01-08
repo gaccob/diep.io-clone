@@ -7,8 +7,10 @@
         "browserify": "latest",
         "jshint": "latest",
         "protobufjs": "5.0.1",
+        "seedrandom": "latest",
         "socket.io-client": "latest",
         "socket.io": "latest",
+        "tmx-parser": "latest",
         "uglify-js": "latest",
         "victor": "latest"
     },
@@ -39,11 +41,11 @@
         "config": "python cfg/conv2js.py --excel_file=cfg/config.xlsx --output_path=cfg/ --skip_rows=1",
         "proto": "pbjs proto/tank.proto -t json > www/tank.proto.json",
 
-        "debug": "browserify app/client.js > www/index.js",
+        "debug": "browserify --no-builtins app/client.js > www/index.js",
         "predebug": "npm run lint && npm run config && npm run proto",
-        "postdebug": "node app/server.js",
+        "postdebug": "node --debug app/server.js",
 
-        "release": "browserify app/client.js | uglifyjs -mc > www/index.js",
+        "release": "browserify --no-builtins app/client.js | uglifyjs -mc > www/index.js",
         "prerelease": "npm run lint && npm run proto",
         "postrelease": "node app/server.js",
 
