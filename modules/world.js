@@ -26,7 +26,11 @@ function World(isLocal)
     this.cw = Package.app.world.cw;
     this.ch = Package.app.world.ch;
 
-    this.map = new Map();
+    if (isLocal === true) {
+        this.map = new Map(require(Package.app.world.map));
+    } else {
+        this.map = new Map(require("../www/" + Package.app.world.map));
+    }
 
     this.spawnRegion = {};
     this.spawnRegion.x = this.w * (1.0 - Package.app.world.obstacleRegion.wRatio) / 2;

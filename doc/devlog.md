@@ -23,8 +23,8 @@ Error: Cannot find module '../../../../.1.1.4@is-buffer/index.js' from '/home/ga
 
 - [issue 1483](https://github.com/substack/node-browserify/issues/1483) 里提到了，这是 [browserify](https://github.com/substack/node-browserify) 在 13.x.x 版本中的 bug。
 
-- 将 browserify 回退到 12.0.2 版本之后，发现会报 fs.readFile() 函数没找到，实际上 fs 没有 require 进来，是个空对象。 [issue 1277](https://github.com/substack/node-browserify/issues/1277) 中提到了这个问题，需要为 browserify 指定 --no-builtins 参数。
+- 将 browserify 回退到 12.0.2 版本之后，发现会报 fs.readFile() 函数没找到，实际上 fs 没有 require 进来，是个空对象。 [issue 1277](https://github.com/substack/node-browserify/issues/1277) 中提到了这个问题，为 browserify 指定 --no-builtins 参数，不会报 fs 的错误了，但是因为没有 builtins，会报 _process() 找不到。。。 这个 issue 上给了一个解决方法，但是测试并不好用，可能是我使用的姿势不对 -。-。
 
-- 加上 --no-builtins 参数，并把 browserify 再更新到最新的 13.3.0 版本，都正常了。 12.x.x 版本的 browserify 也没问题。
+今天纠结这个问题好几个小时，实在有点浪费时间，明天再来看吧。。
 
-结论：这个 bug 需要为 browserify 指定 --no-builtins 参数（猜测是 fs 在某个模块中有重复定义），而这个报错在 12.x.x 和 13.x.x 下不一致，13.x.x 没有报出真正的问题，导致纠结了许久。
+PS. 最开始 builtin 中的 fs 错误，居然在 browserify 13.x.x 中会报错到 is-buffer 中去，也是很神奇……
