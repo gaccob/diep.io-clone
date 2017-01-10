@@ -10,7 +10,7 @@ var Util = require("../modules/util");
 
 var StagePropView = require("../view/stagePropView");
 var StageStatisView = require("../view/stageStatisView");
-var StageTopView = require("../view/stageTopView");
+// var StageTopView = require("../view/stageTopView");
 var StageWorldView = require("../view/stageWorldView");
 var StartView = require("../view/startView");
 
@@ -19,6 +19,7 @@ function CWorld()
     World.call(this, true);
 
     // resource loader
+    PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
     this.loader = new PIXI.loaders.Loader();
     this.loader.add('tank', 'assets/tank.json');
     this.loader.once('complete', function(){
@@ -33,7 +34,7 @@ function CWorld()
     // async load view
     this.stageWorldView = new StageWorldView(this);
     this.stageStatisView = new StageStatisView(this);
-    this.stageTopView = new StageTopView(this);
+    // this.stageTopView = new StageTopView(this);
     this.stagePropView = new StagePropView(this);
     this.startView = new StartView(this);
 
@@ -70,7 +71,7 @@ CWorld.prototype.updateView = function()
 {
     this.startView.update();
     this.stagePropView.update();
-    this.stageTopView.update();
+    // this.stageTopView.update();
     this.stageStatisView.update();
     this.stageWorldView.update();
 };

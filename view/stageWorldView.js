@@ -8,16 +8,19 @@ function adaptView(_this)
     var canvas = document.getElementById("canvas");
     var wRatio = _this.w / _this.world.cw;
     var hRatio = _this.h / _this.world.ch;
+    console.log("w:" + _this.w + " h:" + _this.h);
     if (wRatio < hRatio) {
-        // _this.world.stage.scale.x = wRatio;
-        // _this.world.stage.scale.y = wRatio;
+        _this.world.stage.scale.x = wRatio;
+        _this.world.stage.scale.y = wRatio;
         // canvas.style.top = (_this.h - _this.world.ch * wRatio) / 2 + 'px';
         canvas.height = _this.world.ch * wRatio;
+        // canvas.style.height = Math.floor(_this.world.ch * wRatio) + 'px';
     } else {
-        // _this.world.stage.scale.x = hRatio;
-        // _this.world.stage.scale.y = hRatio;
+        _this.world.stage.scale.x = hRatio;
+        _this.world.stage.scale.y = hRatio;
         // canvas.style.left = (_this.w - _this.world.cw * hRatio) / 2 + 'px';
         canvas.width = _this.world.cw * hRatio;
+        // canvas.style.width = Math.floor(_this.world.cw * hRatio) + 'px';
     }
 }
 
@@ -30,10 +33,8 @@ function StageWorldView(world)
 
     // renderer
     this.renderer = new PIXI.CanvasRenderer(this.w, this.h, {
-    // this.renderer = new PIXI.WebGLRenderer(this.w, this.h, {
         antialias: true,
-        autoResize: true,
-        roundPixels: false
+        roundPixels: true
     });
     this.renderer.view.id = "canvas";
     document.body.appendChild(this.renderer.view);

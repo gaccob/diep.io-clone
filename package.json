@@ -75,7 +75,8 @@
             "gridSize": 128,
             "maxOnline": 30,
             "initTank": 101,
-            "obstacleMaxCount": 50,
+            "aiMaxCount": 0,
+            "obstacleMaxCount": 0,
             "obstacleRegion": {
                 "wRatio": 0.92,
                 "hRatio": 0.92

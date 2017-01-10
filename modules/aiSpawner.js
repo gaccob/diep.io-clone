@@ -74,6 +74,8 @@ var aiName = [
      "夏小顔ζ",
 ];
 
+var Package = require("../package.json");
+
 function getRandomAIName()
 {
     var len = aiName.length;
@@ -91,7 +93,7 @@ function AISpawner(world)
 {
     this.world = world;
 
-    for (var i = 0; i < 8; ++ i) {
+    for (var i = 0; i < Package.app.world.aiMaxCount; ++ i) {
         var commander = new this.world.proto.SyncCommander();
         commander.cmd = this.world.proto.CommanderType.CT_JOIN;
         commander.connid = "ai-" + i;
