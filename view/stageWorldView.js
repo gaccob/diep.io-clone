@@ -1,6 +1,5 @@
 (function(){ "use strict";
 
-var Package = require("../package.json");
 var Victor = require("victor");
 var Util = require("../modules/util");
 
@@ -10,14 +9,14 @@ function adaptView(_this)
     var wRatio = _this.w / _this.world.cw;
     var hRatio = _this.h / _this.world.ch;
     if (wRatio < hRatio) {
-        _this.world.stage.scale.x = wRatio;
-        _this.world.stage.scale.y = wRatio;
-        canvas.style.top = (_this.h - _this.world.ch * wRatio) / 2 + 'px';
+        // _this.world.stage.scale.x = wRatio;
+        // _this.world.stage.scale.y = wRatio;
+        // canvas.style.top = (_this.h - _this.world.ch * wRatio) / 2 + 'px';
         canvas.height = _this.world.ch * wRatio;
     } else {
-        _this.world.stage.scale.x = hRatio;
-        _this.world.stage.scale.y = hRatio;
-        canvas.style.left = (_this.w - _this.world.cw * hRatio) / 2 + 'px';
+        // _this.world.stage.scale.x = hRatio;
+        // _this.world.stage.scale.y = hRatio;
+        // canvas.style.left = (_this.w - _this.world.cw * hRatio) / 2 + 'px';
         canvas.width = _this.world.cw * hRatio;
     }
 }
@@ -31,7 +30,9 @@ function StageWorldView(world)
 
     // renderer
     this.renderer = new PIXI.CanvasRenderer(this.w, this.h, {
+    // this.renderer = new PIXI.WebGLRenderer(this.w, this.h, {
         antialias: true,
+        autoResize: true,
         roundPixels: false
     });
     this.renderer.view.id = "canvas";
@@ -55,13 +56,6 @@ function StageWorldView(world)
     // view
     this.view = new PIXI.Container();
 
-    // background
-    PIXI.loader.add('map', Package.app.world.map)
-               .load(function(loader, resources) {
-                    _this.map = resources.map;
-                    _this.view.addChild(_this.map.tiledMap);
-               });
-
     // stage view
     world.stage.addChild(this.view);
 }
@@ -72,11 +66,12 @@ StageWorldView.prototype = {
 
 StageWorldView.prototype.update = function()
 {
-    // update camera
     var player = this.world.getSelf();
     if (!player) {
         return;
     }
+
+    // update camera
     var x = player.x;
     var y = player.y;
     var viewCenterX = this.world.cw / 2;

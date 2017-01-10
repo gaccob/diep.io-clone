@@ -3,7 +3,15 @@
 function StageStatisView(world)
 {
     this.world = world;
-    this.view = null;
+
+    this.view = new PIXI.Text("", {
+        fill: '#222222',
+        font: '15px Open Sans',
+        weight: "normal"
+    });
+    this.world.stage.addChild(this.view);
+    this.view.x = 10;
+    this.view.y = this.world.ch - this.view.height - 5;
 }
 
 StageStatisView.prototype = {
@@ -12,19 +20,7 @@ StageStatisView.prototype = {
 
 StageStatisView.prototype.update = function()
 {
-    var content = "FPS:" + this.world.fps + " Frame:" + this.world.frame;
-    if (!this.view) {
-        this.view = new PIXI.Text(content, {
-            fill: '#222222',
-            font: '15px Open Sans',
-            weight: "normal"
-        });
-        this.world.stage.addChild(this.view);
-        this.view.x = 10;
-        this.view.y = this.world.ch - this.view.height - 5;
-    } else {
-        this.view.text = content;
-    }
+    this.view.text = "FPS:" + this.world.fps + " Frame:" + this.world.frame;
 };
 
 module.exports = StageStatisView;

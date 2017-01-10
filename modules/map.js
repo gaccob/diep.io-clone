@@ -1,18 +1,21 @@
 (function() { "use strict";
 
+var MapFile = require("../www/assets/map.json");
 var Util = require("../modules/util");
+var WorldMapView = require("../view/worldMapView");
 
-function Map(mapFile)
+function Map(world)
 {
-    this.mapFile = mapFile;
+    this.world = world;
+    this.mapFile = MapFile;
     this.height = this.mapFile.height;
     this.width = this.mapFile.width;
-    this.tilewidth = this.mapFile.tileWidth;
-    this.tileHeight = this.mapFile.tileHeight;
+    this.tilewidth = this.mapFile.tilewidth;
+    this.tileheight = this.mapFile.tileheight;
 
     this.tileProperties = {};
-    for (var i in mapFile.tilesets) {
-        var ts = mapFile.tilesets[i];
+    for (var i in this.mapFile.tilesets) {
+        var ts = this.mapFile.tilesets[i];
         for (var j in ts.tileproperties) {
             var gid = ts.firstgid + j;
             this.tileProperties[gid] = ts.tileproperties[j];
@@ -27,9 +30,33 @@ Map.prototype = {
     constructor: Map,
 };
 
+Map.prototype.bindView = function()
+{
+    if (!this.view) {
+        this.view = new WorldMapView(this.world);
+    }
+};
+
+Map.prototype.update = function()
+{
+    if (this.view) {
+        this.view.update();
+    }
+};
+
+Map.prototype.getLayers = function()
+{
+    return this.mapFile.layers;
+};
+
+Map.prototype.getTileSets = function()
+{
+    return this.mapFile.tilesets;
+};
+
 Map.prototype.getTileX = function(x)
 {
-    return Math.floor(x / this.tileWidth);
+    return Math.floor(x / this.tilewidth);
 };
 
 Map.prototype.getTileY = function(y)
@@ -71,6 +98,9 @@ Map.prototype.getTileProperty = function(x, y)
             }
         }
         // tile properties
+        if (layer.type != "tilelayer") {
+            continue;
+        }
         var lidx = (ty - layer.y) * layer.height + (tx - layer.x);
         var gid = layer.data[lidx];
         if (this.tileProperties[gid]) {

@@ -28,3 +28,17 @@ Error: Cannot find module '../../../../.1.1.4@is-buffer/index.js' from '/home/ga
 今天纠结这个问题好几个小时，实在有点浪费时间，明天再来看吧。。
 
 PS. 最开始 builtin 中的 fs 错误，居然在 browserify 13.x.x 中会报错到 is-buffer 中去，也是很神奇……
+
+
+## 2017.1.9
+
+今天脑袋比较清楚，仔细思考了一下，这些问题纠结的根源在于在 browser 端使用 fs，而 browserify 不能解决问题（也许能解决，我的姿势不对）。既然如此，那就不纠结 browserify 了，既然 tiled 可以导出 json 文件，browser 端无非就是读文件做显示, 这样也不用引入 tmx-parser 或者 pixi-tilexx 的依赖。
+
+分别看了下 pixi-tiled 和 pixi-tiledmap 的实现部分，就愉快的开撸了，反正也不很复杂，而且我只打算用多少功能做多少，代码很少还不到200行。
+
+
+## 2017.1.10
+
+昨天 tiled 地图显示部分的代码写完了，测试下来发现一个比较蛋疼的问题，缩放时会产生拉扯的黑线，和 [pixi.js issue 48](https://github.com/pixijs/pixi.js/issues/48) 描述的现象比较像，看上去是缩放时导致 sprite 的浮点精度问题，但是从 issue 上的对话上看，似乎这个问题早已修复掉。
+
+之前 canvas 的 resize 部分是自己实现的，没有用 renderer 的实现，试着修改成 autoResize 属性来试了一下，不过效果怪怪的，和预期的效果有点差距，最重要的是，依然有水平方向的黑线 -.-

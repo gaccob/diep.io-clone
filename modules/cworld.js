@@ -8,11 +8,11 @@ var CDispatcher = require("../modules/cdispatcher");
 var World = require("../modules/world");
 var Util = require("../modules/util");
 
-var StartView = require("../view/startView");
-var StageWorldView = require("../view/stageWorldView");
+var StagePropView = require("../view/stagePropView");
 var StageStatisView = require("../view/stageStatisView");
 var StageTopView = require("../view/stageTopView");
-var StagePropView = require("../view/stagePropView");
+var StageWorldView = require("../view/stageWorldView");
+var StartView = require("../view/startView");
 
 function CWorld()
 {
@@ -23,6 +23,7 @@ function CWorld()
     this.loader.add('tank', 'assets/tank.json');
     this.loader.once('complete', function(){
         Util.logDebug("tank resource loaded");
+        // TODO:
     });
     this.loader.load();
 
@@ -52,6 +53,9 @@ function CWorld()
     this.localTime = (new Date()).getTime();
     this.fps = 0;
     this.fpsAccumulate = 0;
+
+    // map view
+    this.map.bindView();
 }
 
 CWorld.prototype = Object.create(World.prototype);
