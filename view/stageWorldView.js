@@ -5,23 +5,11 @@ var Util = require("../modules/util");
 
 function adaptView(_this)
 {
+    _this.vx = (_this.w - _this.world.cw) / 2;
+    _this.vy = (_this.h - _this.world.ch) / 2;
     var canvas = document.getElementById("canvas");
-    var wRatio = _this.w / _this.world.cw;
-    var hRatio = _this.h / _this.world.ch;
-    console.log("w:" + _this.w + " h:" + _this.h);
-    if (wRatio < hRatio) {
-        _this.world.stage.scale.x = wRatio;
-        _this.world.stage.scale.y = wRatio;
-        // canvas.style.top = (_this.h - _this.world.ch * wRatio) / 2 + 'px';
-        canvas.height = _this.world.ch * wRatio;
-        // canvas.style.height = Math.floor(_this.world.ch * wRatio) + 'px';
-    } else {
-        _this.world.stage.scale.x = hRatio;
-        _this.world.stage.scale.y = hRatio;
-        // canvas.style.left = (_this.w - _this.world.cw * hRatio) / 2 + 'px';
-        canvas.width = _this.world.cw * hRatio;
-        // canvas.style.width = Math.floor(_this.world.cw * hRatio) + 'px';
-    }
+    canvas.style.top = _this.vy + 'px';
+    canvas.style.left = _this.vx + 'px';
 }
 
 function StageWorldView(world)
@@ -32,7 +20,7 @@ function StageWorldView(world)
     this.h = document.documentElement.clientHeight - 10;
 
     // renderer
-    this.renderer = new PIXI.CanvasRenderer(this.w, this.h, {
+    this.renderer = new PIXI.CanvasRenderer(this.world.cw, this.world.ch, {
         antialias: true,
         roundPixels: true
     });
@@ -50,7 +38,6 @@ function StageWorldView(world)
     window.addEventListener('resize', function() {
         _this.w = document.documentElement.clientWidth;
         _this.h = document.documentElement.clientHeight - 10;
-        _this.renderer.resize(_this.w, _this.h);
         adaptView(_this);
     });
 
@@ -77,8 +64,10 @@ StageWorldView.prototype.update = function()
     var y = player.y;
     var viewCenterX = this.world.cw / 2;
     var viewCenterY = this.world.ch / 2;
-    x = Util.clamp(x, viewCenterX, this.world.w - viewCenterX);
-    y = Util.clamp(y, viewCenterY, this.world.h - viewCenterY);
+    var xoffset = this.vx < 0 ? this.vx : 0;
+    var yoffset = this.vy < 0 ? this.vy : 0;
+    x = Util.clamp(x, viewCenterX + xoffset, this.world.w - viewCenterX - xoffset);
+    y = Util.clamp(y, viewCenterY + yoffset, this.world.h - viewCenterY - yoffset);
     this.view.x = viewCenterX - x;
     this.view.y = viewCenterY - y;
 
