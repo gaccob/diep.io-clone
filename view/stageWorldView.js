@@ -56,6 +56,7 @@ StageWorldView.prototype.update = function()
 {
     var player = this.world.getSelf();
     if (!player) {
+        this.renderer.render(this.world.stage);
         return;
     }
 
