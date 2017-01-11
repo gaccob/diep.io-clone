@@ -18,7 +18,7 @@ StageStatisView.prototype = {
     constructor: StageStatisView
 };
 
-StageStatisView.prototype.update = function()
+StageStatisView.prototype.updateView = function()
 {
     this.view.text = "FPS:" + this.world.fps + " Frame:" + this.world.frame;
 };

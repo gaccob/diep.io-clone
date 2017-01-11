@@ -88,7 +88,7 @@ StageTopView.prototype.addLabel = function(player, rank)
     return label;
 };
 
-StageTopView.prototype.update = function()
+StageTopView.prototype.updateView = function()
 {
     if (this.world.playerCount <= 0) {
         return;

@@ -85,7 +85,7 @@ StartView.prototype = {
     constructor: StartView
 };
 
-StartView.prototype.update = function()
+StartView.prototype.updateView = function()
 {
     // hide status
     var hide = false;

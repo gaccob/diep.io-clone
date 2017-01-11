@@ -58,7 +58,7 @@ WorldHpbarView.prototype = {
     constructor: WorldHpbarView,
 };
 
-WorldHpbarView.prototype.die = function()
+WorldHpbarView.prototype.onDie = function()
 {
     if (this.view && this.view.parent) {
         this.view.parent.removeChild(this.view);
@@ -68,7 +68,7 @@ WorldHpbarView.prototype.die = function()
     this.view = null;
 };
 
-WorldHpbarView.prototype.update = function(percent)
+WorldHpbarView.prototype.updateView = function(percent)
 {
     if (this.view) {
         this.view.x = this.owner.x + this.owner.radius * cfg.xOffsetRatio;

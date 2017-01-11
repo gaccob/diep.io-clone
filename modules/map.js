@@ -39,8 +39,12 @@ Map.prototype.bindView = function()
 
 Map.prototype.update = function()
 {
+};
+
+Map.prototype.updateView = function()
+{
     if (this.view) {
-        this.view.update();
+        this.view.updateView();
     }
 };
 

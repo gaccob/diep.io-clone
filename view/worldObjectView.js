@@ -90,7 +90,7 @@ WorldObjectView.prototype.onDie = function()
     }
 };
 
-WorldObjectView.prototype.update = function()
+WorldObjectView.prototype.updateView = function()
 {
     this.x = this.owner.x;
     this.y = this.owner.y;

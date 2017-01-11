@@ -160,11 +160,11 @@ Unit.prototype.die = function()
     this.isDead = true;
 
     if (this.worldHpbarView) {
-        this.worldHpbarView.die();
+        this.worldHpbarView.onDie();
     }
 
     if (this.worldNameView) {
-        this.worldNameView.die();
+        this.worldNameView.onDie();
     }
 
     if (this.worldView) {
@@ -204,15 +204,21 @@ Unit.prototype.update = function()
         }
         this.hpRegenFrame = this.world.frame;
     }
+};
 
+Unit.prototype.updateView = function()
+{
+    if (this.isDead === true) {
+        return;
+    }
     if (this.worldView) {
-        this.worldView.update();
+        this.worldView.updateView();
     }
     if (this.worldHpbarView) {
-        this.worldHpbarView.update(this.hp / this.maxHp);
+        this.worldHpbarView.updateView(this.hp / this.maxHp);
     }
     if (this.worldNameView && this.player) {
-        this.worldNameView.update(this.player.name);
+        this.worldNameView.updateView(this.player.name);
     }
 };
 
@@ -263,13 +269,6 @@ Unit.prototype.load = function(u)
     this.motion.forceAngle = u.motion.forceAngle;
     this.motion.force = u.motion.force;
 
-    if (this.worldHpbarView) {
-        this.worldHpbarView.update(this.hp / this.maxHp);
-    }
-
-    if (this.worldNameView && this.player) {
-        this.worldNameView.update(this.player.name);
-    }
     if (this.type == Util.unitType.bullet) {
         this.bornFrame = u.bornFrame;
         var weapon = this.owner.getWeaponByIdx(u.weaponIdx);

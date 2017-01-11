@@ -67,15 +67,6 @@ CWorld.prototype.getSelf = function()
     return this.connid ?  this.players[this.connid] : null;
 };
 
-CWorld.prototype.updateView = function()
-{
-    this.startView.update();
-    this.stagePropView.update();
-    // this.stageTopView.update();
-    this.stageStatisView.update();
-    this.stageWorldView.update();
-};
-
 CWorld.prototype.updateDieAnimations = function()
 {
     var cfg = Package.app.dieAnimation;
@@ -97,10 +88,27 @@ CWorld.prototype.updateDieAnimations = function()
     }
 };
 
-CWorld.prototype.updateFrameLogic = function()
+CWorld.prototype.updateView = function()
 {
-    World.prototype.updateFrameLogic.call(this);
+    this.map.updateView();
+
+    for (var i in this.tanks) {
+        this.tanks[i].updateView();
+    }
+    for (var j in this.obstacles) {
+        this.obstacles[j].updateView();
+    }
+    for (var k in this.bullets) {
+        this.bullets[k].updateView();
+    }
+
     this.updateDieAnimations();
+
+    this.startView.updateView();
+    this.stagePropView.updateView();
+    // this.stageTopView.updateView();
+    this.stageStatisView.updateView();
+    this.stageWorldView.updateView();
 };
 
 CWorld.prototype.init = function()

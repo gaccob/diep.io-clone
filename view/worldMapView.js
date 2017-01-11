@@ -25,7 +25,7 @@ WorldMapView.prototype = {
     constructor: WorldMapView
 };
 
-WorldMapView.prototype.update = function()
+WorldMapView.prototype.updateView = function()
 {
     if (_assetsLoaded === true && this.loaded === false && this.world.stageWorldView) {
         this.view = new PIXI.Container();

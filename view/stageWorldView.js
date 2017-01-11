@@ -52,7 +52,7 @@ StageWorldView.prototype = {
     constructor: StageWorldView,
 };
 
-StageWorldView.prototype.update = function()
+StageWorldView.prototype.updateView = function()
 {
     var player = this.world.getSelf();
     if (!player) {

@@ -19,10 +19,10 @@ WorldNameView.prototype = {
     constructor: WorldNameView,
 };
 
-WorldNameView.prototype.update = function(content)
+WorldNameView.prototype.updateView = function(content)
 {
     if (this.content !== content) {
-        this.die();
+        this.onDie();
         this.view = new PIXI.Text(content, {
             font: cfg.font,
             fill: cfg.fill,
@@ -39,7 +39,7 @@ WorldNameView.prototype.update = function(content)
     }
 };
 
-WorldNameView.prototype.die = function()
+WorldNameView.prototype.onDie = function()
 {
     if (this.view) {
         this.view.parent.removeChild(this.view);

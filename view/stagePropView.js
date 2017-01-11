@@ -167,7 +167,7 @@ StagePropView.prototype.reset = function()
     }
 };
 
-StagePropView.prototype.update = function()
+StagePropView.prototype.updateView = function()
 {
     if (this.world.started !== true) {
         this.view.visible = false;
